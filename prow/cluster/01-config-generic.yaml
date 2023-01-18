@@ -10,7 +10,7 @@ data:
 
     in_repo_config:
       enabled:
-        "*": true
+        nephio-project/nephio-test-prow-project: true
       allowed_clusters:
         "*": ["default"]
 
