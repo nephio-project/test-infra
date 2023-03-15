@@ -97,17 +97,3 @@ data:
             - image: alpine
               command:
                 - /bin/printenv
-    presubmits:
-      nephio-project/nf-deploy-controller:
-      - name: test-presubmit
-        decorate: true
-        always_run: true
-        spec:
-          containers:
-            - image: golang:1.18
-              command:
-                - make
-              args:
-                - -f
-                - Makefile
-                - test
