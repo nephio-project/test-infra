@@ -11,6 +11,7 @@ data:
     in_repo_config:
       enabled:
         nephio-project/nephio-test-prow-project: true
+        nephio-project/nf-deploy-controller: true
       allowed_clusters:
         "*": ["default"]
 
