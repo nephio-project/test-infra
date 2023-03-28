@@ -22,3 +22,25 @@ data:
         - verify-owners
         - wip
         - yuks
+      nephio-project/test-infra:
+        plugins:
+        - approve
+        - assign
+        - blunderbuss
+        - config-updater
+        - help
+        - hold
+        - label
+        - lgtm
+        - trigger
+        - verify-owners
+        - wip
+        - yuks
+    config_updater:
+      maps:
+        prow/config/config.yaml:
+          name: config
+          namespace: prow
+        prow/config/plugins.yaml:
+          name: plugins
+          namespace: prow
