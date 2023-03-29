@@ -82,3 +82,25 @@ presubmits:
         - image: alpine
           command:
             - /bin/printenv
+  nephio-project/test-infra:
+  - name: precommit-test-inrepoconfig-validate-job
+    annotations:
+    labels:
+    run_if_changed: '.prow.yaml|.prow/'
+    skip_report: false
+    decorate: true
+    cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: test-infra
+        path_alias: github.com/nephio-project/test-infra
+        base_ref: main
+    spec:
+      containers:
+        - image: "gcr.io/k8s-prow/checkconfig:v20221208-8898931a7f"
+          command:
+            - "checkconfig"
+          args:
+            - "--plugin-config=../test-infra/prow/config/plugins.yaml"
+            - "--config-path=../test-infra/prow/config/config.yaml"
+            - "--prow-yaml-repo-name=$(REPO_OWNER)/$(REPO_NAME)"
