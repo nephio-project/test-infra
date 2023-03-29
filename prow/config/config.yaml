@@ -83,7 +83,7 @@ presubmits:
           command:
             - /bin/printenv
   nephio-project/test-infra:
-  - name: precommit-test-inrepoconfig-validate-job
+  - name: presubmit-test-inrepoconfig-validate-job
     annotations:
     labels:
     run_if_changed: '.prow.yaml|.prow/'
