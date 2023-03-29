@@ -12,5 +12,5 @@ presubmits:
           command:
             - "checkconfig"
           args:
-            - "--plugin-config=config/plugins.yaml"
-            - "--config-path=config/config.yaml"
+            - "--plugin-config=prow/config/plugins.yaml"
+            - "--config-path=prow/config/config.yaml"
