@@ -4,7 +4,7 @@ pod_namespace: test-pods
 in_repo_config:
   enabled:
     nephio-project/nephio-test-prow-project: true
-    nephio-project/nf-deploy-controller: true
+    nephio-project/test-infra: true
   allowed_clusters:
     "*": ["default"]
 
