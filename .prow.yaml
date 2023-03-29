@@ -1,0 +1,16 @@
+presubmits:
+  - name: pre-submit-test-infra-validate-local
+    annotations:
+    labels:
+    run_if_changed: '^config/prow/((plugins|config).yaml|jobs/)'
+    skip_report: false
+    decorate: true
+    cluster: default
+    spec:
+      containers:
+        - image: "gcr.io/k8s-prow/checkconfig:v20221208-8898931a7f"
+          command:
+            - "checkconfig"
+          args:
+            - "--plugin-config=config/plugins.yaml"
+            - "--config-path=config/config.yaml"

@@ -11,7 +11,7 @@ data:
     in_repo_config:
       enabled:
         nephio-project/nephio-test-prow-project: true
-        nephio-project/nf-deploy-controller: true
+        nephio-project/test-infra: true
       allowed_clusters:
         "*": ["default"]
 
@@ -71,13 +71,7 @@ data:
 
     decorate_all_jobs: true
     # periodics:
-    # - interval: 1m
-    #   agent: kubernetes
-    #   name: echo-test-new
-    #   spec:
-    #     containers:
-    #     - image: alpine
-    #       command: ["/bin/date"]
+
     postsubmits:
       nephio-project/nephio-test-prow-project:
       - name: test-postsubmit
