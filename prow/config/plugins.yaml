@@ -29,6 +29,39 @@ plugins:
     - verify-owners
     - wip
     - yuks
+  nephio-project/nephio:
+    plugins:
+    - approve
+    - assign
+    - blunderbuss
+    - cat
+    - dog
+    - help
+    - heart
+    - hold
+    - label
+    - lgtm
+    - trigger
+    - verify-owners
+    - wip
+    - yuks
+  nephio-project/api:
+    plugins:
+    - approve
+    - assign
+    - blunderbuss
+    - cat
+    - dog
+    - help
+    - heart
+    - hold
+    - label
+    - lgtm
+    - trigger
+    - verify-owners
+    - wip
+    - yuks
+
 
 config_updater:
   maps:
