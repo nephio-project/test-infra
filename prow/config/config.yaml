@@ -5,6 +5,8 @@ in_repo_config:
   enabled:
     nephio-project/nephio-test-prow-project: true
     nephio-project/test-infra: true
+    nephio-project/nephio: true
+    nephio-project/api: true
   allowed_clusters:
     "*": ["default"]
 
