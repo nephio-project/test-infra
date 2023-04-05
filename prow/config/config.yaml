@@ -90,7 +90,7 @@ presubmits:
           command:
             - /bin/printenv
   nephio-project/test-infra:
-  - name: presubmit-test-test-infra-inrepoconfig-validate-job
+  - name: presubmit-test-infra-inrepoconfig-validation
     annotations:
     labels:
     run_if_changed: '.prow.yaml|.prow/'
@@ -112,7 +112,7 @@ presubmits:
             - "--config-path=../test-infra/prow/config/config.yaml"
             - "--prow-yaml-repo-name=$(REPO_OWNER)/$(REPO_NAME)"
   nephio-project/nephio:
-  - name: presubmit-test-nephio-inrepoconfig-validate-job
+  - name: presubmit-test-nephio-inrepoconfig-validation
     annotations:
     labels:
     run_if_changed: '.prow.yaml|.prow/'
@@ -134,7 +134,7 @@ presubmits:
             - "--config-path=../test-infra/prow/config/config.yaml"
             - "--prow-yaml-repo-name=$(REPO_OWNER)/$(REPO_NAME)"
   nephio-project/api:
-  - name: presubmit-test-api-inrepoconfig-validate-job
+  - name: presubmit-test-api-inrepoconfig-validation
     annotations:
     labels:
     run_if_changed: '.prow.yaml|.prow/'
@@ -156,7 +156,7 @@ presubmits:
             - "--config-path=../test-infra/prow/config/config.yaml"
             - "--prow-yaml-repo-name=$(REPO_OWNER)/$(REPO_NAME)"
   nephio-project/nephio-example-packages:
-  - name: presubmit-test-nephio-example-packages-inrepoconfig-validate-job
+  - name: presubmit-test-nephio-ex-packages-inrepoconfig-validation
     annotations:
     labels:
     run_if_changed: '.prow.yaml|.prow/'
@@ -178,7 +178,7 @@ presubmits:
             - "--config-path=../test-infra/prow/config/config.yaml"
             - "--prow-yaml-repo-name=$(REPO_OWNER)/$(REPO_NAME)"
   nephio-project/nephio-packages:
-  - name: presubmit-test-nephio-packages-inrepoconfig-validate-job
+  - name: presubmit-test-nephio-packages-inrepoconfig-validation
     annotations:
     labels:
     run_if_changed: '.prow.yaml|.prow/'
@@ -200,7 +200,7 @@ presubmits:
             - "--config-path=../test-infra/prow/config/config.yaml"
             - "--prow-yaml-repo-name=$(REPO_OWNER)/$(REPO_NAME)"
   nephio-project/docs:
-  - name: presubmit-test-docs-inrepoconfig-validate-job
+  - name: presubmit-test-docs-inrepoconfig-validation
     annotations:
     labels:
     run_if_changed: '.prow.yaml|.prow/'
@@ -222,7 +222,7 @@ presubmits:
             - "--config-path=../test-infra/prow/config/config.yaml"
             - "--prow-yaml-repo-name=$(REPO_OWNER)/$(REPO_NAME)"
   nephio-project/free5gc-packages:
-  - name: presubmit-test-free5gc-packages-inrepoconfig-validate-job
+  - name: presubmit-test-free5gc-packages-inrepoconfig-validation
     annotations:
     labels:
     run_if_changed: '.prow.yaml|.prow/'
@@ -244,7 +244,7 @@ presubmits:
             - "--config-path=../test-infra/prow/config/config.yaml"
             - "--prow-yaml-repo-name=$(REPO_OWNER)/$(REPO_NAME)"
   nephio-project/free5gc:
-  - name: presubmit-test-free5gc-inrepoconfig-validate-job
+  - name: presubmit-test-free5gc-inrepoconfig-validation
     annotations:
     labels:
     run_if_changed: '.prow.yaml|.prow/'
