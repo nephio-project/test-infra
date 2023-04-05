@@ -1,67 +1,28 @@
 plugins:
-  nephio-project/nephio-test-prow-project:
+  nephio-project:
     plugins:
     - approve
     - assign
     - blunderbuss
-    - cat
-    - dog
     - help
     - heart
     - hold
+    - invalidcommitmsg
     - label
     - lgtm
     - trigger
     - verify-owners
     - wip
-    - yuks
   nephio-project/test-infra:
     plugins:
-    - approve
-    - assign
-    - blunderbuss
     - config-updater
-    - help
-    - hold
-    - label
-    - lgtm
-    - trigger
-    - verify-owners
-    - wip
-    - yuks
-  nephio-project/nephio:
-    plugins:
-    - approve
-    - assign
-    - blunderbuss
-    - cat
-    - dog
-    - help
-    - heart
-    - hold
-    - label
-    - lgtm
-    - trigger
-    - verify-owners
-    - wip
-    - yuks
-  nephio-project/api:
-    plugins:
-    - approve
-    - assign
-    - blunderbuss
-    - cat
-    - dog
-    - help
-    - heart
-    - hold
-    - label
-    - lgtm
-    - trigger
-    - verify-owners
-    - wip
-    - yuks
 
+external_plugins:
+  nephio-project:
+  - name: needs-rebase
+    events:
+      - issue_comment
+      - pull_request
 
 config_updater:
   maps:
