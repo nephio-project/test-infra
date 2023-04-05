@@ -7,6 +7,11 @@ in_repo_config:
     nephio-project/test-infra: true
     nephio-project/nephio: true
     nephio-project/api: true
+    nephio-project/nephio-example-packages: true
+    nephio-project/nephio-packages: true
+    nephio-project/docs: true
+    nephio-project/free5gc-packages: true
+    nephio-project/free5gc: true
   allowed_clusters:
     "*": ["default"]
 
@@ -85,7 +90,7 @@ presubmits:
           command:
             - /bin/printenv
   nephio-project/test-infra:
-  - name: presubmit-test-inrepoconfig-validate-job
+  - name: presubmit-test-test-infra-inrepoconfig-validate-job
     annotations:
     labels:
     run_if_changed: '.prow.yaml|.prow/'
@@ -107,7 +112,7 @@ presubmits:
             - "--config-path=../test-infra/prow/config/config.yaml"
             - "--prow-yaml-repo-name=$(REPO_OWNER)/$(REPO_NAME)"
   nephio-project/nephio:
-  - name: presubmit-test-inrepoconfig-validate-job
+  - name: presubmit-test-nephio-inrepoconfig-validate-job
     annotations:
     labels:
     run_if_changed: '.prow.yaml|.prow/'
@@ -129,7 +134,117 @@ presubmits:
             - "--config-path=../test-infra/prow/config/config.yaml"
             - "--prow-yaml-repo-name=$(REPO_OWNER)/$(REPO_NAME)"
   nephio-project/api:
-  - name: presubmit-test-inrepoconfig-validate-job
+  - name: presubmit-test-api-inrepoconfig-validate-job
+    annotations:
+    labels:
+    run_if_changed: '.prow.yaml|.prow/'
+    skip_report: false
+    decorate: true
+    cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: test-infra
+        path_alias: github.com/nephio-project/test-infra
+        base_ref: main
+    spec:
+      containers:
+        - image: "gcr.io/k8s-prow/checkconfig:v20221208-8898931a7f"
+          command:
+            - "checkconfig"
+          args:
+            - "--plugin-config=../test-infra/prow/config/plugins.yaml"
+            - "--config-path=../test-infra/prow/config/config.yaml"
+            - "--prow-yaml-repo-name=$(REPO_OWNER)/$(REPO_NAME)"
+  nephio-project/nephio-example-packages:
+  - name: presubmit-test-nephio-example-packages-inrepoconfig-validate-job
+    annotations:
+    labels:
+    run_if_changed: '.prow.yaml|.prow/'
+    skip_report: false
+    decorate: true
+    cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: test-infra
+        path_alias: github.com/nephio-project/test-infra
+        base_ref: main
+    spec:
+      containers:
+        - image: "gcr.io/k8s-prow/checkconfig:v20221208-8898931a7f"
+          command:
+            - "checkconfig"
+          args:
+            - "--plugin-config=../test-infra/prow/config/plugins.yaml"
+            - "--config-path=../test-infra/prow/config/config.yaml"
+            - "--prow-yaml-repo-name=$(REPO_OWNER)/$(REPO_NAME)"
+  nephio-project/nephio-packages:
+  - name: presubmit-test-nephio-packages-inrepoconfig-validate-job
+    annotations:
+    labels:
+    run_if_changed: '.prow.yaml|.prow/'
+    skip_report: false
+    decorate: true
+    cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: test-infra
+        path_alias: github.com/nephio-project/test-infra
+        base_ref: main
+    spec:
+      containers:
+        - image: "gcr.io/k8s-prow/checkconfig:v20221208-8898931a7f"
+          command:
+            - "checkconfig"
+          args:
+            - "--plugin-config=../test-infra/prow/config/plugins.yaml"
+            - "--config-path=../test-infra/prow/config/config.yaml"
+            - "--prow-yaml-repo-name=$(REPO_OWNER)/$(REPO_NAME)"
+  nephio-project/docs:
+  - name: presubmit-test-docs-inrepoconfig-validate-job
+    annotations:
+    labels:
+    run_if_changed: '.prow.yaml|.prow/'
+    skip_report: false
+    decorate: true
+    cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: test-infra
+        path_alias: github.com/nephio-project/test-infra
+        base_ref: main
+    spec:
+      containers:
+        - image: "gcr.io/k8s-prow/checkconfig:v20221208-8898931a7f"
+          command:
+            - "checkconfig"
+          args:
+            - "--plugin-config=../test-infra/prow/config/plugins.yaml"
+            - "--config-path=../test-infra/prow/config/config.yaml"
+            - "--prow-yaml-repo-name=$(REPO_OWNER)/$(REPO_NAME)"
+  nephio-project/free5gc-packages:
+  - name: presubmit-test-free5gc-packages-inrepoconfig-validate-job
+    annotations:
+    labels:
+    run_if_changed: '.prow.yaml|.prow/'
+    skip_report: false
+    decorate: true
+    cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: test-infra
+        path_alias: github.com/nephio-project/test-infra
+        base_ref: main
+    spec:
+      containers:
+        - image: "gcr.io/k8s-prow/checkconfig:v20221208-8898931a7f"
+          command:
+            - "checkconfig"
+          args:
+            - "--plugin-config=../test-infra/prow/config/plugins.yaml"
+            - "--config-path=../test-infra/prow/config/config.yaml"
+            - "--prow-yaml-repo-name=$(REPO_OWNER)/$(REPO_NAME)"
+  nephio-project/free5gc:
+  - name: presubmit-test-free5gc-inrepoconfig-validate-job
     annotations:
     labels:
     run_if_changed: '.prow.yaml|.prow/'
