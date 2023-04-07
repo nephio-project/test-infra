@@ -97,11 +97,6 @@ presubmits:
     skip_report: false
     decorate: true
     cluster: default
-    extra_refs:
-      - org: nephio-project
-        repo: test-infra
-        path_alias: github.com/nephio-project/test-infra
-        base_ref: main
     spec:
       containers:
         - image: "gcr.io/k8s-prow/checkconfig:v20221208-8898931a7f"
