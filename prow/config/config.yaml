@@ -12,6 +12,7 @@ in_repo_config:
     nephio-project/docs: true
     nephio-project/free5gc-packages: true
     nephio-project/free5gc: true
+    nephio-project/edge-status-aggregator: true
   allowed_clusters:
     "*": ["default"]
 
