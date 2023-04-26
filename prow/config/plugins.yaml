@@ -32,3 +32,16 @@ config_updater:
     prow/config/plugins.yaml:
       name: plugins
       namespace: prow
+
+approve:
+  - repos:
+    - nephio-project/nephio-test-prow-project
+    - nephio-project/nephio
+    - nephio-project/api
+    - nephio-project/nephio-example-packages
+    - nephio-project/nephio-packages
+    - nephio-project/docs
+    - nephio-project/free5gc-packages
+    - nephio-project/free5gc
+    - nephio-project/edge-status-aggregator
+    require_self_approval: true
