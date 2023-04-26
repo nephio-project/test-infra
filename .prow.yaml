@@ -14,3 +14,51 @@ presubmits:
           args:
             - "--plugin-config=prow/config/plugins.yaml"
             - "--config-path=prow/config/config.yaml"
+  - name: e2e
+    annotations:
+    labels:
+    run_if_changed: 'E2E_instance.txt'
+    skip_report: false
+    decorate: true
+    cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: one-summit-22-workshop
+        path_alias: github.com/nephio-project/one-summit-22-workshop
+        base_ref: main
+    spec:
+      containers:
+        - image: "nephio/e2e:1"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - |
+              ls /home/prow/go/src/github.com/nephio-project/one-summit-22-workshop
+              cd e2e/terraform && terraform init && terraform plan && \
+              terraform apply -auto-approve && terraform destroy -auto-approve
+          volumeMounts:
+            - name: satoken
+              mountPath: /etc/satoken
+            - name: ssh-key-vol
+              mountPath: "/etc/ssh-key"
+          resources:
+            requests:
+              cpu: 2
+              memory: 2Gi
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+        - name: ssh-key-vol
+          secret:
+            secretName: ssh-key-e2e
+            defaultMode: 256
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: id_rsa.pub
+                path: id_rsa.pub
