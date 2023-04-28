@@ -80,6 +80,81 @@ postsubmits:
         - image: alpine
           command:
             - /bin/printenv
+
+  nephio-project/free5gc-operator:
+  - name: build-push-image-free5gc-operator-release-conf
+    cluster: default
+    always_run: true
+    branches:
+    - "^v.*$"
+    annotations:
+      description: Build and Push Image to DockerHub when release tag is created
+    decorate: true
+    decoration_config:
+      censor_secrets: true
+    max_concurrency: 1
+    spec:
+      containers:
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:debug
+        command:
+        - "/bin/sh"
+        - "-c"
+        - |
+          executor --context=${PWD}/free5gc-operator \
+            --dockerfile=Dockerfile --destination=nephio/free5gc-operator:${PULL_BASE_REF}
+        volumeMounts:
+          - name: kaniko-secret
+            mountPath: /kaniko/.docker/
+        resources:
+          requests:
+            cpu: 2
+            memory: 2Gi
+      volumes:
+        - name: kaniko-secret
+          secret:
+            secretName: regcred
+            items:
+              - key: .dockerconfigjson
+                path: config.json
+  
+  - name: build-push-image-free5gc-operator-commit-conf
+    cluster: default
+    always_run: true
+    branches:
+    - "main"
+    annotations:
+      description: Build and Push Image to DockerHub every commit
+    decorate: true
+    decoration_config:
+      censor_secrets: true
+    max_concurrency: 1
+    spec:
+      containers:
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:debug
+        command:
+        - "/bin/sh"
+        - "-c"
+        - |
+          executor --context=${PWD}/free5gc-operator \
+            --dockerfile=Dockerfile --destination=nephio/free5gc-operator:${BUILD_ID}
+        volumeMounts:
+          - name: kaniko-secret
+            mountPath: /kaniko/.docker/
+        resources:
+          requests:
+            cpu: 2
+            memory: 2Gi
+      volumes:
+        - name: kaniko-secret
+          secret:
+            secretName: regcred
+            items:
+              - key: .dockerconfigjson
+                path: config.json
+
+
 presubmits:
   nephio-project/nephio-test-prow-project:
   - name: test-presubmit
