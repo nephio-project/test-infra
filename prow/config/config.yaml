@@ -69,6 +69,17 @@ tide:
     - do-not-merge/invalid-owners-file
     orgs:
     - nephio-project
+  merge_method:
+    nephio-project/nephio-test-prow-project: squash
+    nephio-project/test-infra: squash
+    nephio-project/nephio: squash
+    nephio-project/api: squash
+    nephio-project/nephio-example-packages: squash
+    nephio-project/nephio-packages: squash
+    nephio-project/docs: squash
+    nephio-project/free5gc-packages: squash
+    nephio-project/free5gc: squash
+    nephio-project/edge-status-aggregator: squash
 
 decorate_all_jobs: true
 postsubmits:
