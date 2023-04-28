@@ -34,14 +34,15 @@ presubmits:
           args:
             - "-c"
             - |
-              ls /home/prow/go/src/github.com/nephio-project/one-summit-22-workshop
               cd e2e/terraform && terraform init && terraform plan && \
               terraform apply -auto-approve && terraform destroy -auto-approve
           volumeMounts:
             - name: satoken
-              mountPath: /etc/satoken
+              mountPath: "/etc/satoken"
             - name: ssh-key-vol
               mountPath: "/etc/ssh-key"
+            - name: nephio-e2e-yaml
+              mountPath: "/etc/nephio"
           resources:
             requests:
               cpu: 2
@@ -62,3 +63,9 @@ presubmits:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
+        - name: nephio-e2e-yaml
+          secret:
+            secretName: nephio-e2e-yaml
+            items:
+              - key: nephio.yaml
+                path: nephio.yaml
