@@ -17,7 +17,7 @@ export HOME=${HOME:-/home/ubuntu/}
 
 sudo apt-get clean
 sudo apt-get update
-yes | sudo  NEEDRESTART_SUSPEND=1  DEBIAN_FRONTEND=noninteractive apt-get install python3.10-venv python3-pip -y
+sudo DEBIAN_FRONTEND=noninteractive apt-get install python3-venv python3-pip -y
 
 python3 -m venv $HOME/.venv
 source $HOME/.venv/bin/activate
