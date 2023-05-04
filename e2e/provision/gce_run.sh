@@ -6,10 +6,7 @@ yes | sudo  NEEDRESTART_SUSPEND=1  DEBIAN_FRONTEND=noninteractive apt-get instal
 python3 -m venv $HOME/.venv
 source $HOME/.venv/bin/activate
 pip install -r requirements.txt
-
-ansible-galaxy collection install community.general
-ansible-galaxy collection install kubernetes.docker
-ansible-galaxy collection install kubernetes.core
+ansible-galaxy collection install -r galaxy-requirements.yml
 
 ssh-keygen -b 2048 -t rsa -f /home/ubuntu/.ssh/id_rsa -q -N ""
 cat /home/ubuntu/.ssh/id_rsa.pub >> /home/ubuntu/.ssh/authorized_keys
