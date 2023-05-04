@@ -128,7 +128,7 @@ postsubmits:
     decorate: true
     decoration_config:
       censor_secrets: true
-    max_concurrency: 1
+    max_concurrency: 0
     spec:
       containers:
       - name: kaniko
