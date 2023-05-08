@@ -24,18 +24,26 @@ source $HOME/.venv/bin/activate
 pip install -r requirements.txt
 ansible-galaxy collection install -r galaxy-requirements.yml
 
-ssh-keygen -b 2048 -t rsa -f $HOME/.ssh/id_rsa -q -N ""
+rm -f ~/.ssh/id_rsa*
+echo -e "\n\n\n" | ssh-keygen -t rsa -N ""
 cat $HOME/.ssh/id_rsa.pub >>$HOME/.ssh/authorized_keys
 
-sudo apt-get -y install gcc-12
-git clone -b v0.6.8 https://github.com/free5gc/gtp5g.git
-cd gtp5g
-make
-sudo make install
-sudo modprobe gtp5g
-sudo dmesg | tail -n 4
+if ! lsmod | grep -q gtp5g; then
+    [[ -d $HOME/gtp5g ]] || git clone --depth 1 -b v0.6.8 https://github.com/free5gc/gtp5g.git $HOME/gtp5g
 
-git clone --depth 1 https://github.com/nephio-project/one-summit-22-workshop.git $HOME/workshop
+    pushd $HOME/gtp5g >/dev/null
+    if ! command -v gcc >/dev/null; then
+        sudo apt-get update
+        sudo apt-get -y install gcc
+    fi
+    make
+    sudo make install
+    sudo modprobe gtp5g
+    sudo dmesg | tail -n 4
+    popd >/dev/null
+fi
+
+[[ -d $HOME/workshop ]] || git clone --depth 1 https://github.com/nephio-project/one-summit-22-workshop.git $HOME/workshop
 mkdir -p $HOME/workshop/nephio-ansible-install/inventory
 
 cp $HOME/nephio.yaml $HOME/workshop/nephio-ansible-install/inventory/
