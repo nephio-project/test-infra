@@ -22,6 +22,7 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install python3-venv python3-pip -y
 python3 -m venv $HOME/.venv
 source $HOME/.venv/bin/activate
 pip install -r requirements.txt
+ansible-galaxy role install -r galaxy-requirements.yml
 ansible-galaxy collection install -r galaxy-requirements.yml
 
 rm -f ~/.ssh/id_rsa*
@@ -47,6 +48,13 @@ fi
 mkdir -p $HOME/workshop/nephio-ansible-install/inventory
 
 cp $HOME/nephio.yaml $HOME/workshop/nephio-ansible-install/inventory/
+
+# Management cluster creation
+#if [[ ${DEBUG:-false} != "true" ]]; then
+#    ansible-playbook -i ~/nephio.yaml playbooks/cluster.yml
+#else
+#    ansible-playbook -vvv -i ~/nephio.yaml playbooks/cluster.yml
+#fi
 
 pushd $HOME/workshop/nephio-ansible-install >/dev/null
 for playbook in install-prereq create-gitea create-gitea-repos deploy-clusters configure-nephio; do

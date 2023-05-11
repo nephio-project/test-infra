@@ -1,0 +1,64 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- name: Check package exists
+  ansible.builtin.stat:
+    path: "{{ local_dest_directory }}/{{ pkg }}"
+  register: kpt_pkg_path
+
+- name: Fetch package
+  ansible.builtin.command: "kpt pkg get {{ repo_uri }}/{{ pkg }}@{{ version }} {{ local_dest_directory }}/{{ pkg }}"
+  when: not kpt_pkg_path.stat.exists
+  changed_when: false
+
+- name: Get package content information
+  become: true
+  ansible.builtin.command: "kpt pkg tree {{ local_dest_directory }}/{{ pkg }}"
+  register: kpt_pkg_tree
+  changed_when: false
+
+- name: Print package content information
+  ansible.builtin.debug:
+    var: kpt_pkg_tree.stdout_lines
+
+# TODO: Improve the render function
+- name: Render package
+  become: true
+  ansible.builtin.command: "kpt fn render {{ local_dest_directory }}/{{ pkg }}"
+  changed_when: false
+
+- name: Get package differences between local and upstream
+  become: true
+  ansible.builtin.command: "kpt pkg diff {{ local_dest_directory }}/{{ pkg }}"
+  register: kpt_pkg_diff
+  changed_when: false
+
+- name: Print package differences
+  ansible.builtin.debug:
+    var: kpt_pkg_diff.stdout_lines
+
+- name: Init package
+  become: true
+  ansible.builtin.command: "kpt live init {{ local_dest_directory }}/{{ pkg }}"
+  changed_when: false
+  ignore_errors: true
+  register: kpt_live_init
+
+- name: Print package initialization
+  ansible.builtin.debug:
+    var: kpt_live_init
+
+- name: Apply package
+  become: true
+  ansible.builtin.command: "kpt live apply --reconcile-timeout=15m {{ local_dest_directory }}/{{ pkg }}"
+  register: kpt_apply
+  until: kpt_apply is not failed
+  retries: 5
+  changed_when: false

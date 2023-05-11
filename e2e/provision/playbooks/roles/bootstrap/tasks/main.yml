@@ -1,0 +1,96 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- name: Check Host requirements
+  ansible.builtin.include_tasks: prechecks.yml
+
+- name: Get k8s clusters
+  become: true
+  ansible.builtin.command: kind get clusters
+  register: bootstrap_kind_get_cluster
+  failed_when: (bootstrap_kind_get_cluster.rc not in [0, 1])
+  changed_when: false
+
+- name: Print kind_get_cluster value
+  ansible.builtin.debug:
+    var: bootstrap_kind_get_cluster
+
+- name: Create management cluster
+  become: true
+  ansible.builtin.command: kind create cluster --config=-
+  args:
+    stdin: |
+      kind: Cluster
+      apiVersion: kind.x-k8s.io/v1alpha4
+      nodes:
+        - role: control-plane
+          image: kindest/node:{{ kubernetes_version }}
+          extraMounts:
+            - hostPath: /var/run/{{ container_engine }}.sock
+              containerPath: /var/run/{{ container_engine }}.sock
+  when: not 'kind' in bootstrap_kind_get_cluster.stdout
+  changed_when: true
+
+- name: Create gitea namespace
+  become: true
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: gitea
+
+- name: Create gitea postgresql user password
+  become: true
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: gitea-postgresql
+        namespace: gitea
+        labels:
+          app.kubernetes.io/name: postgresql
+          app.kubernetes.io/instance: gitea
+      type: Opaque
+      data:
+        postgres-password: "{{ gitea_postgres_password }}"
+        password: "{{ gitea_db_password }}"
+
+- name: Create gitea user password
+  become: true
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: git-user-secret
+        namespace: gitea
+      type: kubernetes.io/basic-auth
+      stringData:
+        username: "{{ gitea_username }}"
+        password: "{{ gitea_password }}"
+
+- name: Deploy base packages
+  ansible.builtin.include_role:
+    name: kpt
+  loop:
+    - {pkg: gitea, version: gitea/v1}
+    - {pkg: cert-manager, version: cert-manager/v1}
+    - {pkg: cluster-capi, version: cluster-capi/v1}
+    - {pkg: cluster-capi-infrastructure-docker, version: cluster-capi-infrastructure-docker/v1}
+  vars:
+    repo_uri: https://github.com/nephio-project/nephio-example-packages
+    local_dest_directory: /tmp
+    pkg: "{{ item.pkg }}"
+    version: "{{ item.version }}"
