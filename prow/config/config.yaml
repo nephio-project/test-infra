@@ -276,10 +276,9 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
-  
   - name: build-push-image-interface-fn-commit-conf
     cluster: default
-    always_run: true
+    run_if_changed: 'krm-functions/interface-fn/.*'
     branches:
     - "main"
     annotations:
@@ -313,7 +312,7 @@ postsubmits:
               - key: .dockerconfigjson
                 path: config.json
 
-  nephio-project/nephio:
+
   - name: build-push-image-ipam-fn-release-conf
     cluster: default
     always_run: true
@@ -349,10 +348,9 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
-  
   - name: build-push-image-ipam-fn-commit-conf
     cluster: default
-    always_run: true
+    run_if_changed: 'krm-functions/ipam-fn/.*'
     branches:
     - "main"
     annotations:
@@ -386,7 +384,7 @@ postsubmits:
               - key: .dockerconfigjson
                 path: config.json
 
-  nephio-project/nephio:
+
   - name: build-push-image-nad-fn-release-conf
     cluster: default
     always_run: true
@@ -407,7 +405,7 @@ postsubmits:
         - "-c"
         - |
           executor --context=${PWD}/krm-functions/nad-fn \
-            --dockerfile=Dockerfile --destination=nephio/nad-fn:${PULL_BASE_REF}
+            --dockerfile=DockerFile --destination=nephio/nad-fn:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -422,10 +420,9 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
-  
   - name: build-push-image-nad-fn-commit-conf
     cluster: default
-    always_run: true
+    run_if_changed: 'krm-functions/nad-fn/.*'
     branches:
     - "main"
     annotations:
@@ -443,7 +440,7 @@ postsubmits:
         - "-c"
         - |
           executor --context=${PWD}/krm-functions/nad-fn \
-            --dockerfile=Dockerfile --destination=nephio/nad-fn:${BUILD_ID}
+            --dockerfile=DockerFile --destination=nephio/nad-fn:${BUILD_ID}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -459,7 +456,7 @@ postsubmits:
               - key: .dockerconfigjson
                 path: config.json
 
-  nephio-project/nephio:
+
   - name: build-push-image-amfdeployfn-release-conf
     cluster: default
     always_run: true
@@ -479,8 +476,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/nfdeploy-fn/amfdeployfn \
-            --dockerfile=Dockerfile --destination=nephio/amf-deploy-fn:${PULL_BASE_REF}
+          executor --context=${PWD}/krm-functions/nfdeploy-fn/ \
+            --dockerfile=amfdeployfn/Dockerfile --destination=nephio/amf-deploy-fn:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -495,10 +492,9 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
-  
   - name: build-push-image-amfdeployfn-commit-conf
     cluster: default
-    always_run: true
+    run_if_changed: 'krm-functions/nfdeploy-fn/amfdeployfn/.*'
     branches:
     - "main"
     annotations:
@@ -515,8 +511,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/nfdeploy-fn/amfdeployfn \
-            --dockerfile=Dockerfile --destination=nephio/amf-deploy-fn:${BUILD_ID}
+          executor --context=${PWD}/krm-functions/nfdeploy-fn/ \
+            --dockerfile=amfdeployfn/Dockerfile --destination=nephio/amf-deploy-fn:${BUILD_ID}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -532,7 +528,7 @@ postsubmits:
               - key: .dockerconfigjson
                 path: config.json
 
-  nephio-project/nephio:
+
   - name: build-push-image-smfdeployfn-release-conf
     cluster: default
     always_run: true
@@ -552,8 +548,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/nfdeploy-fn/smfdeployfn \
-            --dockerfile=Dockerfile --destination=nephio/smf-deploy-fn:${PULL_BASE_REF}
+          executor --context=${PWD}/krm-functions/nfdeploy-fn/ \
+            --dockerfile=smfdeployfn/Dockerfile --destination=nephio/smf-deploy-fn:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -568,10 +564,9 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
-  
   - name: build-push-image-smfdeployfn-commit-conf
     cluster: default
-    always_run: true
+    run_if_changed: 'krm-functions/nfdeploy-fn/smfdeployfn/.*'
     branches:
     - "main"
     annotations:
@@ -588,8 +583,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/nfdeploy-fn/smfdeployfn \
-            --dockerfile=Dockerfile --destination=nephio/smf-deploy-fn:${BUILD_ID}
+          executor --context=${PWD}/krm-functions/nfdeploy-fn/ \
+            --dockerfile=smfdeployfn/Dockerfile --destination=nephio/smf-deploy-fn:${BUILD_ID}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -605,7 +600,7 @@ postsubmits:
               - key: .dockerconfigjson
                 path: config.json
 
-  nephio-project/nephio:
+
   - name: build-push-image-upfdeployfn-release-conf
     cluster: default
     always_run: true
@@ -625,8 +620,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/nfdeploy-fn/upfdeployfn \
-            --dockerfile=Dockerfile --destination=nephio/upf-deploy-fn:${PULL_BASE_REF}
+          executor --context=${PWD}/krm-functions/nfdeploy-fn/ \
+            --dockerfile=upfdeployfn/Dockerfile --destination=nephio/upf-deploy-fn:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -641,10 +636,9 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
-  
   - name: build-push-image-upfdeployfn-commit-conf
     cluster: default
-    always_run: true
+    run_if_changed: 'krm-functions/nfdeploy-fn/upfdeployfn/.*'
     branches:
     - "main"
     annotations:
@@ -661,8 +655,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/nfdeploy-fn/upfdeployfn \
-            --dockerfile=Dockerfile --destination=nephio/upf-deploy-fn:${BUILD_ID}
+          executor --context=${PWD}/krm-functions/nfdeploy-fn/ \
+            --dockerfile=upfdeployfn/Dockerfile --destination=nephio/upf-deploy-fn:${BUILD_ID}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -678,7 +672,7 @@ postsubmits:
               - key: .dockerconfigjson
                 path: config.json
 
-  nephio-project/nephio:
+
   - name: build-push-image-vlan-fn-release-conf
     cluster: default
     always_run: true
@@ -714,10 +708,9 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
-  
   - name: build-push-image-vlan-fn-commit-conf
     cluster: default
-    run_if_changed: '^krm-functions/vlan-fn'
+    run_if_changed: 'krm-functions/vlan-fn/.*'
     branches:
     - "main"
     annotations:
@@ -751,7 +744,6 @@ postsubmits:
               - key: .dockerconfigjson
                 path: config.json
 
-  nephio-project/nephio:
   - name: build-push-image-spec-operator-release-conf
     cluster: default
     always_run: true
@@ -771,8 +763,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/controllers/specialized-operator \
-            --dockerfile=Dockerfile --destination=nephio/specialized-operator:${PULL_BASE_REF}
+          executor --context=${PWD}/controllers/specializer-operator \
+            --dockerfile=Dockerfile --destination=nephio/specializer-operator:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -787,10 +779,9 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
-  
   - name: build-push-image-spec-operator-commit-conf
     cluster: default
-    run_if_changed: '^controllers/specialized-operator'
+    run_if_changed: 'controllers/specializer-operator/.*'
     branches:
     - "main"
     annotations:
@@ -807,8 +798,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/controllers/specialized-operator \
-            --dockerfile=Dockerfile --destination=nephio/specialized-operator:${BUILD_ID}
+          executor --context=${PWD}/controllers/specializer-operator \
+            --dockerfile=Dockerfile --destination=nephio/specializer-operator:${BUILD_ID}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -823,6 +814,7 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
+
 
 presubmits:
   nephio-project/nephio-test-prow-project:
