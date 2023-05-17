@@ -19,6 +19,7 @@ in_repo_config:
 
 deck:
  spyglass:
+   gcs_browser_prefix: http://34.173.197.43/gcs/
    lenses:
    - lens:
        name: metadata
