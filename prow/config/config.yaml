@@ -923,7 +923,7 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
-  - name: build-push-image-nf-dpl-cntrl-commit-conf
+  - name: build-push-image-nf-deploy-controller-commit-conf
     cluster: default
     always_run: true
     branches:
