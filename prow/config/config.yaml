@@ -851,7 +851,7 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
-  - name: build-push-image-watcher-agnt-commit-conf
+  - name: build-push-image-watcher-agent-commit-conf
     cluster: default
     always_run: true
     branches:
