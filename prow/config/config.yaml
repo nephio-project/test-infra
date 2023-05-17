@@ -816,7 +816,7 @@ postsubmits:
                 path: config.json
 
   nephio-project/watcher-agent:
-  - name: build-push-image-watcher-agnt-release-conf
+  - name: build-push-image-watcher-agent-release-conf
     cluster: default
     always_run: true
     branches:
