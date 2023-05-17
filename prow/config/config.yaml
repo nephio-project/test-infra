@@ -888,7 +888,7 @@ postsubmits:
                 path: config.json
 
   nephio-project/nf-deploy-controller:
-  - name: build-push-image-nf-dpl-cntrl-release-conf
+  - name: build-push-image-nf-deploy-controller-release-conf
     cluster: default
     always_run: true
     branches:
