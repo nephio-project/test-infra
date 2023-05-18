@@ -233,7 +233,7 @@ postsubmits:
                 path: config.json
 
   nephio-project/nephio:
-    - name: build-push-image-dnn-fn-release-conf
+  - name: build-push-image-dnn-fn-release-conf
     cluster: default
     always_run: true
     branches:
