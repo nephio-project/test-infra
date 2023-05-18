@@ -47,6 +47,7 @@ approve:
     - nephio-project/free5gc
     - nephio-project/edge-status-aggregator
     require_self_approval: true
+    lgtm_acts_as_approve: false
     
 override:
   allow_top_level_owners: true
