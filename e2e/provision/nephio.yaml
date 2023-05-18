@@ -15,6 +15,7 @@ all:
     gitea_password: secret
     validate_certs: true
     container_engine: docker
+    installation_mode: online #online/offline
     proxy:
       http_proxy: 
       https_proxy:

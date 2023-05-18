@@ -8,24 +8,15 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-roles:
-  - name: andrewrothstein.docker_engine
-    version: v0.2.1
-  - name: andrewrothstein.podman
-    version: v2.0.2
-  - name: andrewrothstein.kind
-    version: v1.2.4
-  - name: andrewrothstein.kubectl
-    version: v1.2.7
-  - name: andrewrothstein.kpt
-    version: 0.0.1
-  - name: darkwizard242.cni
-    version: 2.2.0
-
-collections:
-  - name: community.general
-    version: 6.6.0
-  - name: kubernetes.core
-    version: 2.4.0
-  - name: community.docker
-    version: 3.4.4
+warn_list:
+  - yaml
+skip_list:
+  - experimental
+exclude_paths:
+  - roles/deploy_mk8s/
+mock_roles:
+  - andrewrothstein.kubectl
+  - andrewrothstein.docker_engine
+  - andrewrothstein.podman
+  - andrewrothstein.kpt
+  - darkwizard242.cni

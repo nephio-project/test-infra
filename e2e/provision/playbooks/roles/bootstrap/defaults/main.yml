@@ -8,24 +8,15 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-roles:
-  - name: andrewrothstein.docker_engine
-    version: v0.2.1
-  - name: andrewrothstein.podman
-    version: v2.0.2
-  - name: andrewrothstein.kind
-    version: v1.2.4
-  - name: andrewrothstein.kubectl
-    version: v1.2.7
-  - name: andrewrothstein.kpt
-    version: 0.0.1
-  - name: darkwizard242.cni
-    version: 2.2.0
+host_min_vcpu: 8  # minimum required vCPUs before install
+host_min_cpu_ram: 16  # minimum required CPU RAM before install; value in GB
+host_min_root_disk_space: 50  # minimum required disk space before install; value in GB
 
-collections:
-  - name: community.general
-    version: 6.6.0
-  - name: kubernetes.core
-    version: 2.4.0
-  - name: community.docker
-    version: 3.4.4
+container_engine: docker
+kubernetes_version: v1.27.1
+
+gitea_postgres_password: c2VjcmV0Cg==  # echo "secret" | base64
+gitea_db_password: c2VjcmV0Cg==
+
+gitea_username: admin
+gitea_password: secret

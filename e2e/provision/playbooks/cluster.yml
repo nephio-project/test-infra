@@ -1,0 +1,37 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- name: Bootstrap Management cluster
+  hosts: vm
+  pre_tasks:
+    - name: Install kubernetes python package
+      become: true
+      ansible.builtin.pip:
+        name: kubernetes==26.1.0
+  roles:
+    - role: andrewrothstein.docker_engine
+      become: true
+      when: ( container_engine is not defined ) or ( container_engine == "docker" )
+    - role: andrewrothstein.podman
+      when: container_engine == "podman"
+    - andrewrothstein.kind
+    - andrewrothstein.kubectl
+    - role: andrewrothstein.kpt
+      kpt_ver: '1.0.0-beta.32'
+      kpt_checksums:
+        '1.0.0-beta.32':
+          linux_amd64: sha256:efda99796dafdfa9c4264dbe2eceb252518c4bba11b352228fdc5d7f40c48d8c
+          linux_arm64: sha256:adb379f71f77b31d263e75eed0749143fc6d8cab7e6e92c804045dc20f4464ae
+          darwin_amd64: sha256:94b38117bd0e9a51363fb45be4c7eff4f78973b17e0277806c2b66f631b25388
+          darwin_arm64: sha256:e330662b4e8637301d4a9464708068dcc4bfd46b9e142987d1b0b1ece4238aa7
+    - role: darkwizard242.cni
+      become: true
+      cni_plugins_dir: /tmp/cni
+    - bootstrap
