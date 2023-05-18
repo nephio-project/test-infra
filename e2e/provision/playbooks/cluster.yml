@@ -35,3 +35,4 @@
       become: true
       cni_plugins_dir: /tmp/cni
     - bootstrap
+    - install

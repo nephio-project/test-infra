@@ -1,0 +1,21 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- name: Deploy Nephio packages
+  ansible.builtin.include_role:
+    name: kpt
+  loop:
+    - {pkg: nephio-system, version: nephio-system/v6}
+    - {pkg: nephio-webui, version: nephio-webui/v6}
+  vars:
+    repo_uri: https://github.com/nephio-project/nephio-packages
+    local_dest_directory: /tmp
+    pkg: "{{ item.pkg }}"
+    version: "{{ item.version }}"
