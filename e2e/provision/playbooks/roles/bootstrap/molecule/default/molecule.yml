@@ -18,6 +18,8 @@ lint: |
   set -e
   PATH=${PATH}
   yamllint -c ../../../.yaml-lint.yml .
+  ansible-lint -v -c ../../../.ansible-lint
+  flake8
 platforms:
   - name: bionic
     box: generic/ubuntu2004
@@ -25,6 +27,13 @@ platforms:
       gui: false
 provisioner:
   name: ansible
+  env:
+    ANSIBLE_LIBRARY: ${MOLECULE_PROJECT_DIRECTORY}/../../../playbooks/library
+  inventory:
+    group_vars:
+      all:
+        host_min_vcpu: 2
+        host_min_cpu_ram: 1
 verifier:
   name: testinfra
   options:
