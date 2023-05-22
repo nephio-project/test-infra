@@ -142,7 +142,8 @@ postsubmits:
         - "-c"
         - |
           executor --context=${PWD}/free5gc-operator \
-            --dockerfile=Dockerfile --destination=nephio/free5gc-operator:${BUILD_ID}
+            --dockerfile=Dockerfile --destination=nephio/free5gc-operator:${BUILD_ID} \
+            --destination=nephio/free5gc-operator:latest
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
