@@ -1,0 +1,52 @@
+- name: install kubelet kubeadm kubectl on {{ ansible_os_family }} system
+  become: true
+  block:
+    - name: install curl and apt-transport-https packages
+      ansible.builtin.package:
+        name:
+          - apt-transport-https
+          - curl
+          - libseccomp2
+        state: present
+
+    - name: ensure /etc/apt/keyrings directory exists
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0644'
+
+    - name: add gpg key
+      ansible.builtin.get_url:
+        url: https://pkgs.k8s.io/core:/stable:/v{{k8s_ver}}/deb/Release.key
+        dest: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+        mode: '0644'
+        force: true
+
+    - name: Add specified repository into sources list using specified filename
+      ansible.builtin.apt_repository:
+        repo: deb [trusted=yes] https://pkgs.k8s.io/core:/stable:/v{{k8s_ver}}/deb/ /
+        state: present
+        filename: kubernetes.list
+
+    - name: install packages kubelet kubeadm and kubectl
+      ansible.builtin.package:
+        name:
+          - kubelet
+          - kubeadm
+          - kubectl
+        state: present
+
+    - name: Hold kubeadm
+      ansible.builtin.dpkg_selections:
+        name: kubeadm
+        selection: hold
+
+    - name: Hold kubelet
+      ansible.builtin.dpkg_selections:
+        name: kubelet
+        selection: hold
+
+    - name: Hold kubectl
+      ansible.builtin.dpkg_selections:
+        name: kubectl
+        selection: hold
