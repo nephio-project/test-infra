@@ -44,19 +44,7 @@
       ansible.builtin.command: kind get clusters
       register: kind_get_cluster
       failed_when: (kind_get_cluster.rc not in [0, 1])
-      changed_when: false
-    - name: Create management cluster
+    - name: Create k8s cluster
       become: true
-      ansible.builtin.command: kind create cluster --config=-
-      args:
-        stdin: |
-          kind: Cluster
-          apiVersion: kind.x-k8s.io/v1alpha4
-          nodes:
-            - role: control-plane
-              image: kindest/node:v1.27.1
-              extraMounts:
-                - hostPath: /var/run/docker.sock
-                  containerPath: /var/run/docker.sock
+      ansible.builtin.command: kind create cluster --image kindest/node:v1.27.1
       when: not 'kind' in kind_get_cluster.stdout
-      changed_when: true

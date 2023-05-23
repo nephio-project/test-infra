@@ -8,26 +8,9 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-dependency:
-  name: galaxy
-  options:
-    role-file: ../../../galaxy-requirements.yml
-driver:
-  name: vagrant
-lint: |
-  set -e
-  PATH=${PATH}
-  yamllint -c ../../../.yaml-lint.yml .
-platforms:
-  - name: bionic
-    box: generic/ubuntu2004
-    provider_options:
-      gui: false
-provisioner:
-  name: ansible
-  playbooks:
-    prepare: ${MOLECULE_PROJECT_DIRECTORY}/../kpt/molecule/default/prepare.yml
-verifier:
-  name: testinfra
-  options:
-    sudo: true
+- name: Converge
+  hosts: all
+  tasks:
+    - name: Include install
+      ansible.builtin.include_role:
+        name: kpt
