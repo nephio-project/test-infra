@@ -11,11 +11,10 @@
 - name: Deploy Nephio packages
   ansible.builtin.include_role:
     name: kpt
-  loop:
-    - {pkg: nephio-system, version: nephio-system/v6}
-    - {pkg: nephio-webui, version: nephio-webui/v6}
+  loop: "{{ kpt.packages }}"
   vars:
-    repo_uri: https://github.com/nephio-project/nephio-packages
-    local_dest_directory: /tmp
+    context: "{{ k8s.context }}"
+    repo_uri: "{{ item.repo_uri }}"
+    local_dest_directory: "{{ kpt_local_dest }}"
     pkg: "{{ item.pkg }}"
     version: "{{ item.version }}"

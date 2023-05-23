@@ -14,19 +14,33 @@
 #
 
 
-def test_kind_creation(host):
-    kind = host.docker("kind-control-plane")
+def test_kind_clusters_creation(host):
+    cmd = host.run("sudo kind get clusters")
+    assert cmd.succeeded
+    assert cmd.rc == 0
+    assert "gitea-k8s" in cmd.stdout
+    assert "mgmt-k8s" in cmd.stdout
+
+
+def test_gitea_cluster_creation(host):
+    kind = host.docker("gitea-k8s-control-plane")
+
+    assert kind.is_running
+
+
+def test_mgmt_cluster_mounted_docker_host_sock(host):
+    kind = host.docker("mgmt-k8s-control-plane")
 
     assert kind.is_running
     destinations = host.check_output(
         "docker inspect \
 --format '{{range .Mounts }}{{.Destination}}{{\"\\n\"}}{{end}}' \
-kind-control-plane"
+mgmt-k8s-control-plane"
     )
     assert "/var/run/docker.sock" in destinations
     sources = host.check_output(
         "docker inspect \
 --format '{{range .Mounts }}{{.Source}}{{\"\\n\"}}{{end}}' \
-kind-control-plane"
+mgmt-k8s-control-plane"
     )
     assert "/var/run/docker.sock" in sources

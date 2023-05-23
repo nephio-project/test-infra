@@ -8,30 +8,15 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-dependency:
-  name: galaxy
-  options:
-    role-file: ../../../galaxy-requirements.yml
-driver:
-  name: vagrant
-lint: |
-  set -e
-  PATH=${PATH}
-  yamllint -c ../../../.yaml-lint.yml .
-platforms:
-  - name: bionic
-    box: generic/ubuntu2004
-    provider_options:
-      gui: false
-provisioner:
-  name: ansible
-  inventory:
-    group_vars:
-      all:
-        k8s:
-          context: kind-kind
-verifier:
-verifier:
-  name: testinfra
-  options:
-    sudo: true
+kpt_local_dest: /tmp
+
+k8s:
+  context: kind-mgmt-k8s
+kpt:
+  packages:
+    - repo_uri: https://github.com/nephio-project/nephio-packages
+      pkg: nephio-system
+      version: nephio-system/v6
+    - repo_uri: https://github.com/nephio-project/nephio-packages
+      pkg: nephio-webui
+      version: nephio-webui/v6

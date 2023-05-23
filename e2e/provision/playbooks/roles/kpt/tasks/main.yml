@@ -46,7 +46,7 @@
 
 - name: Init package
   become: true
-  ansible.builtin.command: "kpt live init {{ local_dest_directory }}/{{ pkg }}"
+  ansible.builtin.command: "kpt live init --context {{ context }} {{ local_dest_directory }}/{{ pkg }}"
   changed_when: false
   ignore_errors: true
   register: kpt_live_init
@@ -57,7 +57,7 @@
 
 - name: Apply package
   become: true
-  ansible.builtin.command: "kpt live apply --reconcile-timeout=15m {{ local_dest_directory }}/{{ pkg }}"
+  ansible.builtin.command: "kpt live apply --reconcile-timeout=15m --context {{ context }} {{ local_dest_directory }}/{{ pkg }}"
   register: kpt_apply
   until: kpt_apply is not failed
   retries: 5

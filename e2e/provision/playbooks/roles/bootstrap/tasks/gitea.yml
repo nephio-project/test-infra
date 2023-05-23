@@ -1,0 +1,84 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- name: Get k8s clusters
+  become: true
+  ansible.builtin.command: kind get clusters
+  register: bootstrap_kind_get_cluster
+  failed_when: (bootstrap_kind_get_cluster.rc not in [0, 1])
+  changed_when: false
+
+- name: Print kind_get_cluster value
+  ansible.builtin.debug:
+    var: bootstrap_kind_get_cluster
+
+- name: Create gitea cluster
+  become: true
+  ansible.builtin.command: >
+    kind create cluster --name {{ gitea.k8s.cluster_name }}
+    --image kindest/node:{{ kubernetes_version }}
+  when: not gitea.k8s.cluster_name in bootstrap_kind_get_cluster.stdout
+
+- name: Create gitea namespace
+  become: true
+  kubernetes.core.k8s:
+    context: "kind-{{ gitea.k8s.cluster_name }}"
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ gitea.k8s.namespace }}"
+
+- name: Create gitea postgresql user password
+  become: true
+  kubernetes.core.k8s:
+    context: "kind-{{ gitea.k8s.cluster_name }}"
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: gitea-postgresql
+        namespace: "{{ gitea.k8s.namespace }}"
+        labels:
+          app.kubernetes.io/name: postgresql
+          app.kubernetes.io/instance: gitea
+      type: Opaque
+      data:
+        postgres-password: "{{ gitea.k8s.postgres_password }}"
+        password: "{{ gitea.k8s.db_password }}"
+
+- name: Create gitea user password
+  become: true
+  kubernetes.core.k8s:
+    context: "kind-{{ gitea.k8s.cluster_name }}"
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: git-user-secret
+        namespace: "{{ gitea.k8s.namespace }}"
+      type: kubernetes.io/basic-auth
+      stringData:
+        username: "{{ gitea.k8s.username }}"
+        password: "{{ gitea.k8s.password }}"
+
+- name: Deploy gitea packages
+  ansible.builtin.include_role:
+    name: kpt
+  loop: "{{ gitea.kpt.packages }}"
+  vars:
+    context: "kind-{{ gitea.k8s.cluster_name }}"
+    repo_uri: "{{ item.repo_uri }}"
+    local_dest_directory: "{{ kpt_local_dest }}"
+    pkg: "{{ item.pkg }}"
+    version: "{{ item.version }}"

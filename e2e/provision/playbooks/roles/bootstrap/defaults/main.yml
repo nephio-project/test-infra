@@ -15,8 +15,35 @@ host_min_root_disk_space: 50  # minimum required disk space before install; valu
 container_engine: docker
 kubernetes_version: v1.27.1
 
-gitea_postgres_password: c2VjcmV0Cg==  # echo "secret" | base64
-gitea_db_password: c2VjcmV0Cg==
+kpt_local_dest: /tmp
 
-gitea_username: admin
-gitea_password: secret
+gitea:
+  enabled: true
+  k8s:
+    cluster_name: gitea-k8s  # cluster names must match `^[a-z0-9.-]+$`
+    namespace: gitea
+    postgres_password: c2VjcmV0Cg==  # echo "secret" | base64
+    db_password: c2VjcmV0Cg==
+    username: admin
+    password: secret
+  kpt:
+    packages:
+      - repo_uri: https://github.com/nephio-project/nephio-example-packages
+        pkg: gitea
+        version: gitea/v1
+
+cluster_api:
+  enabled: true
+  k8s:
+    cluster_name: mgmt-k8s  # cluster names must match `^[a-z0-9.-]+$`
+  kpt:
+    packages:
+      - repo_uri: https://github.com/nephio-project/nephio-example-packages
+        pkg: cert-manager
+        version: cert-manager/v1
+      - repo_uri: https://github.com/nephio-project/nephio-example-packages
+        pkg: cluster-capi
+        version: cluster-capi/v1
+      - repo_uri: https://github.com/nephio-project/nephio-example-packages
+        pkg: cluster-capi-infrastructure-docker
+        version: cluster-capi-infrastructure-docker/v1
