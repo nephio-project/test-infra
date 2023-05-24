@@ -12,10 +12,12 @@
   ansible.builtin.include_role:
     name: kpt
   loop:
-    - {pkg: nephio-system, version: nephio-system/v6}
-    - {pkg: nephio-webui, version: nephio-webui/v6}
+    - {pkg: nephio-system, version: nephio-system/v6, namespaces: [config-management-monitoring, config-management-system, nephio-system, porch-fn-system, porch-system, resource-group-system]}
+    - {pkg: nephio-webui, version: nephio-webui/v6, namespaces: [nephio-webui]}
   vars:
     repo_uri: https://github.com/nephio-project/nephio-packages
     local_dest_directory: /tmp
     pkg: "{{ item.pkg }}"
     version: "{{ item.version }}"
+    namespaces: "{{ item.namespaces }}"
+    context: kind-kind

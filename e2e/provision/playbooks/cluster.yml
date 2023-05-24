@@ -10,6 +10,8 @@
 
 - name: Bootstrap Management cluster
   hosts: vm
+  vars:
+    container_engine: docker
   pre_tasks:
     - name: Install kubernetes python package
       become: true
