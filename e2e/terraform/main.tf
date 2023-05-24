@@ -59,8 +59,9 @@ resource "google_compute_instance" "vm_instance" {
     agent       = false
   }
     inline = [
-               "chmod +x provision/gce_run.sh",
-               "provision/gce_run.sh"
+               "cd provision/",
+               "chmod +x gce_run.sh",
+               "./gce_run.sh"
               ]
   }
 

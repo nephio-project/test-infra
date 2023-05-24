@@ -17,15 +17,10 @@ presubmits:
   - name: e2e
     annotations:
     labels:
-    run_if_changed: 'E2E_instance.txt'
+    run_if_changed: '^e2e/'
     skip_report: false
     decorate: true
     cluster: default
-    extra_refs:
-      - org: nephio-project
-        repo: one-summit-22-workshop
-        path_alias: github.com/nephio-project/one-summit-22-workshop
-        base_ref: main
     spec:
       containers:
         - image: "nephio/e2e:1"
@@ -35,7 +30,7 @@ presubmits:
             - "-c"
             - |
               cd e2e/terraform && terraform init && terraform plan && \
-              terraform apply -auto-approve && terraform destroy -auto-approve
+              terraform apply -auto-approve; terraform destroy -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
