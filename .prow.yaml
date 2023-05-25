@@ -64,3 +64,54 @@ presubmits:
             items:
               - key: nephio.yaml
                 path: nephio.yaml
+periodics:
+  - name: e2e-daily
+    annotations:
+    labels:
+    cron: "0 15 * * 1-5"
+    skip_report: false
+    decorate: true
+    cluster: default
+    spec:
+      containers:
+        - image: "nephio/e2e:1"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - |
+              cd e2e/terraform && terraform init && terraform plan && \
+              terraform apply -auto-approve; terraform destroy -auto-approve
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+            - name: ssh-key-vol
+              mountPath: "/etc/ssh-key"
+            - name: nephio-e2e-yaml
+              mountPath: "/etc/nephio"
+          resources:
+            requests:
+              cpu: 2
+              memory: 2Gi
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+        - name: ssh-key-vol
+          secret:
+            secretName: ssh-key-e2e
+            defaultMode: 256
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: id_rsa.pub
+                path: id_rsa.pub
+        - name: nephio-e2e-yaml
+          secret:
+            secretName: nephio-e2e-yaml
+            items:
+              - key: nephio.yaml
+                path: nephio.yaml

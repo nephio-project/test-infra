@@ -5,8 +5,20 @@ provider "google" {
   credentials = "${file(var.credentials)}"
 }
 
+resource "random_string" "vm-name" {
+  length  = 6
+  upper   = false
+  numeric  = false
+  lower   = true
+  special = false
+}
+
+locals {
+  vm-name = "e2e-vm-${random_string.vm-name.result}"
+}
+
 resource "google_compute_instance" "vm_instance" {
-  name         = "e2e-instance"
+  name         = local.vm-name
   machine_type = var.instance
   allow_stopping_for_update = true
   metadata = {
