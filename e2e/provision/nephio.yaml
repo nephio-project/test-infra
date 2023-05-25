@@ -14,7 +14,7 @@ all:
     gitea_username: nephio
     gitea_password: secret
     validate_certs: true
-    container_engine: docker
+    container_engine: podman
     installation_mode: online #online/offline
     proxy:
       http_proxy: 

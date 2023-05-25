@@ -62,3 +62,9 @@
   until: kpt_apply is not failed
   retries: 5
   changed_when: false
+
+- name: Wait for deployments
+  ansible.builtin.include_tasks: wait_deployments.yml
+  loop: "{{ namespaces }}"
+  loop_control:
+    loop_var: namespace
