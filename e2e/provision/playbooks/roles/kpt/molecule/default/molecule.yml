@@ -25,8 +25,16 @@ platforms:
       gui: false
 provisioner:
   name: ansible
-  playbooks:
-    prepare: ${MOLECULE_PROJECT_DIRECTORY}/../kpt/molecule/default/prepare.yml
+  inventory:
+    group_vars:
+      all:
+        local_dest_directory: /tmp
+        pkg: package-examples/nginx
+        repo_uri: https://github.com/GoogleContainerTools/kpt
+        version: v0.9
+        context: kind-kind
+        namespaces:
+          - default
 verifier:
   name: testinfra
   options:
