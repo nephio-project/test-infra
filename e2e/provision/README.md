@@ -8,7 +8,7 @@ $ gcloud compute instances create --machine-type e2-standard-8 --boot-disk-size 
 
 2. SSH to the VM:
 
-Googlers:
+Googlers (you also need to run `gcert`):
 ```bash
 $ gcloud compute ssh nephio-r1-e2e -- -o ProxyCommand='corp-ssh-helper %h %p' -L 7007:localhost:7007
 ```
