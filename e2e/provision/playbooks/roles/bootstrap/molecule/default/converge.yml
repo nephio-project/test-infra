@@ -14,7 +14,3 @@
     - name: Include bootstrap
       ansible.builtin.include_role:
         name: bootstrap
-      vars:
-        host_min_vcpu: 2
-        host_min_cpu_ram: 1
-        container_engine: docker

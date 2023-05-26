@@ -8,30 +8,29 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-- name: Get base directory name
-  set_fact:
-    local_dest: "{{ local_dest_directory }}/{{ pkg }}"
-
 - name: Create base directory if it does not exist
   ansible.builtin.file:
-    path: "{{ local_dest | dirname }}"
+    path: "{{ local_dest_directory }}"
     state: directory
 
-- name: Check package exists
-  ansible.builtin.stat:
-    path: "{{ local_dest }}"
-  register: kpt_pkg_path
-
 - name: Fetch package
-  ansible.builtin.command: "kpt pkg get {{ repo_uri }}/{{ pkg }}@{{ version }} {{ local_dest }}"
-  when: not kpt_pkg_path.stat.exists
-  changed_when: false
+  kpt:
+    repo_uri: "{{ repo_uri }}"
+    pkg_path: "{{ pkg }}"
+    version: "{{ version }}"
+    local_dest_directory: "{{ local_dest_directory }}"
+    command: pkg-get
+
+- name: Get the local path
+  ansible.builtin.set_fact:
+    directory: "{{ local_dest_directory }}/{{ pkg | split('/') | last }}"
 
 - name: Get package content information
   become: true
-  ansible.builtin.command: "kpt pkg tree {{ local_dest }}"
+  kpt:
+    directory: "{{ directory }}"
+    command: pkg-tree
   register: kpt_pkg_tree
-  changed_when: false
 
 - name: Print package content information
   ansible.builtin.debug:
@@ -39,20 +38,24 @@
 
 - name: Check package has been initialized
   ansible.builtin.stat:
-    path: "{{ local_dest }}/resourcegroup.yaml"
+    path: "{{ directory }}/resourcegroup.yaml"
   register: kpt_resourcegroup
 
 # TODO: Improve the render function
 - name: Render package
   become: true
-  ansible.builtin.command: "kpt fn render {{ local_dest }}"
+  kpt:
+    pkg_path: "{{ directory }}"
+    command: fn-render
   when: not kpt_resourcegroup.stat.exists
 
 - name: Get package differences between local and upstream
   become: true
-  ansible.builtin.command: "kpt pkg diff {{ local_dest }}"
+  kpt:
+    pkg_path: "{{ directory }}"
+    version: "{{ version }}"
+    command: pkg-diff
   register: kpt_pkg_diff
-  changed_when: false
 
 - name: Print package differences
   ansible.builtin.debug:
@@ -60,9 +63,14 @@
 
 - name: Init package
   become: true
-  ansible.builtin.command: "kpt live init {{ local_dest }}"
-  when: not kpt_resourcegroup.stat.exists
+  kpt:
+    pkg_path: "{{ directory }}"
+    version: "{{ version }}"
+    context: "{{ context }}"
+    command: live-init
+  ignore_errors: true
   register: kpt_live_init
+  changed_when: false
 
 - name: Print package initialization
   ansible.builtin.debug:
@@ -70,7 +78,11 @@
 
 - name: Apply package
   become: true
-  ansible.builtin.command: "kpt live apply --reconcile-timeout=15m {{ local_dest }}"
+  kpt:
+    pkg_path: "{{ directory }}"
+    version: "{{ version }}"
+    context: "{{ context }}"
+    command: live-apply
   register: kpt_apply
   until: kpt_apply is not failed
   retries: 5

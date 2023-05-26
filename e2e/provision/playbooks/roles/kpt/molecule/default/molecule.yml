@@ -25,6 +25,8 @@ platforms:
       gui: false
 provisioner:
   name: ansible
+  env:
+    ANSIBLE_LIBRARY: ${MOLECULE_PROJECT_DIRECTORY}/../../../playbooks/library
   inventory:
     group_vars:
       all:
