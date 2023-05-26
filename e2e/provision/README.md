@@ -3,7 +3,7 @@
 1. Create a VM:
 
 ```bash
-$ gcloud compute instances create --machine-type e2-standard-8 --boot-disk-size 50GB nephio-r1-e2e
+$ gcloud compute instances create --machine-type e2-standard-8 --boot-disk-size 60GB nephio-r1-e2e
 ```
 
 2. SSH to the VM:
