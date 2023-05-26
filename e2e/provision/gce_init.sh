@@ -29,7 +29,13 @@ fi
 
 apt-get install -y git
 cd /home/ubuntu
-runuser -u ubuntu git clone https://github.com/nephio-project/test-infra.git
+#runuser -u ubuntu git clone https://github.com/nephio-project/test-infra.git
+## These lines below are just to test without merging
+runuser -u ubuntu git clone https://github.com/johnbelamaric/nephio-test-infra.git test-infra
+cd test-infra
+runuser -u ubuntu git checkout update-packages
+cd ..
+## end test lines
 
 sed -e "s/vagrant/ubuntu/" < /home/ubuntu/test-infra/e2e/provision/nephio.yaml > /home/ubuntu/nephio.yaml
 export DEBUG DEPLOYMENT_TYPE
