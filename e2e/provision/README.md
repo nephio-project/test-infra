@@ -1,15 +1,20 @@
 # Quick Start for GCE
 
 1. Create a VM:
-
+   
    ```bash
    $ gcloud compute instances create --machine-type e2-standard-8 \
                                      --boot-disk-size 200GB \
-                                     --image-family=ubuntu-2004-lts \
+                                     --image-family=ubuntu-2204-lts \
                                      --image-project=ubuntu-os-cloud \
                                      --metadata=startup-script-url=https://raw.githubusercontent.com/nephio-project/test-infra/main/e2e/provision/gce_init.sh \
                                      nephio-r1-e2e
    ```
+
+   Note that this creates the default type, which as of right now is based on
+   teh workshop code. You can create an R1-based version by passing
+   `--metadata=nephio-setup-type=r1`. You can also enable the setup debug option
+   with `--metadata=nephio-setup-debug=true`.
 
 2. If you want to watch the progress of the installation, give it about 30
    seconds to reach a network accessible state, and then ssh in and tail the
