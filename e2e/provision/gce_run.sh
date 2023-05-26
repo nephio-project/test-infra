@@ -30,6 +30,8 @@ rm -f ~/.ssh/id_rsa*
 echo -e "\n\n\n" | ssh-keygen -t rsa -N ""
 cat "$HOME/.ssh/id_rsa.pub" >>"$HOME/.ssh/authorized_keys"
 
+KVER=$(uname -r)
+
 if ! lsmod | grep -q gtp5g; then
     [[ -d "$HOME/gtp5g" ]] || git clone --depth 1 -b v0.6.8 https://github.com/free5gc/gtp5g.git "$HOME/gtp5g"
 
@@ -37,6 +39,9 @@ if ! lsmod | grep -q gtp5g; then
     if ! command -v gcc >/dev/null; then
         sudo apt-get update
         sudo apt-get -y install gcc
+    fi
+    if [[ ! -d "/lib/modules/$KVER/build" ]]; then
+        sudo apt-get -y install "linux-headers-$KVER"
     fi
     make
     sudo make install
