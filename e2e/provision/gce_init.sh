@@ -17,17 +17,18 @@ set -o nounset
 
 [[ "${DEBUG:-false}" != "true" ]] || set -o xtrace
 
-apt-get update
-
-if ! command -v gcc >/dev/null; then
-    if [[ $(uname -v) == *22.04.*-Ubuntu* ]]; then
-      apt-get -y install gcc-12
-    else
-      apt-get -y install gcc
-    fi
+if [[ ! -f /etc/sysctl.d/nephio.conf ]]; then
+    cat > /etc/sysctl.d/nephio.conf <<EOF
+fs.inotify.max_user_watches = 524288
+fs.inotify.max_user_instances = 512
+EOF
 fi
 
+service procps force-reload
+
+apt-get update
 apt-get install -y git
+
 cd /home/ubuntu
 #runuser -u ubuntu git clone https://github.com/nephio-project/test-infra.git
 ## These lines below are just to test without merging

@@ -38,7 +38,11 @@ if ! lsmod | grep -q gtp5g; then
     pushd "$HOME/gtp5g" >/dev/null
     if ! command -v gcc >/dev/null; then
         sudo apt-get update
-        sudo apt-get -y install gcc
+        if [[ $(uname -v) == *22.04.*-Ubuntu* ]]; then
+          sudo apt-get -y install gcc-12
+        else
+          sudo apt-get -y install gcc
+        fi
     fi
     if [[ ! -d "/lib/modules/$KVER/build" ]]; then
         sudo apt-get -y install "linux-headers-$KVER"
