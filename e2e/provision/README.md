@@ -12,8 +12,8 @@
    ```
 
    Note that this creates the default type, which as of right now is based on
-   teh workshop code. You can create an R1-based version by passing
-   `--metadata=nephio-setup-type=r1`. You can also enable the setup debug option
+   the R1 code. You can create a workshop-based version by passing
+   `--metadata=nephio-setup-type=one-summit`. You can also enable the setup debug option
    with `--metadata=nephio-setup-debug=true`.
 
 2. If you want to watch the progress of the installation, give it about 30
