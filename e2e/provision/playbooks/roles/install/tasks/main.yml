@@ -23,6 +23,21 @@
     version: "{{ item.version }}"
     namespaces: "{{ item.namespaces }}"
     context: kind-kind
+- name: Create gitea user password in nephio-system namespace
+  become: true
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: git-user-secret
+        namespace: nephio-system
+      type: kubernetes.io/basic-auth
+      stringData:
+        username: "{{ gitea_username }}"
+        password: "{{ gitea_password }}"
+
 ### TEST CODE - after webui merges to the main repo, the repo_uri and version should change
 - name: Deploy Nephio webui
   ansible.builtin.include_role:
