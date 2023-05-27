@@ -36,13 +36,12 @@ if ! lsmod | grep -q gtp5g; then
     [[ -d "$HOME/gtp5g" ]] || git clone --depth 1 -b v0.6.8 https://github.com/free5gc/gtp5g.git "$HOME/gtp5g"
 
     pushd "$HOME/gtp5g" >/dev/null
-    if ! command -v gcc >/dev/null; then
-        sudo apt-get update
-        if [[ $(uname -v) == *22.04.*-Ubuntu* ]]; then
-          sudo apt-get -y install gcc-12
-        else
-          sudo apt-get -y install gcc
-        fi
+    GCC=gcc
+    if [[ $(uname -v) == *22.04.*-Ubuntu* ]]; then
+        GCC=gcc-12
+    fi
+    if ! command -v $GCC >/dev/null; then
+        sudo apt-get -y install $GCC
     fi
     if [[ ! -d "/lib/modules/$KVER/build" ]]; then
         sudo apt-get -y install "linux-headers-$KVER"
