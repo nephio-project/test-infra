@@ -1,7 +1,7 @@
 # Quick Start for GCE
 
 1. Create a VM:
-   
+
    ```bash
    $ gcloud compute instances create --machine-type e2-standard-8 \
                                      --boot-disk-size 200GB \
@@ -11,10 +11,19 @@
                                      nephio-r1-e2e
    ```
 
-   Note that this creates the default type, which as of right now is based on
-   the R1 code. You can create a workshop-based version by passing
-   `--metadata=nephio-setup-type=one-summit`. You can also enable the setup debug option
-   with `--metadata=nephio-setup-debug=true`.
+   There are some optional metadata values you can pass (add them as
+   comma-delimited key=value pairs in the `--metadata` flag).
+
+   - `nephio-setup-type` defaults to `r1` but `one-summit` will use the workshop
+     code instead of the R1 code. Results are not guaranteed with that.
+   - `nephio-setup-debug` defaults to `false` but `true` will turn on verbose
+     debugging.
+   - `nephio-test-infra-repo` defaults to
+     `https://github.com/nephio-project/test-infra.git` but you can set it to
+     your repository when testing changes to these scripts, and your repo will
+     then be pulled by the `gce_init.sh` instead.
+   - `nephio-test-infra-branch` default to `main` but you can use it along with
+     the repo value to choose a branch in the repo for testing.
 
 2. If you want to watch the progress of the installation, give it about 30
    seconds to reach a network accessible state, and then ssh in and tail the
@@ -26,7 +35,7 @@
                     -o ProxyCommand='corp-ssh-helper %h %p' \
                     sudo journalctl -u google-startup-scripts.service --follow
    ```
-   
+
    Everyone else:
    ```bash
    $ gcloud compute ssh nephio-r1-e2e -- \
@@ -42,14 +51,14 @@
                     -L 7007:localhost:7007 \
                     kubectl --kubeconfig /home/ubuntu/.kube/mgmt-config port-forward --namespace=nephio-webui svc/nephio-webui 7007
    ```
-   
+
    Everyone else:
    ```bash
    $ gcloud compute ssh nephio-r1-e2e -- \
                     -L 7007:localhost:7007 \
                     kubectl --kubeconfig /home/ubuntu/.kube/mgmt-config port-forward --namespace=nephio-webui svc/nephio-webui 7007
    ```
-   
+
    You can now navigate to
    [http://localhost:7007/config-as-data](http://localhost:7007/config-as-data) to
    browse the UI.
