@@ -14,6 +14,8 @@
    There are some optional metadata values you can pass (add them as
    comma-delimited key=value pairs in the `--metadata` flag).
 
+   - `nephio-run-e2e` defaults to `false` but you can set it to `true` to run
+     the full e2e suite, instead of just setting up the sandbox.
    - `nephio-setup-type` defaults to `r1` but `one-summit` will use the workshop
      code instead of the R1 code. Results are not guaranteed with that.
    - `nephio-setup-debug` defaults to `false` but `true` will turn on verbose
