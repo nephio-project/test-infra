@@ -74,6 +74,12 @@ else
         ansible-playbook -vvv -i ~/nephio.yaml playbooks/cluster.yml
     fi
 
+    # Put this in the ubuntu dir and make it accessible to world
+    mkdir "$HOME/.kube" && chmod 755 "$HOME/.kube"
+    sudo cp /root/.kube/config "$HOME/.kube"
+    sudo chown $USER:$USER "$HOME/.kube/config"
+    chmod 644 "$HOME/.kube/config"
+
     # Deploy free5GC workload
     if [[ ${DEBUG:-false} != "true" ]]; then
         ansible-playbook -i ~/nephio.yaml playbooks/free5gc.yml
