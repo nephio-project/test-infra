@@ -53,7 +53,7 @@ if ! lsmod | grep -q gtp5g; then
     popd >/dev/null
 fi
 
-if [ "${DEPLOYMENT_TYPE:-one-summit}" == "one-summit" ]; then
+if [ "${DEPLOYMENT_TYPE:-r1}" == "one-summit" ]; then
     [[ -d "$HOME/workshop" ]] || git clone --depth 1 https://github.com/nephio-project/one-summit-22-workshop.git "$HOME/workshop"
     mkdir -p "$HOME/workshop/nephio-ansible-install/inventory"
     cp "$HOME/nephio.yaml" "$HOME/workshop/nephio-ansible-install/inventory/"
