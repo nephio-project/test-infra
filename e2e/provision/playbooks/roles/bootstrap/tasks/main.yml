@@ -11,6 +11,9 @@
 - name: Check Host requirements
   ansible.builtin.include_tasks: prechecks.yml
 
+- name: Set Kernel Parameters
+  ansible.builtin.include_tasks: system-setup.yml
+
 - name: Get k8s clusters
   become: true
   ansible.builtin.command: kind get clusters

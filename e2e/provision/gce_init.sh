@@ -17,15 +17,6 @@ set -o nounset
 
 [[ "${DEBUG:-false}" != "true" ]] || set -o xtrace
 
-if [[ ! -f /etc/sysctl.d/nephio.conf ]]; then
-    cat > /etc/sysctl.d/nephio.conf <<EOF
-fs.inotify.max_user_watches = 524288
-fs.inotify.max_user_instances = 512
-EOF
-fi
-
-service procps force-reload
-
 apt-get update
 apt-get install -y git
 
