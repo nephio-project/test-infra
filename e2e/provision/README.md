@@ -44,13 +44,15 @@
                     sudo journalctl -u google-startup-scripts.service --follow
    ```
 
-4. Once it's done, ssh in and port forward the port to the UI:
+4. Once it's done, ssh in and port forward the port to the UI (7007) and to
+   Gitea's HTTP interface, if you want to have that (3000):
 
    Googlers (you also need to run `gcert`):
    ```bash
    $ gcloud compute ssh nephio-r1-e2e -- \
                     -o ProxyCommand='corp-ssh-helper %h %p' \
                     -L 7007:localhost:7007 \
+                    -L 3000:172.18.0.200:3000 \
                     kubectl --kubeconfig /home/ubuntu/.kube/mgmt-config port-forward --namespace=nephio-webui svc/nephio-webui 7007
    ```
 
@@ -58,6 +60,7 @@
    ```bash
    $ gcloud compute ssh nephio-r1-e2e -- \
                     -L 7007:localhost:7007 \
+                    -L 3000:172.18.0.200:3000 \
                     kubectl --kubeconfig /home/ubuntu/.kube/mgmt-config port-forward --namespace=nephio-webui svc/nephio-webui 7007
    ```
 
