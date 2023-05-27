@@ -86,7 +86,7 @@ else
     # sudo because docker
     sudo /usr/local/bin/kpt fn render /tmp/mgmt-repo/mgmt
     /usr/local/bin/kpt live init /tmp/mgmt-repo/mgmt
-    /usr/local/bin/kpt live apply /tm/mgmt-repo/mgmt
+    /usr/local/bin/kpt live apply /tmp/mgmt-repo/mgmt
 
     mkdir /tmp/mgmt-rootsync
     /usr/local/bin/kpt pkg get --for-deployment https://github.com/nephio-project/nephio-example-packages.git/rootsync@rootsync/v2 /tmp/mgmt-rootsync/mgmt
