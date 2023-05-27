@@ -16,20 +16,33 @@
     - {pkg: nephio-controllers, version: nephio-controllers/v1, namespaces: [nephio-system]}
     - {pkg: configsync, version: configsync/v1, namespaces: [config-management-monitoring, config-management-system, resource-group-system]}
   vars:
-    repo_uri: https://github.com/nephio-project/nephio-example-packages
+    repo_uri: https://github.com/nephio-project/nephio-example-packages.git
     local_dest_directory: /tmp
     pkg: "{{ item.pkg }}"
     version: "{{ item.version }}"
     namespaces: "{{ item.namespaces }}"
     context: kind-kind
-### TEST CODE - after webui merges to the main repo, this can be combined above
+### TEST CODE - after webui merges to the main repo, the repo_uri and version should change
 - name: Deploy Nephio webui
   ansible.builtin.include_role:
     name: kpt
   loop:
     - {pkg: nephio-webui, version: pv-pvs-viewers, namespaces: [nephio-webui]}
   vars:
-    repo_uri: https://github.com/johnbelamaric/nephio-example-packages
+    repo_uri: https://github.com/johnbelamaric/nephio-packages.git
+    local_dest_directory: /tmp
+    pkg: "{{ item.pkg }}"
+    version: "{{ item.version }}"
+    namespaces: "{{ item.namespaces }}"
+    context: kind-kind
+### TEST CODE - after stock packages merge to the main repo, this can be combined above with others from examples
+- name: Deploy Nephio stock repositories
+  ansible.builtin.include_role:
+    name: kpt
+  loop:
+    - {pkg: nephio-stock-repos, version: stock-repos, namespaces: []}
+  vars:
+    repo_uri: https://github.com/johnbelamaric/nephio-example-packages.git
     local_dest_directory: /tmp
     pkg: "{{ item.pkg }}"
     version: "{{ item.version }}"
