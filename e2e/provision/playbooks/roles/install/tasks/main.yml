@@ -22,23 +22,6 @@
     version: "{{ item.version }}"
     namespaces: "{{ item.namespaces }}"
     context: kind-kind
-- name: Create /tmp/rootsync
-  file:
-    path: /tmp/rootsync
-    state: directory
-- name: Deploy repo and rootsync
-  ansible.builtin.include_role:
-    name: kpt
-  loop:
-    - {pkg: repository, version: repository/v2, localdir: "/tmp/mgmt"}
-    - {pkg: rootsync, version: rootsync/v2, localdir: "/tmp/rootsync/mgmt"}
-  vars:
-    repo_uri: https://github.com/nephio-project/nephio-example-packages
-    local_dest_directory: "{{ item.localdir }}"
-    pkg: "{{ item.pkg }}"
-    version: "{{ item.version }}"
-    namespaces: "{{ item.namespaces }}"
-    context: kind-kind
 ### TEST CODE - after webui merges to the main repo, this can be combined above
 - name: Deploy Nephio webui
   ansible.builtin.include_role:
