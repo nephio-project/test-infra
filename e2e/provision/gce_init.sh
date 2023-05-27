@@ -8,28 +8,41 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-DEBUG=$(curl -sf http://metadata.google.internal/computeMetadata/v1/instance/attributes/nephio-setup-debug -H "Metadata-Flavor: Google")
-DEPLOYMENT_TYPE=$(curl -sf http://metadata.google.internal/computeMetadata/v1/instance/attributes/nephio-setup-type -H "Metadata-Flavor: Google")
-
 set -o pipefail
 set -o errexit
 set -o nounset
 
-[[ "${DEBUG:-false}" != "true" ]] || set -o xtrace
+function get_metadata {
+  local md=$1
+  local df=$2
+
+  echo $(curl -sf "http://metadata.google.internal/computeMetadata/v1/instance/attributes/$md" -H "Metadata-Flavor: Google" || echo "$df")
+}
+
+DEBUG=$(get_metadata nephio-setup-debug "false")
+
+[[ "$DEBUG" != "true" ]] || set -o xtrace
+
+DEPLOYMENT_TYPE=$(get_metadata nephio-setup-type "r1")
+RUN_E2E=$(get_metadata nephio-run-e2e "false")
+REPO=$(get_metadata nephio-test-infra-repo "https://github.com/nephio-project/test-infra.git")
+BRANCH=$(get_metadata nephio-test-infra-branch "main")
+
+echo "$DEBUG, $DEPLOYMENT_TYPE, $RUN_E2E, $REPO, $BRANCH"
 
 apt-get update
 apt-get install -y git
 
 cd /home/ubuntu
-#runuser -u ubuntu git clone https://github.com/nephio-project/test-infra.git
-## These lines below are just to test without merging
-runuser -u ubuntu git clone https://github.com/johnbelamaric/nephio-test-infra.git test-infra
-cd test-infra
-runuser -u ubuntu git checkout update-packages
-cd ..
-## end test lines
+
+runuser -u ubuntu git clone "$REPO" test-infra
+cd test-infra && runuser -u ubuntu git checkout "$BRANCH" && cd ..
 
 sed -e "s/vagrant/ubuntu/" < /home/ubuntu/test-infra/e2e/provision/nephio.yaml > /home/ubuntu/nephio.yaml
-export DEBUG DEPLOYMENT_TYPE
 cd ./test-infra/e2e/provision
-runuser -u ubuntu ./gce_run.sh
+export DEBUG DEPLOYMENT_TYPE
+runuser -u ubuntu ./gce_install_sandbox.sh
+
+if [[ "$RUN_E2E" == "true" ]]; then
+  runuser -u ubuntu ./gce_e2e.sh
+fi

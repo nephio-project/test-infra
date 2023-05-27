@@ -79,11 +79,4 @@ else
     sudo cp /root/.kube/config "$HOME/.kube"
     sudo chown $USER:$USER "$HOME/.kube/config"
     chmod 644 "$HOME/.kube/config"
-
-    # Deploy free5GC workload
-    if [[ ${DEBUG:-false} != "true" ]]; then
-        ansible-playbook -i ~/nephio.yaml playbooks/free5gc.yml
-    else
-        ansible-playbook -vvv -i ~/nephio.yaml playbooks/free5gc.yml
-    fi
 fi

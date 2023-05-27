@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+set -o pipefail
+set -o errexit
+set -o nounset
+[[ "${DEBUG:-false}" != "true" ]] || set -o xtrace
+
+export HOME=${HOME:-/home/ubuntu/}
+
+python3 -m venv "$HOME/.venv"
+# shellcheck disable=SC1091
+source "$HOME/.venv/bin/activate"
+
+# Run e2e tests
+if [[ ${DEBUG:-false} != "true" ]]; then
+    ansible-playbook -i ~/nephio.yaml playbooks/free5gc.yml
+else
+    ansible-playbook -vvv -i ~/nephio.yaml playbooks/free5gc.yml
+fi
