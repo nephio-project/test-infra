@@ -14,10 +14,27 @@
   loop:
     - {pkg: porch-dev, version: porch-dev/v1, namespaces: [porch-fn-system, porch-system]}
     - {pkg: nephio-controllers, version: nephio-controllers/v1, namespaces: [nephio-system]}
-    - {pkg: configsync, version: config-sync/v1, namespaces: [config-management-monitoring, config-management-system, resource-group-system]}
+    - {pkg: configsync, version: configsync/v1, namespaces: [config-management-monitoring, config-management-system, resource-group-system]}
   vars:
     repo_uri: https://github.com/nephio-project/nephio-example-packages
     local_dest_directory: /tmp
+    pkg: "{{ item.pkg }}"
+    version: "{{ item.version }}"
+    namespaces: "{{ item.namespaces }}"
+    context: kind-kind
+- name: Create /tmp/rootsync
+  file:
+    path: /tmp/rootsync
+    state: directory
+- name: Deploy repo and rootsync
+  ansible.builtin.include_role:
+    name: kpt
+  loop:
+    - {pkg: repository, version: repository/v2, localdir: "/tmp/mgmt"}
+    - {pkg: rootsync, version: rootsync/v2, localdir: "/tmp/rootsync/mgmt"}
+  vars:
+    repo_uri: https://github.com/nephio-project/nephio-example-packages
+    local_dest_directory: "{{ item.localdir }}"
     pkg: "{{ item.pkg }}"
     version: "{{ item.version }}"
     namespaces: "{{ item.namespaces }}"

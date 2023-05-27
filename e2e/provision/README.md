@@ -24,7 +24,7 @@
      `https://github.com/nephio-project/test-infra.git` but you can set it to
      your repository when testing changes to these scripts, and your repo will
      then be pulled by the `gce_init.sh` instead.
-   - `nephio-test-infra-branch` default to `main` but you can use it along with
+   - `nephio-test-infra-branch` defaults to `main` but you can use it along with
      the repo value to choose a branch in the repo for testing.
 
 2. If you want to watch the progress of the installation, give it about 30
