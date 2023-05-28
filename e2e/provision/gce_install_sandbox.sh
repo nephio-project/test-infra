@@ -25,7 +25,7 @@ function deploy_kpt_pkg {
   # sudo because docker
   sudo /usr/local/bin/kpt fn render "$localpkg"
   /usr/local/bin/kpt live init "$localpkg"
-  /usr/local/bin/kpt live apply "$localpkg"
+  /usr/local/bin/kpt live --kubeconfig "$HOME/.kube/config" apply "$localpkg"
 }
 
 sudo apt-get clean
