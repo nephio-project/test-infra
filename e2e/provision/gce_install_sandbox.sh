@@ -26,8 +26,8 @@ function deploy_kpt_pkg {
   sudo kpt fn render "$localpkg"
   kpt live init "$localpkg"
   kubectl --kubeconfig "$HOME/.kube/config" api-resources
-  kpt pkg tree "$localpkg"
-  kpt live --kubeconfig "$HOME/.kube/config" apply -v 5 "$localpkg"
+  #kpt pkg tree "$localpkg"
+  kpt live --kubeconfig "$HOME/.kube/config" apply "$localpkg"
 }
 
 sudo apt-get clean
