@@ -81,17 +81,22 @@ else
     chmod 644 "$HOME/.kube/config"
 
     # I don't know how to make ansible do what I want, this is what I want
-    mkdir /tmp/mgmt-repo
-    /usr/local/bin/kpt pkg get --for-deployment https://github.com/nephio-project/nephio-example-packages.git/repository@repository/v2 /tmp/mgmt-repo/mgmt
-    # sudo because docker
-    sudo /usr/local/bin/kpt fn render /tmp/mgmt-repo/mgmt
-    /usr/local/bin/kpt live init /tmp/mgmt-repo/mgmt
-    /usr/local/bin/kpt live apply /tmp/mgmt-repo/mgmt
+    deploy_kpt_pkg "repository@repository/v2" "mgmt"
+    deploy_kpt_pkg "rootsync@rootsync/v2" "mgmt"
 
-    mkdir /tmp/mgmt-rootsync
-    /usr/local/bin/kpt pkg get --for-deployment https://github.com/nephio-project/nephio-example-packages.git/rootsync@rootsync/v2 /tmp/mgmt-rootsync/mgmt
-    # sudo because docker
-    sudo /usr/local/bin/kpt fn render /tmp/mgmt-rootsync/mgmt
-    /usr/local/bin/kpt live init /tmp/mgmt-rootsync/mgmt
-    /usr/local/bin/kpt live apply /tmp/mgmt-rootsync/mgmt
+    deploy_kpt_pkg "repository@repository/v2" "mgmt-staging"
 fi
+
+
+function deploy_kpt_pkg {
+  local pkg=$1
+  local name=$2
+
+  local temp=$(mktemp -d -t kpt-XXXX)
+  local localpkg="$temp/$name"
+  /usr/local/bin/kpt pkg get --for-deployment "https://github.com/nephio-project/nephio-example-packages.git/$pkg" "$localpkg"
+  # sudo because docker
+  sudo /usr/local/bin/kpt fn render "$localpkg"
+  /usr/local/bin/kpt live init "$localpkg"
+  /usr/local/bin/kpt live apply "$localpkg"
+}
