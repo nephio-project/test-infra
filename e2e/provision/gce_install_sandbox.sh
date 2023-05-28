@@ -25,7 +25,7 @@ function deploy_kpt_pkg {
   # sudo because docker
   sudo /usr/local/bin/kpt fn render "$localpkg"
   /usr/local/bin/kpt live init "$localpkg"
-  /usr/local/bin/kpt live --kubeconfig "$HOME/.kube/config" apply "$localpkg"
+  /usr/local/bin/kpt live --kubeconfig "$HOME/.kube/config" apply -v 5 "$localpkg"
 }
 
 sudo apt-get clean
@@ -94,16 +94,7 @@ else
     chmod 644 "$HOME/.kube/config"
 
     # I don't know how to make ansible do what I want, this is what I want
-    mkdir /tmp/kpt-repo-mgmt
-    /usr/local/bin/kpt pkg get --for-deployment https://github.com/nephio-project/nephio-example-packages.git/repository@repository/v2 /tmp/kpt-repo-mgmt/mgmt
-    # sudo because docker
-    sudo /usr/local/bin/kpt fn render /tmp/kpt-repo-mgmt/mgmt
-    /usr/local/bin/kpt live init /tmp/kpt-repo-mgmt/mgmt
-    /usr/local/bin/kpt live --kubeconfig "$HOME/.kube/config" apply /tmp/kpt-repo-mgmt/mgmt
-
-    # Something odd is going on, I get an error that the CRDs are not found
-    # if I do this in a function.
-    #deploy_kpt_pkg "repository@repository/v2" "mgmt"
+    deploy_kpt_pkg "repository@repository/v2" "mgmt"
     deploy_kpt_pkg "rootsync@rootsync/v2" "mgmt"
 
     deploy_kpt_pkg "repository@repository/v2" "mgmt-staging"
