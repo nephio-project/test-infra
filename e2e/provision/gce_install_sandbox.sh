@@ -21,11 +21,13 @@ function deploy_kpt_pkg {
 
   local temp=$(mktemp -d -t kpt-XXXX)
   local localpkg="$temp/$name"
-  /usr/local/bin/kpt pkg get --for-deployment "https://github.com/nephio-project/nephio-example-packages.git/$pkg" "$localpkg"
+  kpt pkg get --for-deployment "https://github.com/nephio-project/nephio-example-packages.git/$pkg" "$localpkg"
   # sudo because docker
-  sudo /usr/local/bin/kpt fn render "$localpkg"
-  /usr/local/bin/kpt live init "$localpkg"
-  /usr/local/bin/kpt live --kubeconfig "$HOME/.kube/config" apply -v 5 "$localpkg"
+  sudo kpt fn render "$localpkg"
+  kpt live init "$localpkg"
+  kubectl --kubeconfig "$HOME/.kube/config" api-resources
+  kpt pkg tree "$localpkg"
+  kpt live --kubeconfig "$HOME/.kube/config" apply -v 5 "$localpkg"
 }
 
 sudo apt-get clean
