@@ -15,6 +15,19 @@ set -o nounset
 
 export HOME=${HOME:-/home/ubuntu/}
 
+function deploy_kpt_pkg {
+  local pkg=$1
+  local name=$2
+
+  local temp=$(mktemp -d -t kpt-XXXX)
+  local localpkg="$temp/$name"
+  /usr/local/bin/kpt pkg get --for-deployment "https://github.com/nephio-project/nephio-example-packages.git/$pkg" "$localpkg"
+  # sudo because docker
+  sudo /usr/local/bin/kpt fn render "$localpkg"
+  /usr/local/bin/kpt live init "$localpkg"
+  /usr/local/bin/kpt live apply "$localpkg"
+}
+
 sudo apt-get clean
 sudo apt-get update
 sudo DEBIAN_FRONTEND=noninteractive apt-get install python3-venv python3-pip -y
@@ -87,16 +100,4 @@ else
     deploy_kpt_pkg "repository@repository/v2" "mgmt-staging"
 fi
 
-
-function deploy_kpt_pkg {
-  local pkg=$1
-  local name=$2
-
-  local temp=$(mktemp -d -t kpt-XXXX)
-  local localpkg="$temp/$name"
-  /usr/local/bin/kpt pkg get --for-deployment "https://github.com/nephio-project/nephio-example-packages.git/$pkg" "$localpkg"
-  # sudo because docker
-  sudo /usr/local/bin/kpt fn render "$localpkg"
-  /usr/local/bin/kpt live init "$localpkg"
-  /usr/local/bin/kpt live apply "$localpkg"
-}
+echo "Done installing Nephio Sandbox Environment"
