@@ -92,7 +92,7 @@
     - {pkg: metallb-sandbox-config, version: metallb-sandbox-config/v1, namespaces: []}
     - {pkg: cert-manager, version: cert-manager/v2, namespaces: [cert-manager]}
     - {pkg: gitea, version: gitea/v3, namespaces: [gitea]}
-    - {pkg: cluster-capi, version: cluster-capi/v2, namespaces: [capi-system, capi-kubeadm-control-plane-system, capi-kubeadm-bootstrap-system]}
+    - {pkg: cluster-capi, version: cluster-capi/v4, namespaces: [capi-system, capi-kubeadm-control-plane-system, capi-kubeadm-bootstrap-system]}
     - {pkg: cluster-capi-infrastructure-docker, version: cluster-capi-infrastructure-docker/v1, namespaces: [capd-system]}
     - {pkg: cluster-capi-kind-docker-templates, version: cluster-capi-kind-docker-templates/v1, namespaces: [default]}
     - {pkg: resource-backend, version: resource-backend/v1, namespaces: [backend-system]}
