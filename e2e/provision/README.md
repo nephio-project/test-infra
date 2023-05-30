@@ -53,7 +53,7 @@
                     -o ProxyCommand='corp-ssh-helper %h %p' \
                     -L 7007:localhost:7007 \
                     -L 3000:172.18.0.200:3000 \
-                    kubectl --kubeconfig /home/ubuntu/.kube/mgmt-config port-forward --namespace=nephio-webui svc/nephio-webui 7007
+                    kubectl --kubeconfig /home/ubuntu/.kube/config port-forward --namespace=nephio-webui svc/nephio-webui 7007
    ```
 
    Everyone else:
@@ -61,7 +61,7 @@
    $ gcloud compute ssh nephio-r1-e2e -- \
                     -L 7007:localhost:7007 \
                     -L 3000:172.18.0.200:3000 \
-                    kubectl --kubeconfig /home/ubuntu/.kube/mgmt-config port-forward --namespace=nephio-webui svc/nephio-webui 7007
+                    kubectl --kubeconfig /home/ubuntu/.kube/config port-forward --namespace=nephio-webui svc/nephio-webui 7007
    ```
 
    You can now navigate to
