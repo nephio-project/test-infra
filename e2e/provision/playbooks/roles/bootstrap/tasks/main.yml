@@ -89,27 +89,15 @@
     name: kpt
   loop:
     - {pkg: metallb, version: metallb/v1, namespaces: [metallb-system]}
-    - {pkg: cert-manager, version: cert-manager/v1, namespaces: [cert-manager]}
-    - {pkg: cluster-capi, version: cluster-capi/v2, namespaces: [capi-system, capi-kubeadm-control-plane-system, capi-kubeadm-bootstrap-system]}
+    - {pkg: metallb-sandbox-config, version: metallb-sandbox-config/v1, namespaces: []}
+    - {pkg: cert-manager, version: cert-manager/v2, namespaces: [cert-manager]}
+    - {pkg: gitea, version: gitea/v3, namespaces: [gitea]}
+    - {pkg: cluster-capi, version: cluster-capi/v3, namespaces: [capi-system, capi-kubeadm-control-plane-system, capi-kubeadm-bootstrap-system]}
     - {pkg: cluster-capi-infrastructure-docker, version: cluster-capi-infrastructure-docker/v1, namespaces: [capd-system]}
     - {pkg: cluster-capi-kind-docker-templates, version: cluster-capi-kind-docker-templates/v1, namespaces: [default]}
     - {pkg: resource-backend, version: resource-backend/v1, namespaces: [backend-system]}
   vars:
     repo_uri: https://github.com/nephio-project/nephio-example-packages
-    local_dest_directory: /tmp
-    pkg: "{{ item.pkg }}"
-    version: "{{ item.version }}"
-    namespaces: "{{ item.namespaces }}"
-    context: kind-kind
-## Once the PRs merge, these can be combined above
-- name: Deploy base packages TEST REPO
-  ansible.builtin.include_role:
-    name: kpt
-  loop:
-    - {pkg: gitea, version: gitea-lb, namespaces: [gitea]}
-    - {pkg: metallb-sandbox-config, version: metallb-config, namespaces: []}
-  vars:
-    repo_uri: https://github.com/johnbelamaric/nephio-example-packages.git
     local_dest_directory: /tmp
     pkg: "{{ item.pkg }}"
     version: "{{ item.version }}"
