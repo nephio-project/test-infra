@@ -77,9 +77,57 @@ connection with that setting).
    $ gcloud compute ssh nephio-r1-e2e -- -o ProxyCommand='corp-ssh-helper %h %p'
    $ sudo su - ubuntu
    ```
-   
+
    Everyone else:
    ```bash
    $ gcloud compute ssh nephio-r1-e2e
    $ sudo su - ubuntu
+   ```
+
+6. From that session, you can deploy a fleet of five edge clusters with this:
+
+   ```
+   $ cat > edge-clusters.yaml <<EOF
+   apiVersion: config.porch.kpt.dev/v1alpha2
+   kind: PackageVariantSet
+   metadata:
+     name: edge-clusters
+   spec:
+     upstream:
+       repo: nephio-example-packages
+       package: nephio-workload-cluster
+       revision: v5
+     targets:
+     - repositories:
+       - name: mgmt
+         packageNames:
+         - edge01
+         - edge02
+         - edge03
+         - edge04
+       template:
+         annotations:
+           approval.nephio.org/policy: initial
+   EOF
+   $ kubectl apply -f edge-clusters.yaml
+   ```
+
+   You can observe the progress by looking at the UI, or by using `kubectl` to
+   monitor the various package variants, package revisions, and kind clusters
+   that get created.
+
+7. Once a kind cluster comes up, you can access it by getting its kubeconfig
+   from the cluster. For example:
+
+   ```
+   $ kubectl get secret edge01-kubeconfig -o jsonpath='{.data.value}' | base64 -d > edge01-kubeconfig
+   $ kubectl --kubeconfig edge01-kubeconfig get ns
+   NAME                           STATUS   AGE
+   config-management-monitoring   Active   5m25s
+   config-management-system       Active   5m25s
+   default                        Active   5m46s
+   kube-node-lease                Active   5m48s
+   kube-public                    Active   5m48s
+   kube-system                    Active   5m48s
+   $
    ```
