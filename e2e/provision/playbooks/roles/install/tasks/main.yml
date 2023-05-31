@@ -37,8 +37,6 @@
       stringData:
         username: "{{ gitea_username }}"
         password: "{{ gitea_password }}"
-
-### TEST CODE - after webui merges to the main repo, the repo_uri and version should change
 - name: Deploy Nephio webui
   ansible.builtin.include_role:
     name: kpt
