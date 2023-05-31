@@ -33,14 +33,14 @@
 
    Googlers (you also need to run `gcert`):
    ```bash
-   $ gcloud compute ssh nephio-r1-e2e -- \
+   $ gcloud compute ssh ubuntu@nephio-r1-e2e -- \
                     -o ProxyCommand='corp-ssh-helper %h %p' \
                     sudo journalctl -u google-startup-scripts.service --follow
    ```
 
    Everyone else:
    ```bash
-   $ gcloud compute ssh nephio-r1-e2e -- \
+   $ gcloud compute ssh ubuntu@nephio-r1-e2e -- \
                     sudo journalctl -u google-startup-scripts.service --follow
    ```
 
@@ -49,19 +49,19 @@
 
    Googlers (you also need to run `gcert`):
    ```bash
-   $ gcloud compute ssh nephio-r1-e2e -- \
+   $ gcloud compute ssh ubuntu@nephio-r1-e2e -- \
                     -o ProxyCommand='corp-ssh-helper %h %p' \
                     -L 7007:localhost:7007 \
                     -L 3000:172.18.0.200:3000 \
-                    kubectl --kubeconfig /home/ubuntu/.kube/config port-forward --namespace=nephio-webui svc/nephio-webui 7007
+                    kubectl port-forward --namespace=nephio-webui svc/nephio-webui 7007
    ```
 
    Everyone else:
    ```bash
-   $ gcloud compute ssh nephio-r1-e2e -- \
+   $ gcloud compute ssh ubuntu@nephio-r1-e2e -- \
                     -L 7007:localhost:7007 \
                     -L 3000:172.18.0.200:3000 \
-                    kubectl --kubeconfig /home/ubuntu/.kube/config port-forward --namespace=nephio-webui svc/nephio-webui 7007
+                    kubectl --kubeconfig port-forward --namespace=nephio-webui svc/nephio-webui 7007
    ```
 
    You can now navigate to
@@ -74,14 +74,12 @@ connection with that setting).
 
    Googlers:
    ```bash
-   $ gcloud compute ssh nephio-r1-e2e -- -o ProxyCommand='corp-ssh-helper %h %p'
-   $ sudo su - ubuntu
+   $ gcloud compute ssh ubuntu@nephio-r1-e2e -- -o ProxyCommand='corp-ssh-helper %h %p'
    ```
 
    Everyone else:
    ```bash
-   $ gcloud compute ssh nephio-r1-e2e
-   $ sudo su - ubuntu
+   $ gcloud compute ssh ubuntu@nephio-r1-e2e
    ```
 
 6. From that session, you can deploy a fleet of five edge clusters with this:
