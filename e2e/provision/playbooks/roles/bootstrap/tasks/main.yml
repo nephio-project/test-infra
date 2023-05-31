@@ -11,6 +11,9 @@
 - name: Check Host requirements
   ansible.builtin.include_tasks: prechecks.yml
 
+- name: Set Kernel Parameters
+  ansible.builtin.include_tasks: system-setup.yml
+
 - name: Get k8s clusters
   become: true
   ansible.builtin.command: kind get clusters
@@ -85,11 +88,14 @@
   ansible.builtin.include_role:
     name: kpt
   loop:
-    - {pkg: gitea, version: gitea/v1, namespaces: [gitea]}
-    - {pkg: cert-manager, version: cert-manager/v1, namespaces: [cert-manager]}
-    - {pkg: cluster-capi, version: cluster-capi/v2, namespaces: [capi-system, capi-kubeadm-control-plane-system, capi-kubeadm-bootstrap-system]}
+    - {pkg: metallb, version: metallb/v1, namespaces: [metallb-system]}
+    - {pkg: metallb-sandbox-config, version: metallb-sandbox-config/v1, namespaces: []}
+    - {pkg: cert-manager, version: cert-manager/v2, namespaces: [cert-manager]}
+    - {pkg: gitea, version: gitea/v3, namespaces: [gitea]}
+    - {pkg: cluster-capi, version: cluster-capi/v4, namespaces: [capi-system, capi-kubeadm-control-plane-system, capi-kubeadm-bootstrap-system]}
     - {pkg: cluster-capi-infrastructure-docker, version: cluster-capi-infrastructure-docker/v1, namespaces: [capd-system]}
     - {pkg: cluster-capi-kind-docker-templates, version: cluster-capi-kind-docker-templates/v1, namespaces: [default]}
+    - {pkg: resource-backend, version: resource-backend/v1, namespaces: [backend-system]}
   vars:
     repo_uri: https://github.com/nephio-project/nephio-example-packages
     local_dest_directory: /tmp

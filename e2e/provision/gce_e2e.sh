@@ -1,4 +1,4 @@
----
+#!/usr/bin/env bash
 # SPDX-license-identifier: Apache-2.0
 ##############################################################################
 # Copyright (c) 2023 The Nephio Authors.
@@ -8,15 +8,20 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-host_min_vcpu: 8  # minimum required vCPUs before install
-host_min_cpu_ram: 16  # minimum required CPU RAM before install; value in GB
-host_min_root_disk_space: 50  # minimum required disk space before install; value in GB
+set -o pipefail
+set -o errexit
+set -o nounset
+[[ "${DEBUG:-false}" != "true" ]] || set -o xtrace
 
-container_engine: docker
-kubernetes_version: v1.27.1
+export HOME=${HOME:-/home/ubuntu/}
 
-gitea_postgres_password: c2VjcmV0  # echo -n "secret" | base64
-gitea_db_password: c2VjcmV0
+python3 -m venv "$HOME/.venv"
+# shellcheck disable=SC1091
+source "$HOME/.venv/bin/activate"
 
-gitea_username: admin
-gitea_password: secret
+# Run e2e tests
+if [[ ${DEBUG:-false} != "true" ]]; then
+    ansible-playbook -i ~/nephio.yaml playbooks/free5gc.yml
+else
+    ansible-playbook -vvv -i ~/nephio.yaml playbooks/free5gc.yml
+fi

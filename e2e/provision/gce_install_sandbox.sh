@@ -15,6 +15,21 @@ set -o nounset
 
 export HOME=${HOME:-/home/ubuntu/}
 
+function deploy_kpt_pkg {
+  local pkg=$1
+  local name=$2
+
+  local temp=$(mktemp -d -t kpt-XXXX)
+  local localpkg="$temp/$name"
+  kpt pkg get --for-deployment "https://github.com/nephio-project/nephio-example-packages.git/$pkg" "$localpkg"
+  # sudo because docker
+  sudo kpt fn render "$localpkg"
+  kpt live init "$localpkg"
+  kubectl --kubeconfig "$HOME/.kube/config" api-resources
+  #kpt pkg tree "$localpkg"
+  kpt live --kubeconfig "$HOME/.kube/config" apply "$localpkg"
+}
+
 sudo apt-get clean
 sudo apt-get update
 sudo DEBIAN_FRONTEND=noninteractive apt-get install python3-venv python3-pip -y
@@ -36,9 +51,12 @@ if ! lsmod | grep -q gtp5g; then
     [[ -d "$HOME/gtp5g" ]] || git clone --depth 1 -b v0.6.8 https://github.com/free5gc/gtp5g.git "$HOME/gtp5g"
 
     pushd "$HOME/gtp5g" >/dev/null
-    if ! command -v gcc >/dev/null; then
-        sudo apt-get update
-        sudo apt-get -y install gcc
+    GCC=gcc
+    if [[ $(uname -v) == *22.04.*-Ubuntu* ]]; then
+        GCC=gcc-12
+    fi
+    if ! command -v $GCC >/dev/null; then
+        sudo apt-get -y install $GCC
     fi
     if [[ ! -d "/lib/modules/$KVER/build" ]]; then
         sudo apt-get -y install "linux-headers-$KVER"
@@ -50,7 +68,7 @@ if ! lsmod | grep -q gtp5g; then
     popd >/dev/null
 fi
 
-if [ "${DEPLOYMENT_TYPE:-one-summit}" == "one-summit" ]; then
+if [ "${DEPLOYMENT_TYPE:-r1}" == "one-summit" ]; then
     [[ -d "$HOME/workshop" ]] || git clone --depth 1 https://github.com/nephio-project/one-summit-22-workshop.git "$HOME/workshop"
     mkdir -p "$HOME/workshop/nephio-ansible-install/inventory"
     cp "$HOME/nephio.yaml" "$HOME/workshop/nephio-ansible-install/inventory/"
@@ -71,10 +89,17 @@ else
         ansible-playbook -vvv -i ~/nephio.yaml playbooks/cluster.yml
     fi
 
-    # Deploy free5GC workload
-    if [[ ${DEBUG:-false} != "true" ]]; then
-        ansible-playbook -i ~/nephio.yaml playbooks/free5gc.yml
-    else
-        ansible-playbook -vvv -i ~/nephio.yaml playbooks/free5gc.yml
-    fi
+    # Put this in the ubuntu dir and make it accessible to world
+    mkdir "$HOME/.kube" && chmod 755 "$HOME/.kube"
+    sudo cp /root/.kube/config "$HOME/.kube"
+    sudo chown $USER:$USER "$HOME/.kube/config"
+    chmod 644 "$HOME/.kube/config"
+
+    # I don't know how to make ansible do what I want, this is what I want
+    deploy_kpt_pkg "repository@repository/v2" "mgmt"
+    deploy_kpt_pkg "rootsync@rootsync/v2" "mgmt"
+
+    deploy_kpt_pkg "repository@repository/v2" "mgmt-staging"
 fi
+
+echo "Done installing Nephio Sandbox Environment"

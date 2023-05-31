@@ -35,6 +35,6 @@
           darwin_arm64: sha256:e330662b4e8637301d4a9464708068dcc4bfd46b9e142987d1b0b1ece4238aa7
     - role: darkwizard242.cni
       become: true
-      cni_plugins_dir: /tmp/cni
+      cni_plugins_dir: /opt/cni/bin
     - bootstrap
     - install

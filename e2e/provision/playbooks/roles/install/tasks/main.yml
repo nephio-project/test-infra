@@ -12,10 +12,38 @@
   ansible.builtin.include_role:
     name: kpt
   loop:
-    - {pkg: nephio-system, version: nephio-system/v6, namespaces: [config-management-monitoring, config-management-system, nephio-system, porch-fn-system, porch-system, resource-group-system]}
-    - {pkg: nephio-webui, version: nephio-webui/v6, namespaces: [nephio-webui]}
+    - {pkg: porch-dev, version: porch-dev/v1, namespaces: [porch-fn-system, porch-system]}
+    - {pkg: nephio-controllers, version: nephio-controllers/v3, namespaces: [nephio-system]}
+    - {pkg: configsync, version: configsync/v1, namespaces: [config-management-monitoring, config-management-system, resource-group-system]}
+    - {pkg: nephio-stock-repos, version: nephio-stock-repos/v1, namespaces: []}
   vars:
-    repo_uri: https://github.com/nephio-project/nephio-packages
+    repo_uri: https://github.com/nephio-project/nephio-example-packages.git
+    local_dest_directory: /tmp
+    pkg: "{{ item.pkg }}"
+    version: "{{ item.version }}"
+    namespaces: "{{ item.namespaces }}"
+    context: kind-kind
+- name: Create gitea user password in nephio-system namespace
+  become: true
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: git-user-secret
+        namespace: nephio-system
+      type: kubernetes.io/basic-auth
+      stringData:
+        username: "{{ gitea_username }}"
+        password: "{{ gitea_password }}"
+- name: Deploy Nephio webui
+  ansible.builtin.include_role:
+    name: kpt
+  loop:
+    - {pkg: nephio-webui, version: v7, namespaces: [nephio-webui]}
+  vars:
+    repo_uri: https://github.com/nephio-project/nephio-packages.git
     local_dest_directory: /tmp
     pkg: "{{ item.pkg }}"
     version: "{{ item.version }}"

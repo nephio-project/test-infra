@@ -1,0 +1,23 @@
+## © 2023 Nephio Authors
+## Licensed under the Apache License 2.0
+## SPDX-License-Identifier: Apache-2.0
+---
+- name: systctl config
+  become: true
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: "{{ item }}"
+  with_items:
+    - fs.inotify.max_user_watches=524288
+    - fs.inotify.max_user_instances=512
+    - kernel.keys.maxkeys=500000
+    - kernel.keys.maxbytes=1000000
+
+- name: systctl config
+  become: true
+  shell: "{{ item }}"
+  with_items:
+    - sysctl fs.inotify.max_user_watches=524288
+    - sysctl fs.inotify.max_user_instances=512
+    - sysctl kernel.keys.maxkeys=500000
+    - sysctl kernel.keys.maxbytes=1000000
