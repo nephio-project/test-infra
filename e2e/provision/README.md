@@ -61,7 +61,7 @@
    $ gcloud compute ssh ubuntu@nephio-r1-e2e -- \
                     -L 7007:localhost:7007 \
                     -L 3000:172.18.0.200:3000 \
-                    kubectl --kubeconfig port-forward --namespace=nephio-webui svc/nephio-webui 7007
+                    kubectl port-forward --namespace=nephio-webui svc/nephio-webui 7007
    ```
 
    You can now navigate to
