@@ -94,7 +94,7 @@ connection with that setting).
      upstream:
        repo: nephio-example-packages
        package: nephio-workload-cluster
-       revision: v5
+       revision: v6
      targets:
      - repositories:
        - name: mgmt
