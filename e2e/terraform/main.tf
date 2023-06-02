@@ -72,8 +72,8 @@ resource "google_compute_instance" "vm_instance" {
   }
     inline = [
                "cd provision/",
-               "chmod +x gce_run.sh",
-               "DEBUG=true DEPLOYMENT_TYPE=cluster-api ./gce_run.sh"
+               "chmod +x gce_install_sandbox.sh",
+               "DEBUG=true DEPLOYMENT_TYPE=r1 ./gce_install_sandbox.sh"
               ]
   }
 
