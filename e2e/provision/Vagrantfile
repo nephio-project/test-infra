@@ -43,7 +43,7 @@ Vagrant.configure('2') do |config|
 
       cd /vagrant/
       cp nephio.yaml ~/nephio.yaml
-      ./gce_run.sh | tee ~/gce_run.log
+      ./gce_install_sandbox.sh | tee ~/gce_install_sandbox.log
     SHELL
   end
 
