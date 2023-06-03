@@ -106,11 +106,11 @@ connection with that setting).
        template:
          annotations:
            approval.nephio.org/policy: initial
-      pipeline:
-        mutators:
-        - image: gcr.io/kpt-fn/set-labels:v0.2.0
-          configMap:
-            nephio.org/site-type: edge
+         pipeline:
+           mutators:
+           - image: gcr.io/kpt-fn/set-labels:v0.2.0
+             configMap:
+               nephio.org/site-type: edge
    EOF
    $ kubectl apply -f edge-clusters.yaml
    ```
