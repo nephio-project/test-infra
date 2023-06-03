@@ -123,13 +123,13 @@ connection with that setting).
    from the cluster. For example:
 
    ```
-   $ kubectl get secret edge01-kubeconfig -o jsonpath='{.data.value}' | base64 -d > edge01-kubeconfig
    $ kubectl get clusters
    NAME       PHASE         AGE     VERSION
    edge01     Provisioned   3h40m   v1.26.3
    edge02     Provisioned   3h42m   v1.26.3
    edge03     Provisioned   3h42m   v1.26.3
    edge04     Provisioned   3h40m   v1.26.3
+   $ kubectl get secret edge01-kubeconfig -o jsonpath='{.data.value}' | base64 -d > edge01-kubeconfig
    $ kubectl --kubeconfig edge01-kubeconfig get ns
    NAME                           STATUS   AGE
    config-management-monitoring   Active   3h35m
