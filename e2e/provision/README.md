@@ -144,7 +144,7 @@ connection with that setting).
    You should also check that the Kind cluster came up fully with `kubectl get
    machinesets`. Sometimes they do not all come up; it's not clear why yet, but
    is probably a resourcing issue on the VM. For example, in this case only
-   three clusters had machines come up:
+   two clusters had machines come up:
 
    ```
    $ kubectl get machinesets
@@ -153,7 +153,6 @@ connection with that setting).
    edge02-md-0-blqfh-57fc564884xjf865     edge02     3          3       3           3h49m   v1.26.3
    edge03-md-0-8bss6-5b95ddf7b8xf8fg5     edge03     3          3       3           3h48m   v1.26.3
    edge04-md-0-z7b8p-77748bffbfxwsjbc     edge04     3                              3h46m   v1.26.3
-   test01-md-0-2zkcp-666fb857c6x6jnzk     test01     3          3       3           3h55m   v1.26.3
    ```
 
    If that's the case, pull out the kubeconfig for one of the clusters with
@@ -183,7 +182,6 @@ connection with that setting).
    config-management-monitoring   Active   4h8m
    config-management-system       Active   4h8m
    default                        Active   4h8m
-   free5gc                        Active   3h1m
    free5gc-cp                     Active   7s
    kube-node-lease                Active   4h8m
    kube-public                    Active   4h8m
@@ -270,6 +268,7 @@ connection with that setting).
     config-management-system       Active   3h46m
     default                        Active   3h47m
     free5gc                        Active   159m
+    free5gc-cp                     Active   3h1m
     kube-node-lease                Active   3h47m
     kube-public                    Active   3h47m
     kube-system                    Active   3h47m
