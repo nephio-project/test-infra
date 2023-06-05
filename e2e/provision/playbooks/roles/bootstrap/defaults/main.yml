@@ -18,5 +18,5 @@ kubernetes_version: v1.27.1
 gitea_postgres_password: c2VjcmV0  # echo -n "secret" | base64
 gitea_db_password: c2VjcmV0
 
-gitea_username: admin
+gitea_username: nephio
 gitea_password: secret
