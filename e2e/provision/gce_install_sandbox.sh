@@ -96,10 +96,10 @@ else
     chmod 644 "$HOME/.kube/config"
 
     # I don't know how to make ansible do what I want, this is what I want
-    deploy_kpt_pkg "repository@repository/v2" "mgmt"
-    deploy_kpt_pkg "rootsync@rootsync/v2" "mgmt"
+    deploy_kpt_pkg "repository@repository/v3" "mgmt"
+    deploy_kpt_pkg "rootsync@rootsync/v3" "mgmt"
 
-    deploy_kpt_pkg "repository@repository/v2" "mgmt-staging"
+    deploy_kpt_pkg "repository@repository/v3" "mgmt-staging"
 fi
 
 echo "Done installing Nephio Sandbox Environment"
