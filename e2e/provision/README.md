@@ -5,7 +5,7 @@
    ```bash
    $ gcloud compute instances create --machine-type e2-standard-8 \
                                      --boot-disk-size 200GB \
-                                     --image-family=ubuntu-2204-lts \
+                                     --image-family=ubuntu-2004-lts \
                                      --image-project=ubuntu-os-cloud \
                                      --metadata=startup-script-url=https://raw.githubusercontent.com/nephio-project/test-infra/main/e2e/provision/gce_init.sh \
                                      nephio-r1-e2e
@@ -82,7 +82,7 @@ connection with that setting).
    $ gcloud compute ssh ubuntu@nephio-r1-e2e
    ```
 
-6. From that session, you can deploy a fleet of five edge clusters with this:
+6. From that session, you can deploy a fleet of four edge clusters with this:
 
    ```
    $ cat > edge-clusters.yaml <<EOF
