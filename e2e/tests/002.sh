@@ -23,7 +23,7 @@ source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
-k8s_apply "$kubeconfig" "$TESTDIR/01-edge-clusters.yaml"
+k8s_apply "$kubeconfig" "$TESTDIR/002-edge-clusters.yaml"
 
 k8s_wait_exists "$kubeconfig" 600 "default" "workloadcluster" "edge01"
 k8s_wait_exists "$kubeconfig" 600 "default" "workloadcluster" "edge02"

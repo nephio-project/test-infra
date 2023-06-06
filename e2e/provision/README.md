@@ -82,40 +82,66 @@ connection with that setting).
    $ gcloud compute ssh ubuntu@nephio-r1-e2e
    ```
 
-6. From that session, you can deploy a fleet of four edge clusters by applying
-   the PackageVariantSet that can be found in
-   `test-infra/e2e/tests/01-edge-clusters.yaml`:
+6. Our e2e topology consists of one regional cluster, and three edge clusters.
+   Let's start by deploying the regional cluster. In this case, we will use
+   manual kpt commands to deploy a single cluster. First, check to make sure
+   that both the mgmt and mgmt-staging repositories are in the Ready state.
+   The mgmt repository is used to manage the contents of the management
+   cluster via Nephio; the mgmt-staging repository is just used internally
+   during the cluster bootstrapping process.
+
+   Use the session just started on the VM to run these commands:
 
    ```
-   $ kubectl apply -f test-infra/e2e/tests/01-edge-clusters.yaml
+   $ kubectl get repositories
+   NAME                      TYPE   CONTENT   DEPLOYMENT   READY   ADDRESS
+   free5gc-packages          git    Package   false        True    https://github.com/nephio-project/free5gc-packages.git
+   mgmt                      git    Package   true         True    http://172.18.0.200:3000/nephio/mgmt.git
+   mgmt-staging              git    Package   false        True    http://172.18.0.200:3000/nephio/mgmt-staging.git
+   nephio-example-packages   git    Package   false        True    https://github.com/nephio-project/nephio-example-packages.git
    ```
 
-   You can observe the progress by looking at the UI, or by using `kubectl` to
-   monitor the various package variants, package revisions, and kind clusters
-   that get created.
+   Since those are Ready, we can deploy a package from the
+   nephio-example-packages repository into the mgmt repository. To do this, we
+   retrieve the Package Revision name using `kpt alpha rpkg get`, and then clone
+   that specific Package Revision via the `kpt alpha rpkg clone` command,
+   propose and approve the resulting package revision.
 
-7. Once a kind cluster comes up, you can access it by getting its kubeconfig
-   from the cluster. For example, to see the clusters:
+   ```
+   $ kpt alpha rpkg get --name nephio-workload-cluster --revision v6
+   NAME                                                               PACKAGE                   WORKSPACENAME   REVISION   LATEST   LIFECYCLE   REPOSITORY
+   nephio-example-packages-17bffe318ac068f5f9ef22d44f08053e948a3683   nephio-workload-cluster   v6              v6         true     Published   nephio-example-packages
+   $ kpt alpha rpkg clone -n default nephio-example-packages-17bffe318ac068f5f9ef22d44f08053e948a3683 --repository mgmt regional
+   mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868 created
+   $ kpt alpha rpkg propose -n default mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868
+   mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868 proposed
+   $ kpt alpha rpkg approve -n default mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868
+   mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868 approved
+   ```
+
+   ConfigSync running in the management cluster will now pull out this new
+   package, creating all the resources necessary to provision a Kind cluster and
+   register it with Nephio. This will take about five minutes or so.
+
+7. You can check if the cluster is up with `kubectl get clusters`:
 
    ```
    $ kubectl get clusters
    NAME       PHASE         AGE     VERSION
-   edge01     Provisioned   3h40m   v1.26.3
-   edge02     Provisioned   3h42m   v1.26.3
-   edge03     Provisioned   3h42m   v1.26.3
-   edge04     Provisioned   3h40m   v1.26.3
+   regional   Provisioned   52m     v1.26.3
    ```
 
-   To retrieve the `kubeconfig` file for the edge01 cluster, we pull it from the
-   Kubernetes Secret:
+   We will want to be able to access the API server of that cluster as well, so
+   we will need to get the `kubeconfig` file for it. To retrieve the file, we
+   pull it from the Kubernetes Secret, and decode the Base64 encoding:
 
    ```
-   $ kubectl get secret edge01-kubeconfig -o jsonpath='{.data.value}' | base64 -d > edge01-kubeconfig
+   $ kubectl get secret regional-kubeconfig -o jsonpath='{.data.value}' | base64 -d > regional-kubeconfig
    ```
 
    We can then use it to access the workload cluster directly:
 
-   $ kubectl --kubeconfig edge01-kubeconfig get ns
+   $ kubectl --kubeconfig regional-kubeconfig get ns
    NAME                           STATUS   AGE
    config-management-monitoring   Active   3h35m
    config-management-system       Active   3h35m
@@ -127,29 +153,35 @@ connection with that setting).
    ```
 
    You should also check that the Kind cluster came up fully with `kubectl get
-   machinesets`. Sometimes they do not all come up; it's not clear why yet, but
-   is probably a resourcing issue on the VM. For example, in this case only
-   two clusters had machines come up:
+   machinesets`. You should see READY and AVAILABLE replicas.
 
    ```
    $ kubectl get machinesets
    NAME                                   CLUSTER    REPLICAS   READY   AVAILABLE   AGE     VERSION
-   edge01-md-0-6fk8w-9dc5bb56dxnpz69      edge01     3                              3h46m   v1.26.3
-   edge02-md-0-blqfh-57fc564884xjf865     edge02     3          3       3           3h49m   v1.26.3
-   edge03-md-0-8bss6-5b95ddf7b8xf8fg5     edge03     3          3       3           3h48m   v1.26.3
-   edge04-md-0-z7b8p-77748bffbfxwsjbc     edge04     3                              3h46m   v1.26.3
+   regional-md-0-zhw2j-58d497c498xkz96z   regional   3          3       3           3h58m   v1.26.3
    ```
 
-   If that's the case, pull out the kubeconfig for one of the clusters with
-   READY machines. In this case, edge02 is fully functional, so we will use that
-   in the following steps.
+8. Next, you can deploy a fleet of three edge clusters by applying the
+   PackageVariantSet that can be found in the `tests` directory:
 
-8. Next, install the free5gc functions that are not managed by the
-   operator. For now, let's just pick one cluster, say edge02, to run those. We
-   should consider if we want to create a "regional" cluster for these, or what
-   the overall topology should look like. Since these are all installed with a
-   single package, we can use the UI to pick the `free5gc-cp` package from the
-   `free5gc-packages` repository, and clone it to the `edge02` repository.
+   ```
+   $ kubectl apply -f test-infra/e2e/tests/002-edge-clusters.yaml
+   ```
+
+   This is equivalent to doing the same `kpt` commands we did for the regional
+   cluster, except that it uses the PackageVariantSet controller, which is
+   running in the Nephio management cluster to do them automatically. It will
+   clone the package for each entry in the field `packageNames` in the
+   PackageVariantSet. You can observe the progress by looking at the UI, or by
+   using `kubectl` to monitor the various package variants, package revisions,
+   and kind clusters that get created.
+
+9. While the edge clusters are deploying (which will take 5-10 minutes), we can
+   install the free5gc functions that are not managed by the operator. For this,
+   we will use the regional cluster. Since these are all installed with a single
+   package, we can use the UI to pick the `free5gc-cp` package from the
+   `free5gc-packages` repository, and clone it to the `regional` repository (we
+   could have also used the CLI).
 
    ![Install free5gc - Step 1](free5gc-cp-1.png)
 
@@ -162,7 +194,7 @@ connection with that setting).
    "Approve". Shortly thereafter, we should it in the cluster:
 
    ```
-   $ kubectl --kubeconfig edge02-kubeconfig get ns
+   $ kubectl --kubeconfig regional-kubeconfig get ns
    NAME                           STATUS   AGE
    config-management-monitoring   Active   4h8m
    config-management-system       Active   4h8m
@@ -173,7 +205,7 @@ connection with that setting).
    kube-system                    Active   4h8m
    resource-group-system          Active   4h7m
    $
-   $ kubectl --kubeconfig edge02-kubeconfig -n free5gc-cp get all
+   $ kubectl --kubeconfig regional-kubeconfig -n free5gc-cp get all
    NAME                                 READY   STATUS     RESTARTS   AGE
    pod/free5gc-ausf-7d494d668d-nswlf    0/1     Init:0/1   0          18s
    pod/free5gc-nrf-66cc98cfc5-8scpn     0/1     Init:0/1   0          18s
@@ -216,34 +248,33 @@ connection with that setting).
    statefulset.apps/mongodb   0/1     17s
    ```
 
-9. Now we need to deploy the free5gc operator across all of the edge clusters.
-   To do this, we use another PackageVariantSet. This one uses an
-   objectSelector, and selects the WorkloadCluster resources that were added to
-   the management cluster by the edge-clusters PackageVariantSet. We select only
-   those clusters with the `edge` label. The file is
-   `test-infra/e2e/tests/02-edge-free5gc-operator.yaml`:
-
-   ```
-   $ kubectl apply -f test-infra/e2e/tests/02-edge-free5gc-operator.yaml
-   ```
-
-10. Within five minutes of applying that, you should see `free5gc` namespaces on
-    your edge clusters:
+10. Now we need to deploy the free5gc operator across all of the workload
+    clusters (regional and edge). To do this, we use another PackageVariantSet.
+    This one uses an objectSelector, and selects the WorkloadCluster resources
+    that were added to the management cluster when we deployed the
+    nephio-workload-cluster packages (manually as well as via
+    PackageVariantSet).
 
     ```
-    $ kubectl --kubeconfig edge02-kubeconfig get ns
+    $ kubectl apply -f test-infra/e2e/tests/004-free5gc-operator.yaml
+    ```
+
+11. Within five minutes of applying that, you should see `free5gc` namespaces on
+    your regional and edge clusters:
+
+    ```
+    $ kubectl --kubeconfig edge01-kubeconfig get ns
     NAME                           STATUS   AGE
     config-management-monitoring   Active   3h46m
     config-management-system       Active   3h46m
     default                        Active   3h47m
     free5gc                        Active   159m
-    free5gc-cp                     Active   3h1m
     kube-node-lease                Active   3h47m
     kube-public                    Active   3h47m
     kube-system                    Active   3h47m
     resource-group-system          Active   3h45m
     $
-    $ kubectl --kubeconfig edge02-kubeconfig -n free5gc get all
+    $ kubectl --kubeconfig edge01-kubeconfig -n free5gc get all
     NAME                                                          READY   STATUS    RESTARTS   AGE
     pod/free5gc-operator-controller-controller-58df9975f4-sglj6   2/2     Running   0          164m
 
@@ -254,13 +285,16 @@ connection with that setting).
     replicaset.apps/free5gc-operator-controller-controller-58df9975f4   1         1         1       164m
     ```
 
-11. Finally, we can deploy individual network functions which the operator will
-    instantiate. For now, we will use a separate PackageVariantSet for each of
-    AMF, SMF, and UPF. In the future, we could put those PackageVariantSets into
-    a "topology" package and deploy them all as a unit. Or we can use a topology
-    controller to create them. But for now, let's do each manually. Here's an
-    example PVS for the UPF, the others are similar:
+12. Finally, we can deploy individual network functions which the operator will
+    instantiate. For now, we will use individual PackageVariants targeting the regional
+    cluster for each of the AMF and SMF, and a PackageVariantSet targeting the
+    edge clusters for the UPFs. In the future, we could put all of these
+    resources into yet-another-package - a "topology" package - and deploy them all as a
+    unit. Or we can use a topology controller to create them. But for now, let's do each
+    manually.
 
     ```
-    $ kubectl apply -f test-infra/e2e/tests/03-edge-free5gc-upf.yaml
+    $ kubectl apply -f test-infra/e2e/tests/005-regional-free5gc-amf.yaml
+    $ kubectl apply -f test-infra/e2e/tests/005-regional-free5gc-smf.yaml
+    $ kubectl apply -f test-infra/e2e/tests/006-edge-free5gc-upf.yaml
     ```

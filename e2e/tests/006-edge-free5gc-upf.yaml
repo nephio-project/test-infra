@@ -16,3 +16,5 @@ spec:
     template:
       annotations:
         approval.nephio.org/policy: initial
+      injectors:
+      - nameExpr: target.name
