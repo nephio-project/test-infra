@@ -25,7 +25,7 @@ kubeconfig="$HOME/.kube/config"
 
 workload_cluster_pkg_rev=$(kpt alpha rpkg get --name nephio-workload-cluster --revision v6 -o jsonpath='{.metadata.name}')
 kpt alpha rpkg clone -n default "$workload_cluster_pkg_rev" --repository mgmt regional
-regional_pkg_rev=$(kpt alpha rpkg get --name regional --revision v1 -o jsonpath='{.metadata.name}')
+regional_pkg_rev=$(kpt alpha rpkg get --name regional -o jsonpath='{.metadata.name}')
 
 kpt alpha rpkg propose -n default "$regional_pkg_rev"
 kpt alpha rpkg approve -n default "$regional_pkg_rev"
