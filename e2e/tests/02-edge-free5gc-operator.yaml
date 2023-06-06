@@ -1,0 +1,18 @@
+apiVersion: config.porch.kpt.dev/v1alpha2
+kind: PackageVariantSet
+metadata:
+  name: edge-free5gc-operator
+spec:
+  upstream:
+    repo: free5gc-packages
+    package: free5gc-operator
+    revision: v2
+  targets:
+  - objectSelector:
+      apiVersion: infra.nephio.org/v1alpha1
+      kind: WorkloadCluster
+      matchLabels:
+        nephio.org/site-type: edge
+    template:
+      annotations:
+        approval.nephio.org/policy: initial

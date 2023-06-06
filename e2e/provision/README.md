@@ -82,37 +82,12 @@ connection with that setting).
    $ gcloud compute ssh ubuntu@nephio-r1-e2e
    ```
 
-6. From that session, you can deploy a fleet of four edge clusters with this:
+6. From that session, you can deploy a fleet of four edge clusters by applying
+   the PackageVariantSet that can be found in
+   `test-infra/e2e/tests/01-edge-clusters.yaml`:
 
    ```
-   $ cat > edge-clusters.yaml <<EOF
-   apiVersion: config.porch.kpt.dev/v1alpha2
-   kind: PackageVariantSet
-   metadata:
-     name: edge-clusters
-   spec:
-     upstream:
-       repo: nephio-example-packages
-       package: nephio-workload-cluster
-       revision: v6
-     targets:
-     - repositories:
-       - name: mgmt
-         packageNames:
-         - edge01
-         - edge02
-         - edge03
-         - edge04
-       template:
-         annotations:
-           approval.nephio.org/policy: initial
-         pipeline:
-           mutators:
-           - image: gcr.io/kpt-fn/set-labels:v0.2.0
-             configMap:
-               nephio.org/site-type: edge
-   EOF
-   $ kubectl apply -f edge-clusters.yaml
+   $ kubectl apply -f test-infra/e2e/tests/01-edge-clusters.yaml
    ```
 
    You can observe the progress by looking at the UI, or by using `kubectl` to
@@ -120,7 +95,7 @@ connection with that setting).
    that get created.
 
 7. Once a kind cluster comes up, you can access it by getting its kubeconfig
-   from the cluster. For example:
+   from the cluster. For example, to see the clusters:
 
    ```
    $ kubectl get clusters
@@ -129,7 +104,17 @@ connection with that setting).
    edge02     Provisioned   3h42m   v1.26.3
    edge03     Provisioned   3h42m   v1.26.3
    edge04     Provisioned   3h40m   v1.26.3
+   ```
+
+   To retrieve the `kubeconfig` file for the edge01 cluster, we pull it from the
+   Kubernetes Secret:
+
+   ```
    $ kubectl get secret edge01-kubeconfig -o jsonpath='{.data.value}' | base64 -d > edge01-kubeconfig
+   ```
+
+   We can then use it to access the workload cluster directly:
+
    $ kubectl --kubeconfig edge01-kubeconfig get ns
    NAME                           STATUS   AGE
    config-management-monitoring   Active   3h35m
@@ -235,30 +220,14 @@ connection with that setting).
    To do this, we use another PackageVariantSet. This one uses an
    objectSelector, and selects the WorkloadCluster resources that were added to
    the management cluster by the edge-clusters PackageVariantSet. We select only
-   those clusters with the `edge` label.
+   those clusters with the `edge` label. The file is
+   `test-infra/e2e/tests/02-edge-free5gc-operator.yaml`:
 
    ```
-   apiVersion: config.porch.kpt.dev/v1alpha2
-   kind: PackageVariantSet
-   metadata:
-     name: edge-free5gc-operator
-   spec:
-     upstream:
-       repo: free5gc-packages
-       package: free5gc-operator
-       revision: v2
-     targets:
-     - objectSelector:
-         apiVersion: infra.nephio.org/v1alpha1
-         kind: WorkloadCluster
-         matchLabels:
-           nephio.org/site-type: edge
-       template:
-         annotations:
-           approval.nephio.org/policy: initial
+   $ kubectl apply -f test-infra/e2e/tests/02-edge-free5gc-operator.yaml
    ```
 
-10. Within a few minutes of applying that, you should see `free5gc` namespaces on
+10. Within five minutes of applying that, you should see `free5gc` namespaces on
     your edge clusters:
 
     ```
@@ -293,22 +262,5 @@ connection with that setting).
     example PVS for the UPF, the others are similar:
 
     ```
-    apiVersion: config.porch.kpt.dev/v1alpha2
-    kind: PackageVariantSet
-    metadata:
-      name: edge-free5gc-upf
-    spec:
-      upstream:
-        repo: free5gc-packages
-        package: free5gc-upf
-        revision: v1
-      targets:
-      - objectSelector:
-          apiVersion: infra.nephio.org/v1alpha1
-          kind: WorkloadCluster
-          matchLabels:
-            nephio.org/site-type: edge
-        template:
-          annotations:
-            approval.nephio.org/policy: initial
+    $ kubectl apply -f test-infra/e2e/tests/03-edge-free5gc-upf.yaml
     ```

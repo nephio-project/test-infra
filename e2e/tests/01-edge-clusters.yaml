@@ -1,0 +1,25 @@
+apiVersion: config.porch.kpt.dev/v1alpha2
+kind: PackageVariantSet
+metadata:
+  name: edge-clusters
+spec:
+  upstream:
+    repo: nephio-example-packages
+    package: nephio-workload-cluster
+    revision: v6
+  targets:
+  - repositories:
+    - name: mgmt
+      packageNames:
+      - edge01
+      - edge02
+      - edge03
+      - edge04
+    template:
+      annotations:
+        approval.nephio.org/policy: initial
+      pipeline:
+        mutators:
+        - image: gcr.io/kpt-fn/set-labels:v0.2.0
+          configMap:
+            nephio.org/site-type: edge

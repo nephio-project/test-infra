@@ -14,14 +14,21 @@ set -o nounset
 [[ "${DEBUG:-false}" != "true" ]] || set -o xtrace
 
 export HOME=${HOME:-/home/ubuntu/}
+export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
+export TESTDIR=${TESTDIR:-$E2EDIR/tests}
 
-python3 -m venv "$HOME/.venv"
+for t in $TESTDIR/*.sh
+do
+  /bin/bash "$t"
+done
+
+#python3 -m venv "$HOME/.venv"
 # shellcheck disable=SC1091
-source "$HOME/.venv/bin/activate"
+#source "$HOME/.venv/bin/activate"
 
 # Run e2e tests
-if [[ ${DEBUG:-false} != "true" ]]; then
-    ansible-playbook -i ~/nephio.yaml playbooks/free5gc.yml
-else
-    ansible-playbook -vvv -i ~/nephio.yaml playbooks/free5gc.yml
-fi
+#if [[ ${DEBUG:-false} != "true" ]]; then
+#    ansible-playbook -i ~/nephio.yaml playbooks/free5gc.yml
+#else
+#    ansible-playbook -vvv -i ~/nephio.yaml playbooks/free5gc.yml
+#fi
