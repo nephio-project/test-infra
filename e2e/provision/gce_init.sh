@@ -44,5 +44,5 @@ export DEBUG DEPLOYMENT_TYPE
 runuser -u ubuntu ./gce_install_sandbox.sh
 
 if [[ "$RUN_E2E" == "true" ]]; then
-  runuser -u ubuntu ./gce_e2e.sh
+  runuser -u ubuntu ../e2e.sh
 fi
