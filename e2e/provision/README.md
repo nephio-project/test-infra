@@ -207,61 +207,74 @@ connection with that setting).
 
    Click through the "Next" button until you are through all the steps, then
    click "Add Deployment". On the next screen, click "Propose", and then
-   "Approve". Shortly thereafter, we should it in the cluster:
+   "Approve".
+
+   ![Install free5gc - Step 4](free5gc-cp-4.png)
+
+   ![Install free5gc - Step 5](free5gc-cp-5.png)
+
+   ![Install free5gc - Step 6](free5gc-cp-6.png)
+
+   Shortly thereafter, we should see free5gc-cp in the cluster. Namespace:
 
    ```
-   $ kubectl --kubeconfig regional-kubeconfig get ns
+   ubuntu@nephio-test1-e2e:~$ kubectl --kubeconfig regional-kubeconfig get ns
    NAME                           STATUS   AGE
-   config-management-monitoring   Active   4h8m
-   config-management-system       Active   4h8m
-   default                        Active   4h8m
-   free5gc-cp                     Active   7s
-   kube-node-lease                Active   4h8m
-   kube-public                    Active   4h8m
-   kube-system                    Active   4h8m
-   resource-group-system          Active   4h7m
-   $
+   config-management-monitoring   Active   28m
+   config-management-system       Active   28m
+   default                        Active   28m
+   free5gc-cp                     Active   3m16s
+   kube-node-lease                Active   28m
+   kube-public                    Active   28m
+   kube-system                    Active   28m
+   local-path-storage             Active   28m
+   resource-group-system          Active   27m
+   ```
+
+   And the actual workload resources:
+
+   ```
    $ kubectl --kubeconfig regional-kubeconfig -n free5gc-cp get all
-   NAME                                 READY   STATUS     RESTARTS   AGE
-   pod/free5gc-ausf-7d494d668d-nswlf    0/1     Init:0/1   0          18s
-   pod/free5gc-nrf-66cc98cfc5-8scpn     0/1     Init:0/1   0          18s
-   pod/free5gc-nssf-668db85d54-jhqlc    0/1     Init:0/1   0          18s
-   pod/free5gc-pcf-55d4bfd648-584tp     0/1     Init:0/1   0          18s
-   pod/free5gc-udm-845db6c9c8-jmwrl     0/1     Init:0/1   0          18s
-   pod/free5gc-udr-79466f7f86-mw6bz     0/1     Init:0/1   0          17s
-   pod/free5gc-webui-84ff8c456c-bkvhm   0/1     Init:0/1   0          17s
-   pod/mongodb-0                        0/1     Pending    0          17s
+   NAME                                 READY   STATUS    RESTARTS   AGE
+   pod/free5gc-ausf-7d494d668d-k55kb    1/1     Running   0          3m31s
+   pod/free5gc-nrf-66cc98cfc5-9mxqm     1/1     Running   0          3m31s
+   pod/free5gc-nssf-668db85d54-gsnqw    1/1     Running   0          3m31s
+   pod/free5gc-pcf-55d4bfd648-tk9fs     1/1     Running   0          3m31s
+   pod/free5gc-udm-845db6c9c8-54tfb     1/1     Running   0          3m31s
+   pod/free5gc-udr-79466f7f86-wh5bt     1/1     Running   0          3m31s
+   pod/free5gc-webui-84ff8c456c-g7q44   1/1     Running   0          3m31s
+   pod/mongodb-0                        1/1     Running   0          3m31s
 
    NAME                    TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
-   service/ausf-nausf      ClusterIP   10.134.77.186    <none>        80/TCP           18s
-   service/mongodb         ClusterIP   10.141.173.153   <none>        27017/TCP        18s
-   service/nrf-nnrf        ClusterIP   10.130.158.206   <none>        8000/TCP         18s
-   service/nssf-nnssf      ClusterIP   10.128.206.40    <none>        80/TCP           18s
-   service/pcf-npcf        ClusterIP   10.130.21.1      <none>        80/TCP           18s
-   service/udm-nudm        ClusterIP   10.136.45.206    <none>        80/TCP           18s
-   service/udr-nudr        ClusterIP   10.134.52.158    <none>        80/TCP           18s
-   service/webui-service   NodePort    10.136.16.33     <none>        5000:30500/TCP   18s
+   service/ausf-nausf      ClusterIP   10.131.151.99    <none>        80/TCP           3m32s
+   service/mongodb         ClusterIP   10.139.208.189   <none>        27017/TCP        3m32s
+   service/nrf-nnrf        ClusterIP   10.143.64.94     <none>        8000/TCP         3m32s
+   service/nssf-nnssf      ClusterIP   10.130.139.231   <none>        80/TCP           3m31s
+   service/pcf-npcf        ClusterIP   10.131.19.224    <none>        80/TCP           3m31s
+   service/udm-nudm        ClusterIP   10.128.13.118    <none>        80/TCP           3m31s
+   service/udr-nudr        ClusterIP   10.137.211.80    <none>        80/TCP           3m31s
+   service/webui-service   NodePort    10.140.177.70    <none>        5000:30500/TCP   3m31s
 
    NAME                            READY   UP-TO-DATE   AVAILABLE   AGE
-   deployment.apps/free5gc-ausf    0/1     1            0           18s
-   deployment.apps/free5gc-nrf     0/1     1            0           18s
-   deployment.apps/free5gc-nssf    0/1     1            0           18s
-   deployment.apps/free5gc-pcf     0/1     1            0           18s
-   deployment.apps/free5gc-udm     0/1     1            0           18s
-   deployment.apps/free5gc-udr     0/1     1            0           18s
-   deployment.apps/free5gc-webui   0/1     1            0           17s
+   deployment.apps/free5gc-ausf    1/1     1            1           3m31s
+   deployment.apps/free5gc-nrf     1/1     1            1           3m31s
+   deployment.apps/free5gc-nssf    1/1     1            1           3m31s
+   deployment.apps/free5gc-pcf     1/1     1            1           3m31s
+   deployment.apps/free5gc-udm     1/1     1            1           3m31s
+   deployment.apps/free5gc-udr     1/1     1            1           3m31s
+   deployment.apps/free5gc-webui   1/1     1            1           3m31s
 
    NAME                                       DESIRED   CURRENT   READY   AGE
-   replicaset.apps/free5gc-ausf-7d494d668d    1         1         0       18s
-   replicaset.apps/free5gc-nrf-66cc98cfc5     1         1         0       18s
-   replicaset.apps/free5gc-nssf-668db85d54    1         1         0       18s
-   replicaset.apps/free5gc-pcf-55d4bfd648     1         1         0       18s
-   replicaset.apps/free5gc-udm-845db6c9c8     1         1         0       18s
-   replicaset.apps/free5gc-udr-79466f7f86     1         1         0       18s
-   replicaset.apps/free5gc-webui-84ff8c456c   1         1         0       17s
+   replicaset.apps/free5gc-ausf-7d494d668d    1         1         1       3m31s
+   replicaset.apps/free5gc-nrf-66cc98cfc5     1         1         1       3m31s
+   replicaset.apps/free5gc-nssf-668db85d54    1         1         1       3m31s
+   replicaset.apps/free5gc-pcf-55d4bfd648     1         1         1       3m31s
+   replicaset.apps/free5gc-udm-845db6c9c8     1         1         1       3m31s
+   replicaset.apps/free5gc-udr-79466f7f86     1         1         1       3m31s
+   replicaset.apps/free5gc-webui-84ff8c456c   1         1         1       3m31s
 
    NAME                       READY   AGE
-   statefulset.apps/mongodb   0/1     17s
+   statefulset.apps/mongodb   1/1     3m31s
    ```
 
 10. Now we need to deploy the free5gc operator across all of the workload
