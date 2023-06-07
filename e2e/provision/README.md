@@ -105,13 +105,28 @@ connection with that setting).
    nephio-example-packages repository into the mgmt repository. To do this, we
    retrieve the Package Revision name using `kpt alpha rpkg get`, and then clone
    that specific Package Revision via the `kpt alpha rpkg clone` command,
-   propose and approve the resulting package revision.
+   propose and approve the resulting package revision. We want to use the latest
+   revision of the nephio-workload-cluster package, which you can get with the
+   command below (your latest revision may be different):
 
    ```
-   $ kpt alpha rpkg get --name nephio-workload-cluster --revision v6
+   $ kpt alpha rpkg get --name nephio-workload-cluster
    NAME                                                               PACKAGE                   WORKSPACENAME   REVISION   LATEST   LIFECYCLE   REPOSITORY
-   nephio-example-packages-17bffe318ac068f5f9ef22d44f08053e948a3683   nephio-workload-cluster   v6              v6         true     Published   nephio-example-packages
-   $ kpt alpha rpkg clone -n default nephio-example-packages-17bffe318ac068f5f9ef22d44f08053e948a3683 --repository mgmt regional
+   nephio-example-packages-05707c7acfb59988daaefd85e3f5c299504c2da1   nephio-workload-cluster   main            main       false    Published   nephio-example-packages
+   nephio-example-packages-781e1c17d63eed5634db7b93307e1dad75a92bce   nephio-workload-cluster   v1              v1         false    Published   nephio-example-packages
+   nephio-example-packages-5929727104f2c62a2cb7ad805dabd95d92bf727e   nephio-workload-cluster   v2              v2         false    Published   nephio-example-packages
+   nephio-example-packages-cdc6d453ae3e1bd0b64234d51d575e4a30980a77   nephio-workload-cluster   v3              v3         false    Published   nephio-example-packages
+   nephio-example-packages-c78ecc6bedc8bf68185f28a998718eed8432dc3b   nephio-workload-cluster   v4              v4         false    Published   nephio-example-packages
+   nephio-example-packages-46b923a6bbd09c2ab7aa86c9853a96cbd38d1ed7   nephio-workload-cluster   v5              v5         false    Published   nephio-example-packages
+   nephio-example-packages-17bffe318ac068f5f9ef22d44f08053e948a3683   nephio-workload-cluster   v6              v6         false    Published   nephio-example-packages
+   nephio-example-packages-0fbaccf6c5e75a3eff7976a523bb4f42bb0118ce   nephio-workload-cluster   v7              v7         true     Published   nephio-example-packages
+   ```
+
+   Then, use the NAME from that in the `clone` operation, and the resulting
+   PackageRevision name to perform the `propose` and `approve` operations:
+
+   ```
+   $ kpt alpha rpkg clone -n default nephio-example-packages-0fbaccf6c5e75a3eff7976a523bb4f42bb0118ce --repository mgmt regional
    mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868 created
    $ kpt alpha rpkg propose -n default mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868
    mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868 proposed

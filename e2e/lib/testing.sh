@@ -1,3 +1,4 @@
+#!/bin/bash
 #!/usr/bin/env bash
 # SPDX-license-identifier: Apache-2.0
 ##############################################################################
@@ -8,18 +9,20 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-set -o pipefail
-set -o errexit
-set -o nounset
-[[ "${DEBUG:-false}" != "true" ]] || set -o xtrace
+function testing_get_test_metadata {
+  local testfile=$1
+  local fieldname=$2
 
-export HOME=${HOME:-/home/ubuntu/}
-export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
-export TESTDIR=${TESTDIR:-$E2EDIR/tests}
+  local line=$(grep "$fieldname" "$testfile" || echo "")
+  echo "$line" | cut -d : -f 2
+}
 
-source "$E2EDIR/lib/testing.sh"
+function testing_run_test {
+  local testfile=$1
 
-for t in $TESTDIR/*.sh
-do
-  testing_run_test "$t"
-done
+  local testname=$(testing_get_test_metadata "$testfile" "TEST-NAME")
+  echo "+++++ $(date): starting $testfile $testname"
+  /bin/bash "$testfile"
+  echo "+++++ $(date): finished $testfile $testname"
+}
+

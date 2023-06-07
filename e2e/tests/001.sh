@@ -9,6 +9,10 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
+## TEST METADATA
+## TEST-NAME: Deploy regional workload cluster
+##
+
 set -o pipefail
 set -o errexit
 set -o nounset
@@ -23,7 +27,7 @@ source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
-workload_cluster_pkg_rev=$(kpt alpha rpkg get --name nephio-workload-cluster --revision v6 -o jsonpath='{.metadata.name}')
+workload_cluster_pkg_rev=$(kpt alpha rpkg get --name nephio-workload-cluster --revision v7 -o jsonpath='{.metadata.name}')
 kpt alpha rpkg clone -n default "$workload_cluster_pkg_rev" --repository mgmt regional
 regional_pkg_rev=$(kpt alpha rpkg get --name regional -o jsonpath='{.metadata.name}')
 

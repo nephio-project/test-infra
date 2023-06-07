@@ -9,6 +9,10 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
+## TEST METADATA
+## TEST-NAME: Deploy edge clusters
+##
+
 set -o pipefail
 set -o errexit
 set -o nounset
