@@ -128,6 +128,49 @@ connection with that setting).
    ```
    $ kpt alpha rpkg clone -n default nephio-example-packages-0fbaccf6c5e75a3eff7976a523bb4f42bb0118ce --repository mgmt regional
    mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868 created
+   ```
+
+   We want to make sure that our new regional cluster is labeled as regional. If
+   we were using the UI, we would use the Edit button to add a label to the
+   resources in the package (or, at least to the WorkloadCluster resource).
+   Later, if you look at how we do the edge clusters, you will see the label
+   added by the PackageVariantSet. In this case, since we are using the CLI,
+   we need to pull the package out, modify it, and then push the updates back to
+   the Draft revision. We will use `kpt` and the `set-labels` function to do
+   this.
+
+   To pull the package to a local directory, we use the `rpkg pull` command:
+
+   ```
+   $ kpt alpha rpkg pull -n default mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868 regional
+   ```
+
+   The package is now in the `regional` directory. So, we can execute the
+   `set-labels` function against the package imperatively, using `kpt fn eval`:
+
+   ```
+   $ kpt fn eval --image gcr.io/kpt-fn/set-labels:v0.2.0 regional-02 -- nephio.org/site-type=regional
+   [RUNNING] "gcr.io/kpt-fn/set-labels:v0.2.0"
+   [PASS] "gcr.io/kpt-fn/set-labels:v0.2.0" in 5.5s
+     Results:
+       [info]: set 7 labels in total
+   ```
+
+   If we wanted to, we could have used the `--save` option to add the
+   `set-labels` call to the package pipeline. This would mean that function gets
+   called whenever the server saves the package; if we added new resources
+   later, they would also get labeled.
+
+   In any case, we now can push the package with the labels applied back to the
+   repository:
+
+   ```
+   $ kpt alpha rpkg pull -n default mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868 regional
+   ```
+
+   Finally, we propose and approve the package.
+
+   ```
    $ kpt alpha rpkg propose -n default mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868
    mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868 proposed
    $ kpt alpha rpkg approve -n default mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868
