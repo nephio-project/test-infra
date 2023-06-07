@@ -156,6 +156,7 @@ connection with that setting).
 
    We can then use it to access the workload cluster directly:
 
+   ```
    $ kubectl --kubeconfig regional-kubeconfig get ns
    NAME                           STATUS   AGE
    config-management-monitoring   Active   3h35m
@@ -192,7 +193,7 @@ connection with that setting).
    and kind clusters that get created.
 
 9. While the edge clusters are deploying (which will take 5-10 minutes), we can
-   install the free5gc functions that are not managed by the operator. For this,
+   install the free5gc functions other than SMF, AMF, and UPF. For this,
    we will use the regional cluster. Since these are all installed with a single
    package, we can use the UI to pick the `free5gc-cp` package from the
    `free5gc-packages` repository, and clone it to the `regional` repository (we

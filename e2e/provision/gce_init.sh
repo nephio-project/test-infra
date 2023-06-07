@@ -36,7 +36,9 @@ apt-get install -y git
 cd /home/ubuntu
 
 runuser -u ubuntu git clone "$REPO" test-infra
-cd test-infra && runuser -u ubuntu -- git checkout -b "$BRANCH" --track "origin/$BRANCH" && cd ..
+if [[ "$BRANCH" != "main" ]]; then
+  cd test-infra && runuser -u ubuntu -- git checkout -b "$BRANCH" --track "origin/$BRANCH" && cd ..
+fi
 
 sed -e "s/vagrant/ubuntu/" < /home/ubuntu/test-infra/e2e/provision/nephio.yaml > /home/ubuntu/nephio.yaml
 cd ./test-infra/e2e/provision
