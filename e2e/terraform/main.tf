@@ -23,7 +23,7 @@ resource "google_compute_instance" "vm_instance" {
   allow_stopping_for_update = true
   metadata = {
   ssh-keys = "${var.ansible_user}:${file(var.ssh_pub_key)}"
-  startup-script-url = "startup-script-url=https://raw.githubusercontent.com/nephio-project/test-infra/main/e2e/provision/gce_init.sh"
+  metadata_startup_script = file("${path.module}/../provision/gce_init.sh")
   nephio-run-e2e = true
   }
   boot_disk {
