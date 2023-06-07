@@ -1,5 +1,5 @@
 variable "project" {
-    default = "pure-faculty-367518"
+  default = "pure-faculty-367518"
 }
 
 variable "region" {
@@ -7,7 +7,7 @@ variable "region" {
 }
 
 variable "zone" {
-    default = "us-central1-c"
+  default = "us-central1-c"
 }
 
 variable "instance" {
