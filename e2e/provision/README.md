@@ -149,7 +149,7 @@ connection with that setting).
    `set-labels` function against the package imperatively, using `kpt fn eval`:
 
    ```
-   $ kpt fn eval --image gcr.io/kpt-fn/set-labels:v0.2.0 regional-02 -- nephio.org/site-type=regional
+   $ kpt fn eval --image gcr.io/kpt-fn/set-labels:v0.2.0 regional -- nephio.org/site-type=regional
    [RUNNING] "gcr.io/kpt-fn/set-labels:v0.2.0"
    [PASS] "gcr.io/kpt-fn/set-labels:v0.2.0" in 5.5s
      Results:
