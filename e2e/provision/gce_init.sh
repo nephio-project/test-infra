@@ -36,7 +36,7 @@ apt-get install -y git
 cd /home/ubuntu
 
 runuser -u ubuntu git clone "$REPO" test-infra
-cd test-infra && runuser -u ubuntu git checkout "$BRANCH" && cd ..
+cd test-infra && runuser -u ubuntu -- git checkout -b "$BRANCH" --track "origin/$BRANCH" && cd ..
 
 sed -e "s/vagrant/ubuntu/" < /home/ubuntu/test-infra/e2e/provision/nephio.yaml > /home/ubuntu/nephio.yaml
 cd ./test-infra/e2e/provision
@@ -44,5 +44,5 @@ export DEBUG DEPLOYMENT_TYPE
 runuser -u ubuntu ./gce_install_sandbox.sh
 
 if [[ "$RUN_E2E" == "true" ]]; then
-  runuser -u ubuntu ./gce_e2e.sh
+  runuser -u ubuntu ../e2e.sh
 fi

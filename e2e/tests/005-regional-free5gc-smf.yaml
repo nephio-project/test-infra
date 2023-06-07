@@ -1,0 +1,15 @@
+apiVersion: config.porch.kpt.dev/v1alpha1
+kind: PackageVariant
+metadata:
+  name: regional-free5gc-smf
+spec:
+  upstream:
+    repo: free5gc-packages
+    package: free5gc-smf
+    revision: v1
+  downstream:
+    repo: regional
+  annotations:
+    approval.nephio.org/policy: initial
+  injectors:
+  - name: regional
