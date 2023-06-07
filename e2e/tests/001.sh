@@ -1,4 +1,3 @@
-#!/bin/bash
 #!/usr/bin/env bash
 # SPDX-license-identifier: Apache-2.0
 ##############################################################################
