@@ -76,3 +76,45 @@ function k8s_wait_ready {
   echo "$resource_type $resource_namespace/$resource_name is ready"
   return 0
 }
+
+function k8s_wait_statefulset_ready {
+  local kubeconfig=$1
+  local timeout=$2
+  local resource_namespace=$3
+  local resource_type="statefulset"
+  local resource_name=$4
+  local min_ready=${5:-1}
+
+  # should validate the params...
+
+  local ready=""
+  while [[ "$ready" -lt "$min_ready" && $timeout -gt 0 ]]
+  do
+    echo "$timeout: checking readiness of $resource_type $resource_namespace/$resource_name using $kubeconfig"
+    ready=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath='{.status.readyReplicas}' || echo)
+    timeout=$(( $timeout - 5 ))
+    if [[ "$ready" -lt "$min_ready" && $timeout -gt 0 ]]; then
+      echo "status: $ready (want $min_ready)"
+      sleep 5
+    fi
+  done
+
+  if [[ "$ready" -lt "$min_ready" ]]; then
+    echo "Timed out waiting for $resource_type $resource_namespace/$resource_name to be ready"
+    return 1
+  fi
+
+  echo "$resource_type $resource_namespace/$resource_name is ready"
+  return 0
+}
+
+
+function k8s_get_capi_kubeconfig {
+  local kubeconfig=$1
+  local namespace=$2
+  local cluster=$3
+
+  local file=$(tempfile)
+  kubectl --kubeconfig "$kubeconfig" -n "$namespace" get secret "${cluster}-kubeconfig" -o jsonpath='{.data.value}' | base64 -d > "$file"
+  echo "$file"
+}
