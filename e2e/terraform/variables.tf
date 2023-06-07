@@ -29,3 +29,15 @@ variable "ssh_pub_key" {
 variable "ansible_user" {
   default = "ubuntu"
 }
+
+variable "nephio_lab_nodes" {
+  default     = 0
+  type        = number
+  description = "The number of Lab instances to be created."
+}
+
+variable "nephio_e2e_nodes" {
+  default     = 1
+  type        = number
+  description = "The number of End-to-End instances running per PR."
+}
