@@ -165,7 +165,7 @@ connection with that setting).
    repository:
 
    ```
-   $ kpt alpha rpkg pull -n default mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868 regional
+   $ kpt alpha rpkg push -n default mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868 regional
    ```
 
    Finally, we propose and approve the package.
