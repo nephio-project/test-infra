@@ -30,6 +30,11 @@ BRANCH=$(get_metadata nephio-test-infra-branch "main")
 
 echo "$DEBUG, $DEPLOYMENT_TYPE, $RUN_E2E, $REPO, $BRANCH"
 
+# pre-configure the "docker" group and add the "ubuntu" user to it so that the docker
+# and kpt fn apply commands will work without sudo
+addgroup docker
+usermod -a -G docker ubuntu
+
 apt-get update
 apt-get install -y git
 
