@@ -25,7 +25,7 @@ resource "google_compute_instance" "lab_instances" {
   metadata = {
     ssh-keys                = "${var.ansible_user}:${file(var.ssh_pub_key)}"
     metadata_startup_script = file("${path.module}/../provision/gce_init.sh")
-    nephio-run-e2e          = true
+    nephio-run-e2e          = false
   }
   boot_disk {
     initialize_params {
