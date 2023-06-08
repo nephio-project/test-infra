@@ -82,7 +82,7 @@ connection with that setting).
    $ gcloud compute ssh ubuntu@nephio-r1-e2e
    ```
 
-6. Our e2e topology consists of one regional cluster, and three edge clusters.
+6. Our e2e topology consists of one regional cluster, and two edge clusters.
    Let's start by deploying the regional cluster. In this case, we will use
    manual kpt commands to deploy a single cluster. First, check to make sure
    that both the mgmt and mgmt-staging repositories are in the Ready state.
@@ -216,7 +216,7 @@ connection with that setting).
    regional-md-0-zhw2j-58d497c498xkz96z   regional   3          3       3           3h58m   v1.26.3
    ```
 
-8. Next, you can deploy a fleet of three edge clusters by applying the
+8. Next, you can deploy a fleet of two edge clusters by applying the
    PackageVariantSet that can be found in the `tests` directory:
 
    ```

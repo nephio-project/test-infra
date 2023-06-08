@@ -31,8 +31,6 @@ k8s_apply "$kubeconfig" "$TESTDIR/002-edge-clusters.yaml"
 
 k8s_wait_exists "$kubeconfig" 600 "default" "workloadcluster" "edge01"
 k8s_wait_exists "$kubeconfig" 600 "default" "workloadcluster" "edge02"
-k8s_wait_exists "$kubeconfig" 600 "default" "workloadcluster" "edge03"
 
 k8s_wait_ready "$kubeconfig" 600 "default" "cluster" "edge01"
 k8s_wait_ready "$kubeconfig" 600 "default" "cluster" "edge02"
-k8s_wait_ready "$kubeconfig" 600 "default" "cluster" "edge03"

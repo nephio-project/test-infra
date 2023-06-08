@@ -29,7 +29,7 @@ kubeconfig="$HOME/.kube/config"
 
 k8s_apply "$kubeconfig" "$TESTDIR/004-free5gc-operator.yaml"
 
-for cluster in "regional" "edge01" "edge02" "edge03"; do
+for cluster in "regional" "edge01" "edge02"; do
   cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
   k8s_wait_exists "$cluster_kubeconfig" 600 "free5gc" "deployment" "free5gc-operator-controller-controller"
   k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc" "deployment" "free5gc-operator-controller-controller"

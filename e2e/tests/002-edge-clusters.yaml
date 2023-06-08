@@ -13,7 +13,6 @@ spec:
       packageNames:
       - edge01
       - edge02
-      - edge03
     template:
       annotations:
         approval.nephio.org/policy: initial
@@ -22,3 +21,4 @@ spec:
         - image: gcr.io/kpt-fn/set-labels:v0.2.0
           configMap:
             nephio.org/site-type: edge
+            nephio.org/region: us-west1
