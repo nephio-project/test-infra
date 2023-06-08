@@ -52,7 +52,10 @@ cd ./test-infra/e2e/provision
 export DEBUG DEPLOYMENT_TYPE
 runuser -u ubuntu ./gce_install_sandbox.sh
 
-usermod ubuntu -G docker -a
+# Grant Docker permissions to current user
+if ! getent group docker | grep -q "$USER"; then
+    sudo usermod -aG docker "$USER"
+fi
 
 if [[ "$RUN_E2E" == "true" ]]; then
   runuser -u ubuntu ../e2e.sh
