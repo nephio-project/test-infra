@@ -36,4 +36,4 @@ kpt alpha rpkg approve -n default "$pkg_rev"
 
 k8s_wait_exists "$regional_kubeconfig" 600 "free5gc-cp" "statefulset" "mongodb"
 
-k8s_wait_statefulset_ready "$regional_kubeconfig" 600 "free5gc-cp" "mongodb"
+k8s_wait_ready_replicas "$regional_kubeconfig" 600 "free5gc-cp" "statefulset" "mongodb"
