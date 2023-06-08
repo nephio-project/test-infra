@@ -1,3 +1,4 @@
+#!/bin/bash
 #!/usr/bin/env bash
 # SPDX-license-identifier: Apache-2.0
 ##############################################################################
@@ -9,7 +10,7 @@
 ##############################################################################
 
 ## TEST METADATA
-## TEST-NAME: Deploy regional workload cluster
+## TEST-NAME: Deploy free5gc operator to all workload clusters
 ##
 
 set -o pipefail
@@ -26,16 +27,10 @@ source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
-workload_cluster_pkg_rev=$(kpt alpha rpkg get --name nephio-workload-cluster --revision v7 -o jsonpath='{.metadata.name}')
-regional_pkg_rev=$(kpt alpha rpkg clone -n default "$workload_cluster_pkg_rev" --repository mgmt regional | cut -f 1 - ' ')
+k8s_apply "$kubeconfig" "$TESTDIR/004-free5gc-operator.yaml"
 
-kpt alpha rpkg pull -n default "$regional_pkg_rev" regional
-kpt fn eval --image "gcr.io/kpt-fn/set-labels:v0.2.0" regional -- "nephio.org/site-type=regional" "nephio.org/region=us-west1"
-kpt alpha rpkg push -n default "$regional_pkg_rev" regional
-
-kpt alpha rpkg propose -n default "$regional_pkg_rev"
-kpt alpha rpkg approve -n default "$regional_pkg_rev"
-
-k8s_wait_exists "$kubeconfig" 600 "default" "workloadcluster" "regional"
-
-k8s_wait_ready "$kubeconfig" 600 "default" "cluster" "regional"
+for cluster in "regional" "edge01" "edge02" "edge03" "edge04"; do
+  cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
+  k8s_wait_exists "$cluster_kubeconfig" 600 "free5gc" "deployment" "free5gc-operator-controller-controller"
+  k8s_wait_ready "$cluster_kubeconfig" 600 "free5gc" "deployment" "free5gc-operator-controller-controller"
+done

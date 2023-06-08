@@ -33,7 +33,15 @@ echo "$DEBUG, $DEPLOYMENT_TYPE, $RUN_E2E, $REPO, $BRANCH"
 apt-get update
 apt-get install -y git
 
+usermod ubuntu -G docker -a
+
 cd /home/ubuntu
+
+cat > .bash_aliases <<EOF
+alias k=kubectl
+EOF
+
+chown ubuntu:ubuntu .bash_aliases
 
 runuser -u ubuntu git clone "$REPO" test-infra
 if [[ "$BRANCH" != "main" ]]; then
