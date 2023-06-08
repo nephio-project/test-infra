@@ -1,15 +1,22 @@
-apiVersion: config.porch.kpt.dev/v1alpha1
-kind: PackageVariant
+apiVersion: config.porch.kpt.dev/v1alpha2
+kind: PackageVariantSet
 metadata:
   name: regional-free5gc-smf
 spec:
   upstream:
     repo: free5gc-packages
-    package: free5gc-smf
-    revision: v1
-  downstream:
-    repo: regional
-  annotations:
-    approval.nephio.org/policy: initial
-  injectors:
-  - name: regional
+    package: pkg-example-amf-bp
+    revision: v3
+  targets:
+  - objectSelector:
+      apiVersion: infra.nephio.org/v1alpha1
+      kind: WorkloadCluster
+      matchLabels:
+        nephio.org/site-type: regional
+    template:
+      downstream:
+        package: free5gc-smf
+      annotations:
+        approval.nephio.org/policy: initial
+      injectors:
+      - nameExpr: target.name
