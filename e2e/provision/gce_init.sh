@@ -33,7 +33,6 @@ echo "$DEBUG, $DEPLOYMENT_TYPE, $RUN_E2E, $REPO, $BRANCH"
 apt-get update
 apt-get install -y git
 
-usermod ubuntu -G docker -a
 
 cd /home/ubuntu
 
@@ -52,6 +51,8 @@ sed -e "s/vagrant/ubuntu/" < /home/ubuntu/test-infra/e2e/provision/nephio.yaml >
 cd ./test-infra/e2e/provision
 export DEBUG DEPLOYMENT_TYPE
 runuser -u ubuntu ./gce_install_sandbox.sh
+
+usermod ubuntu -G docker -a
 
 if [[ "$RUN_E2E" == "true" ]]; then
   runuser -u ubuntu ../e2e.sh
