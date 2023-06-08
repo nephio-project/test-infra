@@ -5,7 +5,7 @@ metadata:
 spec:
   upstream:
     repo: free5gc-packages
-    package: pkg-example-amf-bp
+    package: pkg-example-smf-bp
     revision: v3
   targets:
   - objectSelector:
