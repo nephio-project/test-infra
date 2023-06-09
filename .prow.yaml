@@ -64,6 +64,115 @@ presubmits:
             items:
               - key: nephio.yaml
                 path: nephio.yaml
+postsubmits:
+  - name: build-push-image-gotests
+    cluster: default
+    run_if_changed: 'images/gotests/.*'
+    branches:
+    - "main"
+    annotations:
+      description: Build and Push Image to DockerHub every commit
+    decorate: true
+    decoration_config:
+      censor_secrets: true
+    max_concurrency: 0
+    spec:
+      containers:
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:debug
+        command:
+        - "/bin/sh"
+        - "-c"
+        - |
+          executor --context=${PWD}/images/gotests \
+            --dockerfile=Dockerfile --destination=nephio/gotests:${BUILD_ID} \
+            --destination=nephio/gotests:latest
+        volumeMounts:
+          - name: kaniko-secret
+            mountPath: /kaniko/.docker/
+        resources:
+          requests:
+            cpu: 2
+            memory: 2Gi
+      volumes:
+        - name: kaniko-secret
+          secret:
+            secretName: regcred
+            items:
+              - key: .dockerconfigjson
+                path: config.json
+  - name: build-push-image-e2e
+    cluster: default
+    run_if_changed: 'images/e2e/.*'
+    branches:
+    - "main"
+    annotations:
+      description: Build and Push Image to DockerHub every commit
+    decorate: true
+    decoration_config:
+      censor_secrets: true
+    max_concurrency: 0
+    spec:
+      containers:
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:debug
+        command:
+        - "/bin/sh"
+        - "-c"
+        - |
+          executor --context=${PWD}/images/e2e \
+            --dockerfile=Dockerfile --destination=nephio/e2e:${BUILD_ID} \
+            --destination=nephio/e2e:latest
+        volumeMounts:
+          - name: kaniko-secret
+            mountPath: /kaniko/.docker/
+        resources:
+          requests:
+            cpu: 2
+            memory: 2Gi
+      volumes:
+        - name: kaniko-secret
+          secret:
+            secretName: regcred
+            items:
+              - key: .dockerconfigjson
+                path: config.json
+  - name: build-push-image-label_sync
+    cluster: default
+    run_if_changed: 'images/label_sync/.*'
+    branches:
+    - "main"
+    annotations:
+      description: Build and Push Image to DockerHub every commit
+    decorate: true
+    decoration_config:
+      censor_secrets: true
+    max_concurrency: 0
+    spec:
+      containers:
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:debug
+        command:
+        - "/bin/sh"
+        - "-c"
+        - |
+          executor --context=${PWD}/images/label_sync \
+            --dockerfile=Dockerfile --destination=nephio/label_sync:${BUILD_ID} \
+            --destination=nephio/label_sync:latest
+        volumeMounts:
+          - name: kaniko-secret
+            mountPath: /kaniko/.docker/
+        resources:
+          requests:
+            cpu: 2
+            memory: 2Gi
+      volumes:
+        - name: kaniko-secret
+          secret:
+            secretName: regcred
+            items:
+              - key: .dockerconfigjson
+                path: config.json
 periodics:
   - name: e2e-daily
     annotations:
