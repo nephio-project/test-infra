@@ -100,7 +100,7 @@ gcloud compute ssh ubuntu@nephio-r1-e2e
 
 
 Our e2e topology consists of one regional cluster, and two edge clusters.
-Let's start by deploying the regional cluster. In this case, we will use
+Let's start by deploying the regional cluster. In this case, you will use
 manual kpt commands to deploy a single cluster. First, check to make sure
 that both the mgmt and mgmt-staging repositories are in the Ready state.
 The mgmt repository is used to manage the contents of the management
@@ -221,9 +221,9 @@ ConfigSync running in the management cluster will now pull out this new
 package, creating all the resources necessary to provision a Kind cluster and
 register it with Nephio. This will take about five minutes or so.
 
-## Step6: Check Regional cluster installation
+## Step 6: Check Regional cluster installation
 
-You can check if the cluster is:
+You can check if the cluster has been added to the management cluster:
 
 ```bash
 kubectl get clusters
