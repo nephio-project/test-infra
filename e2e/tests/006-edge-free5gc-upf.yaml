@@ -5,8 +5,8 @@ metadata:
 spec:
   upstream:
     repo: free5gc-packages
-    package: free5gc-upf
-    revision: v1
+    package: pkg-example-upf-bp
+    revision: v3
   targets:
   - objectSelector:
       apiVersion: infra.nephio.org/v1alpha1
@@ -14,6 +14,8 @@ spec:
       matchLabels:
         nephio.org/site-type: edge
     template:
+      downstream:
+        package: free5gc-upf
       annotations:
         approval.nephio.org/policy: initial
       injectors:
