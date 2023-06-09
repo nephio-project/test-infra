@@ -34,7 +34,17 @@ echo "$DEBUG, $DEPLOYMENT_TYPE, $RUN_E2E, $REPO, $BRANCH"
 apt-get update
 apt-get install -y git
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 cd /home/$NEPHIO_USER
+
+=======
+
+=======
+>>>>>>> cd34dd9 (pre-provision the docker group)
+cd /home/$NEPHIO_USER
+
+>>>>>>> b983ba6 (Additional e2e tests, and some conveniences (#70))
 cat > .bash_aliases <<EOF
 alias k=kubectl
 EOF
@@ -49,17 +59,32 @@ fi
 sed -e "s/vagrant/$NEPHIO_USER/" < /home/$NEPHIO_USER/test-infra/e2e/provision/nephio.yaml > /home/$NEPHIO_USER/nephio.yaml
 cd ./test-infra/e2e/provision
 export DEBUG DEPLOYMENT_TYPE
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> cd34dd9 (pre-provision the docker group)
 
 # Create the docker user now so that the NEPHIO_USER can be added to the docker group
 # prior to installation of the management cluster installation.
 if ! getent group docker > /dev/null; then
     addgroup docker
 fi
+<<<<<<< HEAD
+=======
+runuser -u $NEPHIO_USER ./gce_install_sandbox.sh
+>>>>>>> b983ba6 (Additional e2e tests, and some conveniences (#70))
+=======
+>>>>>>> cd34dd9 (pre-provision the docker group)
 
 # Grant Docker permissions to current user
 if ! getent group docker | grep -q "$NEPHIO_USER"; then
     sudo usermod -aG docker "$NEPHIO_USER"
 fi
+<<<<<<< HEAD
+
+runuser -u $NEPHIO_USER ./gce_install_sandbox.sh
+=======
+>>>>>>> b983ba6 (Additional e2e tests, and some conveniences (#70))
 
 runuser -u $NEPHIO_USER ./gce_install_sandbox.sh
 
