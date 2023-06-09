@@ -41,9 +41,9 @@ function deploy_kpt_pkg {
 
 sudo apt-get clean
 sudo apt-get update
-sudo DEBIAN_FRONTEND=noninteractive apt-get install python3-venv python3-pip -y
+sudo DEBIAN_FRONTEND=noninteractive apt-get install python3-virtualenv python3-pip -y
 
-python3 -m venv "$HOME/.venv"
+virtualenv "$HOME/.venv"
 # shellcheck disable=SC1091
 source "$HOME/.venv/bin/activate"
 pip install -r requirements.txt

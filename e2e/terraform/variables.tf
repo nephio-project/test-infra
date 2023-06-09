@@ -1,5 +1,5 @@
 variable "project" {
-    default = "pure-faculty-367518"
+  default = "pure-faculty-367518"
 }
 
 variable "region" {
@@ -7,7 +7,7 @@ variable "region" {
 }
 
 variable "zone" {
-    default = "us-central1-c"
+  default = "us-central1-c"
 }
 
 variable "instance" {
@@ -28,4 +28,16 @@ variable "ssh_pub_key" {
 
 variable "ansible_user" {
   default = "ubuntu"
+}
+
+variable "nephio_lab_nodes" {
+  default     = 0
+  type        = number
+  description = "The number of Lab instances to be created."
+}
+
+variable "nephio_e2e_nodes" {
+  default     = 1
+  type        = number
+  description = "The number of End-to-End instances running per PR."
 }
