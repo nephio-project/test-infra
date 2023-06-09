@@ -10,7 +10,7 @@
 ##############################################################################
 
 ## TEST METADATA
-## TEST-NAME: Deploy edge clusters
+## TEST-NAME: Deploy free5gc operator to all workload clusters
 ##
 
 set -o pipefail
@@ -27,10 +27,10 @@ source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
-k8s_apply "$kubeconfig" "$TESTDIR/002-edge-clusters.yaml"
+k8s_apply "$kubeconfig" "$TESTDIR/004-free5gc-operator.yaml"
 
-k8s_wait_exists "$kubeconfig" 600 "default" "workloadcluster" "edge01"
-k8s_wait_exists "$kubeconfig" 600 "default" "workloadcluster" "edge02"
-
-k8s_wait_ready "$kubeconfig" 600 "default" "cluster" "edge01"
-k8s_wait_ready "$kubeconfig" 600 "default" "cluster" "edge02"
+for cluster in "regional" "edge01" "edge02"; do
+  cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
+  k8s_wait_exists "$cluster_kubeconfig" 600 "free5gc" "deployment" "free5gc-operator-controller-controller"
+  k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc" "deployment" "free5gc-operator-controller-controller"
+done

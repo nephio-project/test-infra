@@ -29,11 +29,11 @@ kubeconfig="$HOME/.kube/config"
 regional_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
 
 upstream_pkg_rev=$(kpt alpha rpkg get --name free5gc-cp --revision v1 -o jsonpath='{.metadata.name}')
-pkg_rev=$(kpt alpha rpkg clone -n default "$pkg_rev" --repository regional free5gc-cp | cut -f 1 - ' ')
+pkg_rev=$(kpt alpha rpkg clone -n default "$upstream_pkg_rev" --repository regional free5gc-cp | cut -f 1 -d ' ')
 
 kpt alpha rpkg propose -n default "$pkg_rev"
 kpt alpha rpkg approve -n default "$pkg_rev"
 
 k8s_wait_exists "$regional_kubeconfig" 600 "free5gc-cp" "statefulset" "mongodb"
 
-k8s_wait_statefulset_ready "$regional_kubeconfig" 600 "free5gc-cp" "mongodb"
+k8s_wait_ready_replicas "$regional_kubeconfig" 600 "free5gc-cp" "statefulset" "mongodb"

@@ -82,7 +82,7 @@ connection with that setting).
    $ gcloud compute ssh ubuntu@nephio-r1-e2e
    ```
 
-6. Our e2e topology consists of one regional cluster, and three edge clusters.
+6. Our e2e topology consists of one regional cluster, and two edge clusters.
    Let's start by deploying the regional cluster. In this case, we will use
    manual kpt commands to deploy a single cluster. First, check to make sure
    that both the mgmt and mgmt-staging repositories are in the Ready state.
@@ -130,14 +130,10 @@ connection with that setting).
    mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868 created
    ```
 
-   We want to make sure that our new regional cluster is labeled as regional. If
-   we were using the UI, we would use the Edit button to add a label to the
-   resources in the package (or, at least to the WorkloadCluster resource).
-   Later, if you look at how we do the edge clusters, you will see the label
-   added by the PackageVariantSet. In this case, since we are using the CLI,
-   we need to pull the package out, modify it, and then push the updates back to
-   the Draft revision. We will use `kpt` and the `set-labels` function to do
-   this.
+   We want to make sure that our new regional cluster is labeled as regional.
+   Since we are using the CLI, we need to pull the package out, modify it, and
+   then push the updates back to the Draft revision. We will use `kpt` and the
+   `set-labels` function to do this.
 
    To pull the package to a local directory, we use the `rpkg pull` command:
 
@@ -149,7 +145,7 @@ connection with that setting).
    `set-labels` function against the package imperatively, using `kpt fn eval`:
 
    ```
-   $ kpt fn eval --image gcr.io/kpt-fn/set-labels:v0.2.0 regional -- nephio.org/site-type=regional
+   $ kpt fn eval --image gcr.io/kpt-fn/set-labels:v0.2.0 regional -- "nephio.org/site-type=regional" "nephio.org/region=us-west1"
    [RUNNING] "gcr.io/kpt-fn/set-labels:v0.2.0"
    [PASS] "gcr.io/kpt-fn/set-labels:v0.2.0" in 5.5s
      Results:
@@ -220,7 +216,7 @@ connection with that setting).
    regional-md-0-zhw2j-58d497c498xkz96z   regional   3          3       3           3h58m   v1.26.3
    ```
 
-8. Next, you can deploy a fleet of three edge clusters by applying the
+8. Next, you can deploy a fleet of two edge clusters by applying the
    PackageVariantSet that can be found in the `tests` directory:
 
    ```

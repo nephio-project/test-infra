@@ -77,13 +77,13 @@ function k8s_wait_ready {
   return 0
 }
 
-function k8s_wait_statefulset_ready {
+function k8s_wait_ready_replicas {
   local kubeconfig=$1
   local timeout=$2
   local resource_namespace=$3
-  local resource_type="statefulset"
-  local resource_name=$4
-  local min_ready=${5:-1}
+  local resource_type=$4
+  local resource_name=$5
+  local min_ready=${6:-1}
 
   # should validate the params...
 
