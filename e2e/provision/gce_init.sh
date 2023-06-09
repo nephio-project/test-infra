@@ -39,8 +39,14 @@ usermod -a -G docker ubuntu
 apt-get update
 apt-get install -y git
 
+<<<<<<< HEAD
 cd /home/$NEPHIO_USER
 
+=======
+
+cd /home/$NEPHIO_USER
+
+>>>>>>> b983ba6 (Additional e2e tests, and some conveniences (#70))
 cat > .bash_aliases <<EOF
 alias k=kubectl
 EOF
@@ -55,19 +61,26 @@ fi
 sed -e "s/vagrant/$NEPHIO_USER/" < /home/$NEPHIO_USER/test-infra/e2e/provision/nephio.yaml > /home/$NEPHIO_USER/nephio.yaml
 cd ./test-infra/e2e/provision
 export DEBUG DEPLOYMENT_TYPE
+<<<<<<< HEAD
 
 # Create the docker user now so that the NEPHIO_USER can be added to the docker group
 # prior to installation of the management cluster installation.
 if ! getent group docker > /dev/null; then
     addgroup docker
 fi
+=======
+runuser -u $NEPHIO_USER ./gce_install_sandbox.sh
+>>>>>>> b983ba6 (Additional e2e tests, and some conveniences (#70))
 
 # Grant Docker permissions to current user
 if ! getent group docker | grep -q "$NEPHIO_USER"; then
     sudo usermod -aG docker "$NEPHIO_USER"
 fi
+<<<<<<< HEAD
 
 runuser -u $NEPHIO_USER ./gce_install_sandbox.sh
+=======
+>>>>>>> b983ba6 (Additional e2e tests, and some conveniences (#70))
 
 if [[ "$RUN_E2E" == "true" ]]; then
   runuser -u $NEPHIO_USER ../e2e.sh
