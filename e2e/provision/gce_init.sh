@@ -31,14 +31,8 @@ NEPHIO_USER=${USER:-ubuntu}
 
 echo "$DEBUG, $DEPLOYMENT_TYPE, $RUN_E2E, $REPO, $BRANCH"
 
-# pre-configure the "docker" group and add the "ubuntu" user to it so that the docker
-# and kpt fn apply commands will work without sudo
-addgroup docker
-usermod -a -G docker ubuntu
-
 apt-get update
 apt-get install -y git
-
 
 cd /home/$NEPHIO_USER
 
@@ -56,12 +50,19 @@ fi
 sed -e "s/vagrant/$NEPHIO_USER/" < /home/$NEPHIO_USER/test-infra/e2e/provision/nephio.yaml > /home/$NEPHIO_USER/nephio.yaml
 cd ./test-infra/e2e/provision
 export DEBUG DEPLOYMENT_TYPE
-runuser -u $NEPHIO_USER ./gce_install_sandbox.sh
+
+# Create the docker user now so that the NEPHIO_USER can be added to the docker group
+# prior to installation of the management cluster installation.
+if ! getent group docker > /dev/null; then
+    addgroup docker
+fi
 
 # Grant Docker permissions to current user
 if ! getent group docker | grep -q "$NEPHIO_USER"; then
     sudo usermod -aG docker "$NEPHIO_USER"
 fi
+
+runuser -u $NEPHIO_USER ./gce_install_sandbox.sh
 
 if [[ "$RUN_E2E" == "true" ]]; then
   runuser -u $NEPHIO_USER ../e2e.sh
