@@ -2,7 +2,7 @@
 
 ## Step 0: Prerequisites
 
-You need a account in GCP and `gloud` available on your local environment.
+You need a account in GCP and `gcloud` available on your local environment.
 
 ## Step 1: Create a VM
 
