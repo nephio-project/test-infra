@@ -63,6 +63,12 @@ options:
           - resource-merge
           - fast-forward
           - force-delete-replace
+    for_deployment:
+        description:
+           - (Experimental) indicates if the fetched package is a deployable
+             instance that will be deployed to a cluster.
+        required: false
+        type: bool
     directory:
         description:
           - Directory of the kpt package.
@@ -290,7 +296,14 @@ class KptClient:
 
     # Fetch a package from a git repo.
     def pkg_get(
-        self, repo_uri, pkg_path, local_dest_directory, version, strategy, **kargs
+        self,
+        repo_uri,
+        pkg_path,
+        local_dest_directory,
+        version,
+        strategy,
+        for_deployment,
+        **kargs
     ):
         cmd = [self._kpt_cmd_path, "pkg", "get"]
         cmd.append(
@@ -302,6 +315,8 @@ class KptClient:
         )
         if local_dest_directory:
             cmd.append(local_dest_directory)
+        if for_deployment:
+            cmd.append("--for-deployment")
         if strategy and strategy in [
             "resource-merge",
             "fast-forward",
@@ -434,6 +449,7 @@ def main():
         version=dict(type="str", required=False),
         local_dest_directory=dict(type="str", required=False),
         strategy=dict(type="str", required=False),
+        for_deployment=dict(type="bool", required=False),
         directory=dict(type="str", required=False),
         diff_type=dict(type="bool", required=False),
         diff_tool=dict(type="str", required=False),

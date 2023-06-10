@@ -19,6 +19,7 @@
     pkg_path: "{{ pkg }}"
     version: "{{ version }}"
     local_dest_directory: "{{ local_dest_directory }}"
+    for_deployment: "{{ for_deployment | default(false) | bool }}"
     command: pkg-get
 
 - name: Get the local path
@@ -26,7 +27,6 @@
     directory: "{{ local_dest_directory }}/{{ pkg | split('/') | last }}"
 
 - name: Get package content information
-  become: true
   kpt:
     directory: "{{ directory }}"
     command: pkg-tree
