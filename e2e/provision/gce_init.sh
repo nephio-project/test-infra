@@ -56,6 +56,7 @@ runuser -u $NEPHIO_USER ./gce_install_sandbox.sh
 # Grant Docker permissions to current user
 if ! getent group docker | grep -q "$NEPHIO_USER"; then
     sudo usermod -aG docker "$NEPHIO_USER"
+    newgrp docker
 fi
 
 if [[ "$RUN_E2E" == "true" ]]; then
