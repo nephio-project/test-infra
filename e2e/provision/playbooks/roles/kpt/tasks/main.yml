@@ -23,10 +23,10 @@
     pkg_path: "{{ pkg }}"
     version: "{{ version }}"
     local_dest_directory: "{{ workdir }}"
+    for_deployment: "{{ for_deployment | default(false) | bool }}"
     command: pkg-get
 
 - name: Get package content information
-  become: true
   kpt:
     directory: "{{ workdir }}"
     command: pkg-tree
