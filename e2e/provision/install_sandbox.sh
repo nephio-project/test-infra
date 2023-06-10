@@ -51,14 +51,11 @@ function deploy_kpt_pkg {
     done
 }
 
-sudo apt-get clean
+# Install dependencies for it's ansible execution
 sudo apt-get update
-sudo DEBIAN_FRONTEND=noninteractive apt-get install python3-virtualenv python3-pip -y
-
-virtualenv "$HOME/.venv"
-# shellcheck disable=SC1091
-source "$HOME/.venv/bin/activate"
-pip install -r requirements.txt
+sudo -E DEBIAN_FRONTEND=noninteractive apt-get remove -q -y python3-openssl
+sudo -E NEEDRESTART_SUSPEND=1 DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confnew" --allow-downgrades --allow-remove-essential --allow-change-held-packages -fuy install -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" python3-pip
+sudo pip install -r requirements.txt
 ansible-galaxy role install -r galaxy-requirements.yml
 ansible-galaxy collection install -r galaxy-requirements.yml
 
