@@ -19,6 +19,7 @@ Vagrant.configure('2') do |config|
   config.vm.box = 'generic/ubuntu2004'
   config.vm.box_check_update = false
   config.vm.synced_folder './', '/vagrant'
+  config.vm.synced_folder '../tests', "/opt/e2e/tests"
 
   config.vm.network 'forwarded_port', guest: 7007, guest_ip: '127.0.0.1', host: 7007
   config.vm.network 'forwarded_port', guest: 3000, guest_ip: '172.18.0.200', host: 3000
@@ -70,6 +71,7 @@ Vagrant.configure('2') do |config|
 
   config.vm.provider :libvirt do |v, override|
     override.vm.synced_folder './', '/vagrant', type: 'virtiofs'
+    override.vm.synced_folder '../tests', "/opt/e2e/tests", type: 'virtiofs'
     v.memorybacking :access, mode: 'shared'
     v.random_hostname = true
     v.management_network_address = '10.0.2.0/24'
