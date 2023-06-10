@@ -17,5 +17,5 @@
   loop:
     - {name: fs.inotify.max_user_watches, value: 524288}
     - {name: fs.inotify.max_user_instances, value: 512}
-    - {name: kernel.keys.maxkeys, value: 500000 }
+    - {name: kernel.keys.maxkeys, value: 500000}
     - {name: kernel.keys.maxbytes, value: 1000000}

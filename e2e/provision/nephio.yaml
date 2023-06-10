@@ -15,9 +15,9 @@ all:
     gitea_password: secret
     validate_certs: true
     container_engine: podman
-    installation_mode: online #online/offline
+    installation_mode: online # online/offline
     proxy:
-      http_proxy: 
+      http_proxy:
       https_proxy:
       no_proxy:
     host_os: "linux"  # use "darwin" for MacOS X, "windows" for Windows

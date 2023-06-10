@@ -37,7 +37,7 @@ apt-get install -y git
 cd /home/$NEPHIO_USER
 
 runuser -u $NEPHIO_USER git clone "$REPO" test-infra
-if [[ $BRANCH != "main" ]]; then
+if [[ "$BRANCH" != "main" ]]; then
     cd test-infra && runuser -u $NEPHIO_USER -- git checkout -b "$BRANCH" --track "origin/$BRANCH" && cd ..
 fi
 
@@ -54,6 +54,6 @@ if ! getent group docker | grep -q "$NEPHIO_USER"; then
     sudo usermod -aG docker "$NEPHIO_USER"
 fi
 
-if [[ $RUN_E2E == "true" ]]; then
+if [[ "$RUN_E2E" == "true" ]]; then
     runuser -u $NEPHIO_USER ../e2e.sh
 fi

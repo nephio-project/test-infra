@@ -18,6 +18,8 @@ lint: |
   set -e
   PATH=${PATH}
   yamllint -c ../../../.yaml-lint.yml .
+  ansible-lint -v -c ../../../.ansible-lint
+  flake8
 platforms:
   - name: bionic
     box: generic/ubuntu2004

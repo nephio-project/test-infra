@@ -27,7 +27,7 @@
         api_version: cluster.x-k8s.io/v1beta1
         kind: Machine
       register: machine_list
-      until: machine_list|json_query('resources[*].status.phase')|unique == ["Running"]
+      until: machine_list | json_query('resources[*].status.phase') | unique == ["Running"]
       retries: 20
       delay: 30
     - name: Wait for kubeadmcontrolplane resources
@@ -37,7 +37,7 @@
         api_version: controlplane.cluster.x-k8s.io/v1beta1
         kind: KubeadmControlPlane
       register: kubeadmcontrolplane_list
-      until: not kubeadmcontrolplane_list|json_query('resources[*].status.initialized')|bool
+      until: not kubeadmcontrolplane_list | json_query('resources[*].status.initialized') | bool
       retries: 5
       delay: 10
     - name: Get k8s clusters
@@ -45,6 +45,7 @@
       ansible.builtin.command: kind get clusters
       register: kind_get_cluster
       failed_when: (kind_get_cluster.rc not in [0, 1])
+      changed_when: false
     - name: Print kind_get_cluster value
       ansible.builtin.debug:
         var: kind_get_cluster
