@@ -117,6 +117,11 @@ else
     sudo chown $USER:$USER "$HOME/.kube/config"
     chmod 644 "$HOME/.kube/config"
 
+    # Grant Docker permissions to current user
+    if ! getent group docker | grep -q "$USER"; then
+        sudo usermod -aG docker "$USER"
+    fi
+
     # I don't know how to make ansible do what I want, this is what I want
     deploy_kpt_pkg "repository@repository/v3" "mgmt"
     deploy_kpt_pkg "rootsync@rootsync/v3" "mgmt"
