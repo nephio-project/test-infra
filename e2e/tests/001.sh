@@ -37,5 +37,6 @@ kpt alpha rpkg propose -n default "$regional_pkg_rev"
 kpt alpha rpkg approve -n default "$regional_pkg_rev"
 
 k8s_wait_exists "$kubeconfig" 600 "default" "workloadcluster" "regional"
-
+k8s_wait_exists "$kubeconfig" 600 "default" "cluster" "regional"
 k8s_wait_ready "$kubeconfig" 600 "default" "cluster" "regional"
+

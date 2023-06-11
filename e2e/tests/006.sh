@@ -38,7 +38,7 @@ for cluster in "edge01" "edge02"; do
 done
 
 for cluster in "edge01" "edge02"; do
-  cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
+  cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "$cluster")
   k8s_wait_exists "$cluster_kubeconfig" 600 "free5gc-upf" "deployment" "free5gc-upf"
   k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc-upf" "deployment" "free5gc-upf"
 done
