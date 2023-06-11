@@ -10,7 +10,7 @@
 ##############################################################################
 
 ## TEST METADATA
-## TEST-NAME: Deploy free5gc AMF and SMF to regional clusters
+## TEST-NAME: Deploy free5gc UPF to edge clusters
 ##
 
 set -o pipefail
@@ -30,11 +30,11 @@ kubeconfig="$HOME/.kube/config"
 k8s_apply "$kubeconfig" "$TESTDIR/006-edge-free5gc-upf.yaml"
 
 for cluster in "edge01" "edge02"; do
-  k8s_wait_exists "$kubeconfig" 600 "default" "packagevariant" "edge-free5gc-smf-${cluster}-free5gc-upf"
+  k8s_wait_exists "$kubeconfig" 600 "default" "packagevariant" "edge-free5gc-upf-${cluster}-free5gc-upf"
 done
 
 for cluster in "edge01" "edge02"; do
-  k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "edge-free5gc-smf-${cluster}-free5gc-upf"
+  k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "edge-free5gc-upf-${cluster}-free5gc-upf"
 done
 
 for cluster in "edge01" "edge02"; do
