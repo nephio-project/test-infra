@@ -46,4 +46,5 @@ if [[ "$ORGNAME" == "google.com" ]]; then
   OPTS="-o ProxyCommand='corp-ssh-helper %h %p'"
 fi
 
+trap "echo To ssh to the VM: gcloud compute ssh $VM -- $OPTS" INT
 echo gcloud compute ssh $VM -- $OPTS sudo journalctl -u google-startup-scripts.service --follow | /bin/bash
