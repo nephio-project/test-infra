@@ -312,9 +312,9 @@ class KptClient:
         result = dict(changed=False, rc=0, cmd=" ".join(cmd))
 
         dest = (
-            (local_dest_directory if local_dest_directory else ".")
-            + "/"
-            + pkg_path.split("/")[-1]
+            local_dest_directory
+            if local_dest_directory
+            else "./" + pkg_path.split("/")[-1]
         )
         if not os.path.exists(dest):
             self._run(cmd)
@@ -356,7 +356,7 @@ class KptClient:
             cmd.extend(["--output", output])
         if results_dir:
             cmd.extend(["--results-dir", results_dir])
-        self._run(cmd)
+        self._run(cmd, False)
 
     # Initialize a package with the information needed for inventory tracking.
     def live_init(
@@ -424,7 +424,7 @@ class KptClient:
             cmd.extend(["--show-status-events", show_status_events])
         if context:
             cmd.extend(["--context", context])
-        self._run(cmd)
+        self._run(cmd, False)
 
 
 def main():

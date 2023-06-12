@@ -18,14 +18,15 @@
     - {pkg: nephio-stock-repos, version: nephio-stock-repos/v1, namespaces: []}
   vars:
     repo_uri: https://github.com/nephio-project/nephio-example-packages.git
-    local_dest_directory: /tmp
     pkg: "{{ item.pkg }}"
     version: "{{ item.version }}"
     namespaces: "{{ item.namespaces }}"
     context: kind-kind
+
 - name: Create gitea user password in nephio-system namespace
   become: true
   kubernetes.core.k8s:
+    context: kind-kind
     state: present
     definition:
       apiVersion: v1
@@ -37,6 +38,7 @@
       stringData:
         username: "{{ gitea_username }}"
         password: "{{ gitea_password }}"
+
 - name: Deploy Nephio webui
   ansible.builtin.include_role:
     name: kpt
@@ -44,7 +46,6 @@
     - {pkg: nephio-webui, version: v7, namespaces: [nephio-webui]}
   vars:
     repo_uri: https://github.com/nephio-project/nephio-packages.git
-    local_dest_directory: /tmp
     pkg: "{{ item.pkg }}"
     version: "{{ item.version }}"
     namespaces: "{{ item.namespaces }}"
