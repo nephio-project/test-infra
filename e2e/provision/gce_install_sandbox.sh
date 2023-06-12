@@ -26,7 +26,7 @@ function deploy_kpt_pkg {
   sudo kpt fn render "$localpkg"
   kpt live init "$localpkg"
   kubectl --kubeconfig "$HOME/.kube/config" api-resources
-  #kpt pkg tree "$localpkg"
+  kpt pkg tree "$localpkg"
   let retries=5
   while [[ $retries -gt 0 ]]
   do
