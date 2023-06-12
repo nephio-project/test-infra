@@ -21,7 +21,9 @@
   roles:
     - role: andrewrothstein.docker_engine
       become: true
-      when: ( container_engine is not defined ) or ( container_engine == "docker" )
+      when:
+        - ( container_engine is not defined ) or ( container_engine == "docker" )
+        - not lookup('ansible.builtin.env', 'CODESPACE_NAME')
     - role: andrewrothstein.podman
       when: container_engine == "podman"
     - andrewrothstein.kind
