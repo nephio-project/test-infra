@@ -461,3 +461,20 @@ kubectl apply -f test-infra/e2e/tests/005-regional-free5gc-amf.yaml
 kubectl apply -f test-infra/e2e/tests/005-regional-free5gc-smf.yaml
 kubectl apply -f test-infra/e2e/tests/006-edge-free5gc-upf.yaml
 ```
+# Quick Start for VM running on Openstack
+
+## Step 1: Order or Create a VM using your local VM
+
+Order or create a VM with the following specification:
+- Linux Flavour: Ubuntu-22.04-jammy
+- 16 cores
+- 32 GB memory
+- 200 GB disk size
+- default user is "ubuntu" and "ubuntu" has sudo rights
+
+## Step 2: Kick off the install
+```
+wget -O - https://raw.githubusercontent.com/nephio-project/test-infra/main/e2e/provision/gce_init.sh |  \
+sudo NEPHIO_DEBUG=false   \
+     NEPHIO_USER=ubuntu  \
+     bash
