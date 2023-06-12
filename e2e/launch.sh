@@ -43,8 +43,26 @@ echo "Organization is '$ORGNAME'"
 
 OPTS=""
 if [[ "$ORGNAME" == "google.com" ]]; then
-  OPTS="-o ProxyCommand='corp-ssh-helper %h %p'"
+  OPTS='-o ProxyCommand="corp-ssh-helper %h %p"'
 fi
 
-trap "echo To ssh to the VM: gcloud compute ssh $VM -- $OPTS" INT
-echo gcloud compute ssh $VM -- $OPTS sudo journalctl -u google-startup-scripts.service --follow | /bin/bash
+function print_ssh_message {
+  cat <<EOF
+
+To reconnect and see the startup script output:
+
+gcloud compute ssh ubuntu@${VM} -- $OPTS sudo journalctl -u google-startup-scripts.service --follow
+
+To ssh to the VM:
+
+gcloud compute ssh ubuntu@${VM} -- $OPTS
+
+To ssh with a tunnel to Gitea and the UI, including kubectl port-forward:
+
+gcloud compute ssh ubuntu@${VM} -- $OPTS -L 7007:localhost:7007 -L 3000:172.18.0.200:3000 kubectl port-forward --namespace=nephio-webui svc/nephio-webui 7007
+
+EOF
+}
+
+trap "print_ssh_message" INT
+echo gcloud compute ssh ubuntu@${VM} -- $OPTS sudo journalctl -u google-startup-scripts.service --follow | /bin/bash
