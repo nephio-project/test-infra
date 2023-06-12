@@ -47,17 +47,12 @@ chown $NEPHIO_USER:$NEPHIO_USER /home/$NEPHIO_USER/.bash_aliases
 sed -e "s/vagrant/$NEPHIO_USER/" < /home/$NEPHIO_USER/test-infra/e2e/provision/nephio.yaml > /home/$NEPHIO_USER/nephio.yaml
 cd ./test-infra/e2e/provision
 export DEBUG DEPLOYMENT_TYPE
-
-if ! getent group docker > /dev/null; then
-    addgroup docker
-fi
+runuser -u $NEPHIO_USER ./gce_install_sandbox.sh
 
 # Grant Docker permissions to current user
 if ! getent group docker | grep -q "$NEPHIO_USER"; then
     sudo usermod -aG docker "$NEPHIO_USER"
 fi
-
-runuser -u $NEPHIO_USER ./gce_install_sandbox.sh
 
 if [[ "$RUN_E2E" == "true" ]]; then
   runuser -u $NEPHIO_USER ../e2e.sh
