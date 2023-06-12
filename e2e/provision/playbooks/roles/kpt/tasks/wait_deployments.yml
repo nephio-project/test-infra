@@ -24,6 +24,7 @@
 - name: Wait for deployments
   become: true
   kubernetes.core.k8s:
+    context: "{{ context }}"
     definition:
       apiVersion: apps/v1
       kind: Deployment
