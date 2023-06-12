@@ -37,16 +37,14 @@ apt-get install -y git
 
 cd /home/$NEPHIO_USER
 
-cat > .bash_aliases <<EOF
-alias k=kubectl
-EOF
-
-chown $NEPHIO_USER:$NEPHIO_USER .bash_aliases
 
 runuser -u $NEPHIO_USER git clone "$REPO" test-infra
 if [[ "$BRANCH" != "main" ]]; then
   cd test-infra && runuser -u $NEPHIO_USER -- git checkout -b "$BRANCH" --track "origin/$BRANCH" && cd ..
 fi
+
+cp /home/$NEPHIO_USER/test-infra/e2e/provision/bash_config.sh /home/$NEPHIO_USER/.bash_aliases
+chown $NEPHIO_USER:$NEPHIO_USER /home/$NEPHIO_USER/.bash_aliases
 
 sed -e "s/vagrant/$NEPHIO_USER/" < /home/$NEPHIO_USER/test-infra/e2e/provision/nephio.yaml > /home/$NEPHIO_USER/nephio.yaml
 cd ./test-infra/e2e/provision

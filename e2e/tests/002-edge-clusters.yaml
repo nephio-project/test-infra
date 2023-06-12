@@ -6,7 +6,7 @@ spec:
   upstream:
     repo: nephio-example-packages
     package: nephio-workload-cluster
-    revision: v7
+    revision: v8
   targets:
   - repositories:
     - name: mgmt
