@@ -470,7 +470,7 @@ Order or create a VM with the following specification:
 - 16 cores
 - 32 GB memory
 - 200 GB disk size
-- default user is "ubuntu" and "ubuntu" has sudo rights
+- default user is "ubuntu" and "ubuntu" needs sudo passwordless permissions
 
 ## Step 2: Kick off the install
 ```
