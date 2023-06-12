@@ -118,3 +118,14 @@ function k8s_get_capi_kubeconfig {
   kubectl --kubeconfig "$kubeconfig" -n "$namespace" get secret "${cluster}-kubeconfig" -o jsonpath='{.data.value}' | base64 -d > "$file"
   echo "$file"
 }
+
+function k8s_exec {
+  local kubeconfig=$1
+  local resource_namespace=$2
+  local resource_name=$3
+  local command=$4
+
+  echo "executing command $command on $resource_name in namespace $resource_namespace using $kubeconfig"
+  kubectl --kubeconfig $kubeconfig -n $resource_namespace exec -it $resource_name -- /bin/bash -c "$command"
+  return $?
+}
