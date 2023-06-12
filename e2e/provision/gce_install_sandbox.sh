@@ -22,8 +22,7 @@ function deploy_kpt_pkg {
   local temp=$(mktemp -d -t kpt-XXXX)
   local localpkg="$temp/$name"
   kpt pkg get --for-deployment "https://github.com/nephio-project/nephio-example-packages.git/$pkg" "$localpkg"
-  # sudo because docker
-  sudo kpt fn render "$localpkg"
+  kpt fn render "$localpkg"
   kpt live init "$localpkg"
   kubectl --kubeconfig "$HOME/.kube/config" api-resources
   kpt pkg tree "$localpkg"
