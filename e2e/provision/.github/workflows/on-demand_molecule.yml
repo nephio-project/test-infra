@@ -1,0 +1,89 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+name: Check All Molecule tests
+# yamllint disable-line rule:truthy
+on:
+  push:
+    paths:
+      - e2e/provision/galaxy-requirements.yml
+      - e2e/provision/test-requirements.txt
+      - e2e/provision/playbooks/roles/**
+  pull_request_review:
+    types:
+      - submitted
+
+jobs:
+  bootstrap:
+    name: Pull python dependencies
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v3.5.3
+      - uses: actions/setup-python@v4.6.1
+        with:
+          python-version: '3.x'
+      - uses: syphar/restore-virtualenv@v1.3
+        id: cache-tox-molecule
+        with:
+          requirement_files: e2e/provision/test-requirements.txt
+          custom_virtualenv_dir: .tox/molecule
+      - uses: syphar/restore-pip-download-cache@v1.2
+        if: steps.cache-tox-molecule.outputs.cache-hit != 'true'
+        with:
+          requirement_files: e2e/provision/test-requirements.txt
+      - run: pip install -r e2e/provision/test-requirements.txt
+        if: steps.cache-tox-molecule.outputs.cache-hit != 'true'
+  changes:
+    runs-on: ubuntu-latest
+    if: >-
+      (
+        github.event_name == 'pull_request_review' &&
+        github.event.review.state == 'approved'
+      ) ||
+      github.event_name != 'pull_request_review'
+    needs: bootstrap
+    outputs:
+      environments: ${{ steps.filter.outputs.changes }}
+    steps:
+      - uses: actions/checkout@v3.5.3
+      - uses: dorny/paths-filter@v2.11.1
+        if: ${{ !env.ACT }}
+        id: filter
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          filters: |
+            reqs: &reqs
+              - e2e/provision/galaxy-requirements.yml
+              - e2e/provision/test-requirements.txt
+              - 'e2e/provision/playbooks/library/**'
+            bootstrap:
+              - *reqs
+              - 'e2e/provision/playbooks/roles/bootstrap/**'
+            kpt:
+              - *reqs
+              - 'e2e/provision/playbooks/roles/kpt/**'
+            install:
+              - *reqs
+              - 'e2e/provision/playbooks/roles/install/**'
+  check-molecule:
+    name: Check Ansible role with Molecule tests
+    needs: changes
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: ${{ fromJSON(needs.changes.outputs.environments) }}
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v3.5.3
+        if: matrix.environment != 'reqs'
+      - uses: ./.github/actions/molecule-test
+        if: matrix.environment != 'reqs'
+        with:
+          tox-env: ${{ matrix.environment }}
