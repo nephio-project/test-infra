@@ -29,7 +29,7 @@ kubeconfig="$HOME/.kube/config"
 
 k8s_apply "$kubeconfig" "$TESTDIR/003-network.yaml"
 
-k8s_wait_ready "$kubeconfig" "default" "packagevariant" "network"
+k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "network"
 
 ## Apply the network topology
 k8s_apply "$kubeconfig" "$TESTDIR/003-network-topo.yaml"
