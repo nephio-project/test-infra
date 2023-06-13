@@ -336,6 +336,7 @@ PackageVariantSet that can be found in the `tests` directory:
 ```bash
 kubectl apply -f test-infra/e2e/tests/002-edge-clusters.yaml
 ```
+
 <details>
 <summary>The output is similar to:</summary>
 
@@ -361,6 +362,26 @@ kubectl get secret edge01-kubeconfig -o jsonpath='{.data.value}' | base64 -d > $
 kubectl get secret edge02-kubeconfig -o jsonpath='{.data.value}' | base64 -d > $HOME/.kube/edge02-kubeconfig
 export KUBECONFIG=$HOME/.kube/config:$HOME/.kube/regional-kubeconfig:$HOME/.kube/edge01-kubeconfig:$HOME/.kube/edge02-kubeconfig
 ```
+
+Finally, we want to configure the resource backend to know about these clusters.
+The resource backend is an IP address and VLAN index management system. It is
+included for demonstration purposes, to show how Nephio package specialization
+can interact with external systems to fully configure packages. But it needs to
+be configured to match our topology. This will likely be automated in the
+future, but for now you can just apply the configuration we have created that
+matches this test topology.
+
+```bash
+kubectl apply -f test-infra/e2e/tests/003-network-topo.yaml
+```
+
+<details>
+<summary>The output is similar to:</summary>
+
+```console
+rawtopology.topo.nephio.org/nephio created
+```
+</details>
 
 ### Step 4: Deploy Free5GC control plane functions
 
