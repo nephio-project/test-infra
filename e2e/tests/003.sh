@@ -26,6 +26,10 @@ export LIBDIR=${LIBDIR:-$E2EDIR/lib}
 source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
+
+## Apply the network topology
+k8s_apply "$kubeconfig" "$TESTDIR/003-network-topo.yaml"
+
 regional_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
 
 upstream_pkg_rev=$(kpt alpha rpkg get --name free5gc-cp --revision v1 -o jsonpath='{.metadata.name}')
