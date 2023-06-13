@@ -1,8 +1,8 @@
 FROM golang:1.18 as builder
-RUN apk update && apk add git  && cd src && \
-    git clone https://github.com/kubernetes/test-infra.git && \
-    cd test-infra/prow/cmd/generic-autobumper && \
-    go build
+RUN git clone --depth 1 https://github.com/kubernetes/test-infra.git /opt/test-infra
+
+WORKDIR /opt/test-infra
+RUN CGO_ENABLED=0 go build -o /tmp/ ./prow/cmd/generic-autobumper/...
 
 FROM golang:1.20.4-alpine3.17
 COPY --from=builder /go/src/test-infra/prow/cmd/generic-autobumper/generic-autobumper /go/bin
