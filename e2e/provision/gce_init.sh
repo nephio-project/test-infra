@@ -19,24 +19,22 @@ function get_metadata {
   echo $(curl -sf "http://metadata.google.internal/computeMetadata/v1/instance/attributes/$md" -H "Metadata-Flavor: Google" || echo "$df")
 }
 
-DEBUG=$(get_metadata nephio-setup-debug "false")
+DEBUG=${NEPHIO_DEBUG:-$(get_metadata nephio-setup-debug "false")}
 
 [[ "$DEBUG" != "true" ]] || set -o xtrace
 
-DEPLOYMENT_TYPE=$(get_metadata nephio-setup-type "r1")
-RUN_E2E=$(get_metadata nephio-run-e2e "false")
-REPO=$(get_metadata nephio-test-infra-repo "https://github.com/nephio-project/test-infra.git")
-BRANCH=$(get_metadata nephio-test-infra-branch "main")
-NEPHIO_USER=${USER:-ubuntu}
+DEPLOYMENT_TYPE=${NEPHIO_DEPLOYMENT_TYPE:-$(get_metadata nephio-setup-type "r1")}
+RUN_E2E=${NEPHIO_RUN_E2E:-$(get_metadata nephio-run-e2e "false")}
+REPO=${NEPHIO_REPO:-$(get_metadata nephio-test-infra-repo "https://github.com/nephio-project/test-infra.git")}
+BRANCH=${NEPHIO_BRANCH:-$(get_metadata nephio-test-infra-branch "main")}
+NEPHIO_USER=${NEPHIO_USER:-ubuntu}
 
-echo "$DEBUG, $DEPLOYMENT_TYPE, $RUN_E2E, $REPO, $BRANCH"
+echo "$DEBUG, $DEPLOYMENT_TYPE, $RUN_E2E, $REPO, $BRANCH, $NEPHIO_USER"
 
 apt-get update
 apt-get install -y git
 
-
 cd /home/$NEPHIO_USER
-
 
 runuser -u $NEPHIO_USER git clone "$REPO" test-infra
 if [[ "$BRANCH" != "main" ]]; then
@@ -54,7 +52,6 @@ runuser -u $NEPHIO_USER ./gce_install_sandbox.sh
 # Grant Docker permissions to current user
 if ! getent group docker | grep -q "$NEPHIO_USER"; then
     sudo usermod -aG docker "$NEPHIO_USER"
-    newgrp docker
 fi
 
 if [[ "$RUN_E2E" == "true" ]]; then
