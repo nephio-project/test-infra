@@ -11,7 +11,7 @@
 set -o pipefail
 set -o errexit
 set -o nounset
-[[ "${DEBUG:-false}" != "true" ]] || set -o xtrace
+[[ ${DEBUG:-false} != "true" ]] || set -o xtrace
 
 export HOME=${HOME:-/home/ubuntu/}
 export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
@@ -19,7 +19,6 @@ export TESTDIR=${TESTDIR:-$E2EDIR/tests}
 
 source "$E2EDIR/lib/testing.sh"
 
-for t in $TESTDIR/*.sh
-do
-  testing_run_test "$t"
+for t in $TESTDIR/*.sh; do
+    testing_run_test "$t"
 done

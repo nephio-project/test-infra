@@ -14,7 +14,7 @@ set -o nounset
 
 DEBUG=${DEBUG:-false}
 
-[[ "$DEBUG" != "true" ]] || set -o xtrace
+[[ $DEBUG != "true" ]] || set -o xtrace
 
 VM=${1:-nephio-r1-e2e}
 RUNE2E=${2:-false}
@@ -25,13 +25,13 @@ STARTUP_SCRIPT_URL="https://raw.githubusercontent.com/$REPO/$BRANCH/e2e/provisio
 FULLREPO="https://github.com/$REPO.git"
 
 gcloud compute instances delete -q "$VM" || echo
-gcloud compute instances create   \
-  --machine-type e2-standard-8    \
-  --boot-disk-size 200GB          \
-  --image-family=ubuntu-2004-lts  \
-  --image-project=ubuntu-os-cloud \
-  "--metadata=startup-script-url=$STARTUP_SCRIPT_URL,nephio-run-e2e=$RUNE2E,nephio-test-infra-repo=$FULLREPO,nephio-test-infra-branch=$BRANCH,nephio-setup-debug=$DEBUG" \
-  "$VM"
+gcloud compute instances create \
+    --machine-type e2-standard-8 \
+    --boot-disk-size 200GB \
+    --image-family=ubuntu-2004-lts \
+    --image-project=ubuntu-os-cloud \
+    "--metadata=startup-script-url=$STARTUP_SCRIPT_URL,nephio-run-e2e=$RUNE2E,nephio-test-infra-repo=$FULLREPO,nephio-test-infra-branch=$BRANCH,nephio-setup-debug=$DEBUG" \
+    "$VM"
 
 echo "Waiting for instance to become available..."
 
@@ -42,12 +42,12 @@ ORGNAME=$(gcloud organizations describe $(gcloud projects get-ancestors $(gcloud
 echo "Organization is '$ORGNAME'"
 
 OPTS=""
-if [[ "$ORGNAME" == "google.com" ]]; then
-  OPTS='-o ProxyCommand="corp-ssh-helper %h %p"'
+if [[ $ORGNAME == "google.com" ]]; then
+    OPTS='-o ProxyCommand="corp-ssh-helper %h %p"'
 fi
 
 function print_ssh_message {
-  cat <<EOF
+    cat <<EOF
 
 To reconnect and see the startup script output:
 

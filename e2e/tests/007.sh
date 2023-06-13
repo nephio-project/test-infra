@@ -16,7 +16,7 @@
 set -o pipefail
 set -o errexit
 set -o nounset
-[[ "${DEBUG:-false}" != "true" ]] || set -o xtrace
+[[ ${DEBUG:-false} != "true" ]] || set -o xtrace
 
 export HOME=${HOME:-/home/ubuntu/}
 export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
@@ -30,19 +30,19 @@ kubeconfig="$HOME/.kube/config"
 k8s_apply "$kubeconfig" "$TESTDIR/007-edge-free5gc-ueransim.yaml"
 
 for cluster in "edge01" "edge02"; do
-  k8s_wait_exists "$kubeconfig" 600 "default" "packagevariant" "edge-free5gc-ueransim-${cluster}-free5gc-ueransim"
+    k8s_wait_exists "$kubeconfig" 600 "default" "packagevariant" "edge-free5gc-ueransim-${cluster}-free5gc-ueransim"
 done
 
 for cluster in "edge01" "edge02"; do
-  k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "edge-free5gc-ueransim-${cluster}-free5gc-ueransim"
+    k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "edge-free5gc-ueransim-${cluster}-free5gc-ueransim"
 done
 
 for cluster in "edge01" "edge02"; do
-  cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "$cluster")
-  k8s_wait_exists "$cluster_kubeconfig" 600 "ueransim" "deployment" "ueransim-gnb"
-  k8s_wait_exists "$cluster_kubeconfig" 600 "ueransim" "deployment" "ueransim-ue"
-  k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "ueransim" "deployment" "ueransim-gnb"
-  k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "ueransim" "deployment" "ueransim-ue"
-  ue_pod_name=${kubectl --kubeconfig $cluster_kubeconfig get pods -n ueransim  -l app=ueransim -l component=ue}
-  k8s_exec $cluster_kubeconfig "ueransim" $ue_pod_name "ping -I uesimtun0 google.com"
+    cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "$cluster")
+    k8s_wait_exists "$cluster_kubeconfig" 600 "ueransim" "deployment" "ueransim-gnb"
+    k8s_wait_exists "$cluster_kubeconfig" 600 "ueransim" "deployment" "ueransim-ue"
+    k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "ueransim" "deployment" "ueransim-gnb"
+    k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "ueransim" "deployment" "ueransim-ue"
+    ue_pod_name=${kubectl--kubeconfig $cluster_kubeconfig get pods -n ueransim  -l app=ueransim -l component=ue}
+    k8s_exec $cluster_kubeconfig "ueransim" $ue_pod_name "ping -I uesimtun0 google.com"
 done

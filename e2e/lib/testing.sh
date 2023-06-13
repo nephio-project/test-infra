@@ -10,19 +10,18 @@
 ##############################################################################
 
 function testing_get_test_metadata {
-  local testfile=$1
-  local fieldname=$2
+    local testfile=$1
+    local fieldname=$2
 
-  local line=$(grep "$fieldname" "$testfile" || echo "")
-  echo "$line" | cut -d : -f 2
+    local line=$(grep "$fieldname" "$testfile" || echo "")
+    echo "$line" | cut -d : -f 2
 }
 
 function testing_run_test {
-  local testfile=$1
+    local testfile=$1
 
-  local testname=$(testing_get_test_metadata "$testfile" "TEST-NAME")
-  echo "+++++ $(date): starting $testfile $testname"
-  /bin/bash "$testfile"
-  echo "+++++ $(date): finished $testfile $testname"
+    local testname=$(testing_get_test_metadata "$testfile" "TEST-NAME")
+    echo "+++++ $(date): starting $testfile $testname"
+    /bin/bash "$testfile"
+    echo "+++++ $(date): finished $testfile $testname"
 }
-

@@ -13,15 +13,15 @@ set -o errexit
 set -o nounset
 
 function get_metadata {
-  local md=$1
-  local df=$2
+    local md=$1
+    local df=$2
 
-  echo $(curl -sf "http://metadata.google.internal/computeMetadata/v1/instance/attributes/$md" -H "Metadata-Flavor: Google" || echo "$df")
+    echo $(curl -sf "http://metadata.google.internal/computeMetadata/v1/instance/attributes/$md" -H "Metadata-Flavor: Google" || echo "$df")
 }
 
 DEBUG=${NEPHIO_DEBUG:-$(get_metadata nephio-setup-debug "false")}
 
-[[ "$DEBUG" != "true" ]] || set -o xtrace
+[[ $DEBUG != "true" ]] || set -o xtrace
 
 DEPLOYMENT_TYPE=${NEPHIO_DEPLOYMENT_TYPE:-$(get_metadata nephio-setup-type "r1")}
 RUN_E2E=${NEPHIO_RUN_E2E:-$(get_metadata nephio-run-e2e "false")}
@@ -37,14 +37,14 @@ apt-get install -y git
 cd /home/$NEPHIO_USER
 
 runuser -u $NEPHIO_USER git clone "$REPO" test-infra
-if [[ "$BRANCH" != "main" ]]; then
-  cd test-infra && runuser -u $NEPHIO_USER -- git checkout -b "$BRANCH" --track "origin/$BRANCH" && cd ..
+if [[ $BRANCH != "main" ]]; then
+    cd test-infra && runuser -u $NEPHIO_USER -- git checkout -b "$BRANCH" --track "origin/$BRANCH" && cd ..
 fi
 
 cp /home/$NEPHIO_USER/test-infra/e2e/provision/bash_config.sh /home/$NEPHIO_USER/.bash_aliases
 chown $NEPHIO_USER:$NEPHIO_USER /home/$NEPHIO_USER/.bash_aliases
 
-sed -e "s/vagrant/$NEPHIO_USER/" < /home/$NEPHIO_USER/test-infra/e2e/provision/nephio.yaml > /home/$NEPHIO_USER/nephio.yaml
+sed -e "s/vagrant/$NEPHIO_USER/" </home/$NEPHIO_USER/test-infra/e2e/provision/nephio.yaml >/home/$NEPHIO_USER/nephio.yaml
 cd ./test-infra/e2e/provision
 export DEBUG DEPLOYMENT_TYPE
 runuser -u $NEPHIO_USER ./gce_install_sandbox.sh
@@ -54,6 +54,6 @@ if ! getent group docker | grep -q "$NEPHIO_USER"; then
     sudo usermod -aG docker "$NEPHIO_USER"
 fi
 
-if [[ "$RUN_E2E" == "true" ]]; then
-  runuser -u $NEPHIO_USER ../e2e.sh
+if [[ $RUN_E2E == "true" ]]; then
+    runuser -u $NEPHIO_USER ../e2e.sh
 fi
