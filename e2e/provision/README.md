@@ -1,10 +1,26 @@
 # Quick Start for GCE
 
-## Step 0: Prerequisites
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Create a Virtual Machine](#create-a-virtual-machine)
+- [Follow installation](#follow-installation)
+- [Access to the User Interfaces](#access-to-the-user-interfaces)
+- [Open terminal](#open-terminal)
+- [Excercise](#excercise)
+  - [Create regional cluster](#step-1-create-regional-cluster)
+  - [Check Regional cluster installation](#step-2-check-regional-cluster-installation)
+  - [Deploy 2 edge clusters](#step-3-deploy-2-edge-clusters)
+  - [Deploy Free5GC control plane functions](#step-4-deploy-free5Gc-control-plane-functions)
+  - [Deploy Free5GC operator in the workload clusters](#step-5-deploy-free5GC-operator-in-the-workload-clusters)
+  - [Check Free5GC operator deployment](#step-6-check-free5GC-operator-deployment)
+  - [Deploy AMF, SMF and UPF](#step-7-deploy-amf-smf-and-upf)
+
+## Prerequisites
 
 You need a account in GCP and `gcloud` available on your local environment.
 
-## Step 1: Create a VM
+## Create a Virtual Machine
 
 ```bash
 gcloud compute instances create --machine-type e2-standard-8 \
@@ -31,7 +47,7 @@ comma-delimited key=value pairs in the `--metadata` flag).
 - `nephio-test-infra-branch` defaults to `main` but you can use it along with
     the repo value to choose a branch in the repo for testing.
 
-## Step2: Follow installation
+## Follow installation
 
 If you want to watch the progress of the installation, give it about 30
 seconds to reach a network accessible state, and then ssh in and tail the
@@ -50,7 +66,7 @@ gcloud compute ssh ubuntu@nephio-r1-e2e -- \
                 sudo journalctl -u google-startup-scripts.service --follow
 ```
 
-## Step 3: Access to the User Interfaces
+## Access to the User Interfaces
 
 Once it's done, ssh in and port forward the port to the UI (7007) and to
 Gitea's HTTP interface, if you want to have that (3000):
@@ -78,7 +94,7 @@ You can now navigate to
 [http://localhost:7007/config-as-data](http://localhost:7007/config-as-data) to
 browse the UI.
 
-## Step 4: Open terminal
+## Open terminal
 
 You probably want a second ssh window open to run `kubectl` commands, etc.,
 without the port forwarding (which would fail if you try to open a second ssh
@@ -96,8 +112,9 @@ Everyone else:
 gcloud compute ssh ubuntu@nephio-r1-e2e
 ```
 
-## Step 5: Create regional cluster
+## Excercise
 
+### Step 1: Create regional cluster
 
 Our e2e topology consists of one regional cluster, and two edge clusters.
 Let's start by deploying the regional cluster. In this case, you will use
@@ -113,14 +130,17 @@ Use the session just started on the VM to run these commands:
 kubectl get repositories
 ```
 
-The output is similar to:
-```
+<details>
+<summary>The output is similar to:</summary>
+
+```console
 NAME                      TYPE   CONTENT   DEPLOYMENT   READY   ADDRESS
 free5gc-packages          git    Package   false        True    https://github.com/nephio-project/free5gc-packages.git
 mgmt                      git    Package   true         True    http://172.18.0.200:3000/nephio/mgmt.git
 mgmt-staging              git    Package   false        True    http://172.18.0.200:3000/nephio/mgmt-staging.git
 nephio-example-packages   git    Package   false        True    https://github.com/nephio-project/nephio-example-packages.git
 ```
+</details>
 
 Since those are Ready, you can deploy a package from the
 nephio-example-packages repository into the mgmt repository. To do this, you
@@ -134,8 +154,10 @@ command below (your latest revision may be different):
 kpt alpha rpkg get --name nephio-workload-cluster
 ```
 
-The output is similar to:
-```
+<details>
+<summary>The output is similar to:</summary>
+
+```console
 NAME                                                               PACKAGE                   WORKSPACENAME   REVISION   LATEST   LIFECYCLE   REPOSITORY
 nephio-example-packages-05707c7acfb59988daaefd85e3f5c299504c2da1   nephio-workload-cluster   main            main       false    Published   nephio-example-packages
 nephio-example-packages-781e1c17d63eed5634db7b93307e1dad75a92bce   nephio-workload-cluster   v1              v1         false    Published   nephio-example-packages
@@ -145,7 +167,9 @@ nephio-example-packages-c78ecc6bedc8bf68185f28a998718eed8432dc3b   nephio-worklo
 nephio-example-packages-46b923a6bbd09c2ab7aa86c9853a96cbd38d1ed7   nephio-workload-cluster   v5              v5         false    Published   nephio-example-packages
 nephio-example-packages-17bffe318ac068f5f9ef22d44f08053e948a3683   nephio-workload-cluster   v6              v6         false    Published   nephio-example-packages
 nephio-example-packages-0fbaccf6c5e75a3eff7976a523bb4f42bb0118ce   nephio-workload-cluster   v7              v7         true     Published   nephio-example-packages
+nephio-example-packages-7895e28d847c0296a204007ed577cd2a4222d1ea   nephio-workload-cluster   v8              v8         true     Published   nephio-example-packages
 ```
+</details>
 
 Then, use the NAME from that in the `clone` operation, and the resulting
 PackageRevision name to perform the `propose` and `approve` operations:
@@ -154,10 +178,13 @@ PackageRevision name to perform the `propose` and `approve` operations:
 kpt alpha rpkg clone -n default nephio-example-packages-0fbaccf6c5e75a3eff7976a523bb4f42bb0118ce --repository mgmt regional
 ```
 
-The output is similar to:
-```
+<details>
+<summary>The output is similar to:</summary>
+
+```console
 mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868 created
 ```
+</details>
 
 You want to make sure that our new regional cluster is labeled as regional.
 Since you are using the CLI, you need to pull the package out, modify it, and
@@ -177,13 +204,16 @@ The package is now in the `regional` directory. So, you can execute the
 kpt fn eval --image gcr.io/kpt-fn/set-labels:v0.2.0 regional -- "nephio.org/site-type=regional" "nephio.org/region=us-west1"
 ```
 
-The output is similar to:
-```
+<details>
+<summary>The output is similar to:</summary>
+
+```console
 [RUNNING] "gcr.io/kpt-fn/set-labels:v0.2.0"
 [PASS] "gcr.io/kpt-fn/set-labels:v0.2.0" in 5.5s
     Results:
     [info]: set 7 labels in total
 ```
+</details>
 
 If you wanted to, you could have used the `--save` option to add the
 `set-labels` call to the package pipeline. This would mean that function gets
@@ -197,31 +227,46 @@ repository:
 kpt alpha rpkg push -n default mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868 regional
 ```
 
+<details>
+<summary>The output is similar to:</summary>
+
+```console
+[RUNNING] "gcr.io/kpt-fn/apply-replacements:v0.1.1" 
+[PASS] "gcr.io/kpt-fn/apply-replacements:v0.1.1"
+```
+</details>
+
 Finally, you propose and approve the package.
 
 ```bash
 kpt alpha rpkg propose -n default mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868
 ```
 
-The output is similar to:
-```
+<details>
+<summary>The output is similar to:</summary>
+
+```console
 mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868 proposed
 ```
+</details>
 
 ```bash
 kpt alpha rpkg approve -n default mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868
 ```
 
-The output is similar to:
-```
+<details>
+<summary>The output is similar to:</summary>
+
+```console
 mgmt-08c26219f9879acdefed3469f8c3cf89d5db3868 approved
 ```
+</details>
 
 ConfigSync running in the management cluster will now pull out this new
 package, creating all the resources necessary to provision a Kind cluster and
 register it with Nephio. This will take about five minutes or so.
 
-## Step 6: Check Regional cluster installation
+### Step 2: Check Regional cluster installation
 
 You can check if the cluster has been added to the management cluster:
 
@@ -229,28 +274,34 @@ You can check if the cluster has been added to the management cluster:
 kubectl get clusters
 ```
 
-The output is similar to:
-```
+<details>
+<summary>The output is similar to:</summary>
+
+```console
 NAME       PHASE         AGE     VERSION
 regional   Provisioned   52m     v1.26.3
 ```
+</details>
 
 To access the API server of that cluster as well, you
 need to get the `kubeconfig` file for it. To retrieve the file, you
 pull it from the Kubernetes Secret, and decode the Base64 encoding:
 
 ```bash
-kubectl get secret regional-kubeconfig -o jsonpath='{.data.value}' | base64 -d > regional-kubeconfig
+kubectl get secret regional-kubeconfig -o jsonpath='{.data.value}' | base64 -d > $HOME/.kube/regional-kubeconfig
+export KUBECONFIG=$HOME/.kube/config:$HOME/.kube/regional-kubeconfig
 ```
 
 You can then use it to access the workload cluster directly:
 
 ```bash
-kubectl --kubeconfig regional-kubeconfig get ns
+kubectl get ns --context regional-admin@regional
 ```
 
-The output is similar to:
-```
+<details>
+<summary>The output is similar to:</summary>
+
+```console
 NAME                           STATUS   AGE
 config-management-monitoring   Active   3h35m
 config-management-system       Active   3h35m
@@ -259,6 +310,7 @@ kube-node-lease                Active   3h39m
 kube-public                    Active   3h39m
 kube-system                    Active   3h39m
 ```
+</details>
 
 You should also check that the Kind cluster came up fully with `kubectl get
 machinesets`. You should see READY and AVAILABLE replicas.
@@ -267,13 +319,16 @@ machinesets`. You should see READY and AVAILABLE replicas.
 kubectl get machinesets
 ```
 
-The output is similar to:
-```
+<details>
+<summary>The output is similar to:</summary>
+
+```console
 NAME                                   CLUSTER    REPLICAS   READY   AVAILABLE   AGE     VERSION
 regional-md-0-zhw2j-58d497c498xkz96z   regional   3          3       3           3h58m   v1.26.3
 ```
+</details>
 
-## Step7: Deploy 2 edge clusters
+### Step 3: Deploy 2 edge clusters
 
 Next, you can deploy a fleet of two edge clusters by applying the
 PackageVariantSet that can be found in the `tests` directory:
@@ -281,6 +336,13 @@ PackageVariantSet that can be found in the `tests` directory:
 ```bash
 kubectl apply -f test-infra/e2e/tests/002-edge-clusters.yaml
 ```
+<details>
+<summary>The output is similar to:</summary>
+
+```console
+packagevariantset.config.porch.kpt.dev/edge-clusters created
+```
+</details>
 
 This is equivalent to doing the same `kpt` commands you did for the regional
 cluster, except that it uses the PackageVariantSet controller, which is
@@ -295,12 +357,12 @@ need to get the `kubeconfig` file. To retrieve the file, you
 pull it from the Kubernetes Secret, and decode the Base64 encoding:
 
 ```bash
-kubectl get secret edge01-kubeconfig -o jsonpath='{.data.value}' | base64 -d > edge01-kubeconfig
-kubectl get secret edge02-kubeconfig -o jsonpath='{.data.value}' | base64 -d > edge02-kubeconfig
+kubectl get secret edge01-kubeconfig -o jsonpath='{.data.value}' | base64 -d > $HOME/.kube/edge01-kubeconfig
+kubectl get secret edge02-kubeconfig -o jsonpath='{.data.value}' | base64 -d > $HOME/.kube/edge02-kubeconfig
+export KUBECONFIG=$HOME/.kube/config:$HOME/.kube/regional-kubeconfig:$HOME/.kube/edge01-kubeconfig:$HOME/.kube/edge02-kubeconfig
 ```
 
-
-## Step8: Deploy Free5GC control plane functions
+### Step 4: Deploy Free5GC control plane functions
 
 While the edge clusters are deploying (which will take 5-10 minutes), you can
 install the free5gc functions other than SMF, AMF, and UPF. For this,
@@ -328,11 +390,13 @@ click "Add Deployment". On the next screen, click "Propose", and then
 Shortly thereafter, you should see free5gc-cp in the cluster namespace:
 
 ```bash
-kubectl --kubeconfig regional-kubeconfig get ns
+kubectl get ns --context regional-admin@regional
 ```
 
-The output is similar to:
-```
+<details>
+<summary>The output is similar to:</summary>
+
+```console
 NAME                           STATUS   AGE
 config-management-monitoring   Active   28m
 config-management-system       Active   28m
@@ -344,15 +408,18 @@ kube-system                    Active   28m
 local-path-storage             Active   28m
 resource-group-system          Active   27m
 ```
+</details>
 
 And the actual workload resources:
 
 ```bash
-kubectl --kubeconfig regional-kubeconfig -n free5gc-cp get all
+kubectl -n free5gc-cp get all --context regional-admin@regional
 ```
 
-The output is similar to:
-```
+<details>
+<summary>The output is similar to:</summary>
+
+```console
 NAME                                 READY   STATUS    RESTARTS   AGE
 pod/free5gc-ausf-7d494d668d-k55kb    1/1     Running   0          3m31s
 pod/free5gc-nrf-66cc98cfc5-9mxqm     1/1     Running   0          3m31s
@@ -394,8 +461,9 @@ replicaset.apps/free5gc-webui-84ff8c456c   1         1         1       3m31s
 NAME                       READY   AGE
 statefulset.apps/mongodb   1/1     3m31s
 ```
+</details>
 
-## Step9: Deploy Free5GC operator in the workload clusters
+### Step 5: Deploy Free5GC operator in the workload clusters
 
 Now you need to deploy the free5gc operator across all of the workload
 clusters (regional and edge). To do this, you use another PackageVariantSet.
@@ -408,17 +476,19 @@ PackageVariantSet).
 kubectl apply -f test-infra/e2e/tests/004-free5gc-operator.yaml
 ```
 
-## Step 10: Check Free5GC operator deployment
+### Step 6: Check Free5GC operator deployment
 
 Within five minutes of applying that, you should see `free5gc` namespaces on
 your regional and edge clusters:
 
 ```bash
-kubectl --kubeconfig edge01-kubeconfig get ns
+kubectl get ns --context edge01-admin@edge01
 ```
 
-The output is similar to:
-```
+<details>
+<summary>The output is similar to:</summary>
+
+```console
 NAME                           STATUS   AGE
 config-management-monitoring   Active   3h46m
 config-management-system       Active   3h46m
@@ -429,13 +499,16 @@ kube-public                    Active   3h47m
 kube-system                    Active   3h47m
 resource-group-system          Active   3h45m
 ```
+</details>
 
 ```bash
-kubectl --kubeconfig edge01-kubeconfig -n free5gc get all
+kubectl -n free5gc get all --context edge01-admin@edge01
 ```
 
-The output is similar to:
-```
+<details>
+<summary>The output is similar to:</summary>
+
+```console
 NAME                                                          READY   STATUS    RESTARTS   AGE
 pod/free5gc-operator-controller-controller-58df9975f4-sglj6   2/2     Running   0          164m
 
@@ -445,8 +518,9 @@ deployment.apps/free5gc-operator-controller-controller   1/1     1            1 
 NAME                                                                DESIRED   CURRENT   READY   AGE
 replicaset.apps/free5gc-operator-controller-controller-58df9975f4   1         1         1       164m
 ```
+</details>
 
-## Step 11: Deploy AMF, SMF and UPF
+### Step 7: Deploy AMF, SMF and UPF
 
 Finally, you can deploy individual network functions which the operator will
 instantiate. For now, you will use individual PackageVariants targeting the regional
