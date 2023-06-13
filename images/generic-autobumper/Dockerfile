@@ -4,5 +4,7 @@ RUN git clone --depth 1 https://github.com/kubernetes/test-infra.git /opt/test-i
 WORKDIR /opt/test-infra
 RUN CGO_ENABLED=0 go build -o /tmp/ ./prow/cmd/generic-autobumper/...
 
-FROM golang:1.20.4-alpine3.17
-COPY --from=builder /go/src/test-infra/prow/cmd/generic-autobumper/generic-autobumper /go/bin
+FROM gcr.io/distroless/static-debian11
+
+COPY --from=builder /tmp/generic-autobumper /
+CMD ["/generic-autobumper"]
