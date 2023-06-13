@@ -54,17 +54,9 @@ destroy_kpt_pkg "$mgmt_staging_temp_dir"  "mgmt-staging"
 destroy_kpt_pkg "$mgmt_rootsync_temp_dir" "mgmt"
 destroy_kpt_pkg "$mgmt_temp_dir"          "mgmt"
 
-echo "waiting for pods to stop crashing . . ."
-pods_crashing=true
-while [ "$pods_crashing" = true ]
-do
-  sleep 10
-  if ! kubectl --kubeconfig "$HOME/.kube/config" get pods -A | grep -q CrashLoopBackOff
-  then
-    pods_crashing=false
-  fi
-done 
-echo "pods have stopped crashing"
+echo "waiting 60 seconds for package deletions to propogate . . ."
+sleep 60
+echo "continuing . . ."
 
 apply_kpt_pkg   "$mgmt_temp_dir"          "mgmt"
 apply_kpt_pkg   "$mgmt_rootsync_temp_dir" "mgmt"
