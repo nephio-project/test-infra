@@ -11,32 +11,31 @@
 set -o pipefail
 set -o errexit
 set -o nounset
-[[ "${DEBUG:-false}" != "true" ]] || set -o xtrace
+[[ ${DEBUG:-false} != "true" ]] || set -o xtrace
 
 export HOME=${HOME:-/home/ubuntu/}
 
 function deploy_kpt_pkg {
-  local pkg=$1
-  local name=$2
+    local pkg=$1
+    local name=$2
 
-  local temp=$(mktemp -d -t kpt-XXXX)
-  local localpkg="$temp/$name"
-  kpt pkg get --for-deployment "https://github.com/nephio-project/nephio-example-packages.git/$pkg" "$localpkg"
-  # sudo because docker
-  sudo kpt fn render "$localpkg"
-  kpt live init "$localpkg"
-  kubectl --kubeconfig "$HOME/.kube/config" api-resources
-  kpt pkg tree "$localpkg"
-  let retries=5
-  while [[ $retries -gt 0 ]]
-  do
-    if kpt live --kubeconfig "$HOME/.kube/config" apply "$localpkg"; then
-      retries=0
-    else
-      retries=$(( $retries - 1 ))
-      sleep 5
-    fi
-  done
+    local temp=$(mktemp -d -t kpt-XXXX)
+    local localpkg="$temp/$name"
+    kpt pkg get --for-deployment "https://github.com/nephio-project/nephio-example-packages.git/$pkg" "$localpkg"
+    # sudo because docker
+    sudo kpt fn render "$localpkg"
+    kpt live init "$localpkg"
+    kubectl --kubeconfig "$HOME/.kube/config" api-resources
+    kpt pkg tree "$localpkg"
+    let retries=5
+    while [[ $retries -gt 0 ]]; do
+        if kpt live --kubeconfig "$HOME/.kube/config" apply "$localpkg"; then
+            retries=0
+        else
+            retries=$((retries - 1))
+            sleep 5
+        fi
+    done
 }
 
 sudo apt-get clean

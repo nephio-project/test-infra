@@ -16,7 +16,7 @@
 set -o pipefail
 set -o errexit
 set -o nounset
-[[ "${DEBUG:-false}" != "true" ]] || set -o xtrace
+[[ ${DEBUG:-false} != "true" ]] || set -o xtrace
 
 export HOME=${HOME:-/home/ubuntu/}
 export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
@@ -27,7 +27,6 @@ source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
-
 k8s_wait_exists "$kubeconfig" 600 "default" "repository" "nephio-example-packages"
 
 k8s_wait_exists "$kubeconfig" 600 "default" "repository" "mgmt"
@@ -35,4 +34,3 @@ k8s_wait_exists "$kubeconfig" 600 "default" "repository" "mgmt-staging"
 
 k8s_wait_ready "$kubeconfig" 600 "default" "repository" "mgmt"
 k8s_wait_ready "$kubeconfig" 600 "default" "repository" "mgmt-staging"
-

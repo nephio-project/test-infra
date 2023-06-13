@@ -15,7 +15,7 @@
 set -o pipefail
 set -o errexit
 set -o nounset
-[[ "${DEBUG:-false}" != "true" ]] || set -o xtrace
+[[ ${DEBUG:-false} != "true" ]] || set -o xtrace
 
 export HOME=${HOME:-/home/ubuntu/}
 export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
@@ -39,4 +39,3 @@ kpt alpha rpkg approve -n default "$regional_pkg_rev"
 k8s_wait_exists "$kubeconfig" 600 "default" "workloadcluster" "regional"
 k8s_wait_exists "$kubeconfig" 600 "default" "cluster" "regional"
 k8s_wait_ready "$kubeconfig" 600 "default" "cluster" "regional"
-

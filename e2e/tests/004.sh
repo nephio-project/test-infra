@@ -16,7 +16,7 @@
 set -o pipefail
 set -o errexit
 set -o nounset
-[[ "${DEBUG:-false}" != "true" ]] || set -o xtrace
+[[ ${DEBUG:-false} != "true" ]] || set -o xtrace
 
 export HOME=${HOME:-/home/ubuntu/}
 export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
@@ -30,7 +30,7 @@ kubeconfig="$HOME/.kube/config"
 k8s_apply "$kubeconfig" "$TESTDIR/004-free5gc-operator.yaml"
 
 for cluster in "regional" "edge01" "edge02"; do
-  cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "$cluster")
-  k8s_wait_exists "$cluster_kubeconfig" 600 "free5gc" "deployment" "free5gc-operator-controller"
-  k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc" "deployment" "free5gc-operator-controller"
+    cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "$cluster")
+    k8s_wait_exists "$cluster_kubeconfig" 600 "free5gc" "deployment" "free5gc-operator-controller"
+    k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc" "deployment" "free5gc-operator-controller"
 done

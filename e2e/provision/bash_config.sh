@@ -14,12 +14,12 @@
 alias k=kubectl
 
 function get_capi_kubeconfig {
-  local cluster=$1
+    local cluster=$1
 
-  if [[ -z "$cluster" ]]; then
-    echo "Usage: $0 cluster-name"
-    return 1
-  fi
+    if [[ -z $cluster ]]; then
+        echo "Usage: $0 cluster-name"
+        return 1
+    fi
 
-  kubectl get secret "${cluster}-kubeconfig" -o jsonpath='{.data.value}' | base64 -d > "${cluster}-kubeconfig"
+    kubectl get secret "${cluster}-kubeconfig" -o jsonpath='{.data.value}' | base64 -d >"${cluster}-kubeconfig"
 }
