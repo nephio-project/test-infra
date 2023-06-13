@@ -95,7 +95,7 @@
     - {pkg: cluster-capi, version: cluster-capi/v4, namespaces: [capi-system, capi-kubeadm-control-plane-system, capi-kubeadm-bootstrap-system]}
     - {pkg: cluster-capi-infrastructure-docker, version: cluster-capi-infrastructure-docker/v1, namespaces: [capd-system]}
     - {pkg: cluster-capi-kind-docker-templates, version: cluster-capi-kind-docker-templates/v1, namespaces: [default]}
-    - {pkg: resource-backend, version: resource-backend/v1, namespaces: [backend-system]}
+    - {pkg: resource-backend, version: resource-backend/v2, namespaces: [backend-system]}
     - {pkg: network, version: network/v1, namespaces: []}
   vars:
     repo_uri: https://github.com/nephio-project/nephio-example-packages
