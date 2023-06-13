@@ -1,4 +1,4 @@
-FROM golang:1.20.4-alpine3.17 as builder
+FROM golang:1.18 as builder
 RUN apk update && apk add git  && cd src && \
     git clone https://github.com/kubernetes/test-infra.git && \
     cd test-infra/prow/cmd/generic-autobumper && \
