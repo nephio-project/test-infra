@@ -18,7 +18,8 @@ Vagrant.configure('2') do |config|
 
   config.vm.box = 'generic/ubuntu2004'
   config.vm.box_check_update = false
-  config.vm.synced_folder './', '/vagrant'
+  vagrant_root = File.dirname(__FILE__)
+  config.vm.synced_folder "#{vagrant_root}/../../", '/opt/test-infra'
 
   config.vm.network 'forwarded_port', guest: 7007, guest_ip: '127.0.0.1', host: 7007
   config.vm.network 'forwarded_port', guest: 3000, guest_ip: '172.18.0.200', host: 3000
@@ -29,24 +30,24 @@ Vagrant.configure('2') do |config|
         sudo sed -i "s/addresses: .*/addresses: [1.1.1.1, 8.8.8.8, 8.8.4.4]/g" /etc/netplan/01-netcfg.yaml
         sudo netplan apply
     fi
-    # Create .bash_aliases
-    echo 'cd /vagrant/' >> /home/vagrant/.bash_aliases
-    chown vagrant:vagrant /home/vagrant/.bash_aliases
   SHELL
 
   # Provision test bed
-  config.vm.provision 'shell', privileged: false do |sh|
+  config.vm.provision 'shell', privileged: true do |sh|
     sh.env = {
-      DEBUG: ENV.fetch('DEBUG', true),
-      DEPLOYMENT_TYPE: ENV.fetch('DEPLOYMENT_TYPE', 'r1')
+      NEPHIO_DEBUG: ENV.fetch('DEBUG', true),
+      NEPHIO_DEPLOYMENT_TYPE: ENV.fetch('DEPLOYMENT_TYPE', 'r1'),
+      NEPHIO_RUN_E2E: ENV.fetch('RUN_E2E', false),
+      NEPHIO_USER: 'vagrant',
+      NEPHIO_REPO_DIR: '/opt/test-infra',
+      E2EDIR: '/opt/test-infra/e2e'
     }
     sh.inline = <<-SHELL
       set -o errexit
       set -o pipefail
-      echo "StrictHostKeyChecking no" >> ~/.ssh/config
-      cd /vagrant/
-      cp nephio.yaml ~/nephio.yaml
-      ./install_sandbox.sh | tee ~/install_sandbox.log
+
+      cd /opt/test-infra/e2e/provision/
+      ./init.sh | tee ~/init.log
     SHELL
   end
 
@@ -69,7 +70,7 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.provider :libvirt do |v, override|
-    override.vm.synced_folder './', '/vagrant', type: 'virtiofs'
+    override.vm.synced_folder "#{vagrant_root}/../../", '/opt/test-infra', type: 'virtiofs'
     v.memorybacking :access, mode: 'shared'
     v.random_hostname = true
     v.management_network_address = '10.0.2.0/24'

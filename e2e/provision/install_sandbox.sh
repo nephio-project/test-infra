@@ -78,11 +78,18 @@ if [ "${DEPLOYMENT_TYPE:-r1}" == "one-summit" ]; then
     popd >/dev/null
 else
     trap get_status ERR
+
+    mkdir -p ~/.ssh/
+    touch ~/.ssh/config
+    if ! grep -q "StrictHostKeyChecking no" ~/.ssh/config; then
+        echo "StrictHostKeyChecking no" >>~/.ssh/config
+    fi
+    chmod 600 ~/.ssh/config
     # Management cluster creation
     if [[ ${DEBUG:-false} != "true" ]]; then
-        ansible-playbook -i ~/nephio.yaml playbooks/cluster.yml
+        ansible-playbook -i ./nephio.yaml playbooks/cluster.yml
     else
-        ansible-playbook -vvv -i ~/nephio.yaml playbooks/cluster.yml
+        ansible-playbook -vvv -i ./nephio.yaml playbooks/cluster.yml
     fi
 
     # Put this in the ubuntu dir and make it accessible to world
