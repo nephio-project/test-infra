@@ -18,5 +18,6 @@ spec:
         package: free5gc-upf
       annotations:
         approval.nephio.org/policy: initial
+        approval.nephio.org/delay: 10m
       injectors:
       - nameExpr: target.name
