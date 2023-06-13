@@ -6,7 +6,7 @@
     },
     "hostRequirements": {
         "cpus": 8,
-        "memory": "32gb"
+        "memory": "16gb"
     },
     "postCreateCommand": "cd e2e/provision/; ./install_sandbox.sh | tee ~/install_sandbox.log",
     "forwardPorts": [7007, 3000]
