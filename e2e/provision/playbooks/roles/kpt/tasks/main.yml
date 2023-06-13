@@ -83,6 +83,7 @@
     version: "{{ version }}"
     context: "{{ context }}"
     command: live-apply
+    reconcile_timeout: "{{ reconcile_timeout }}"
   register: kpt_apply
   until: kpt_apply is not failed
   retries: 5
