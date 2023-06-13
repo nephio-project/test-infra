@@ -367,9 +367,31 @@ Finally, we want to configure the resource backend to know about these clusters.
 The resource backend is an IP address and VLAN index management system. It is
 included for demonstration purposes, to show how Nephio package specialization
 can interact with external systems to fully configure packages. But it needs to
-be configured to match our topology. This will likely be automated in the
-future, but for now you can just apply the configuration we have created that
-matches this test topology.
+be configured to match our topology.
+
+First, we apply a package that defines the high-level networks to which our
+workloads will attach. Part of the Nephio package specialization pipeline will
+determine the exact VLAN tags and IP addresses for those attachments, based on
+the specific clusters. There is a pre-defined PackageVariant in the tests
+directory for this:
+
+```bash
+kubectl apply -f test-infra/e2e/tests/003-network.yaml
+```
+
+<details>
+<summary>The output is similar to:</summary>
+
+```console
+packagevariant.config.porch.kpt.dev/network created
+```
+</details>
+
+That package defines certain resources that exist for the entire topology.
+However, we also need to configure the resource backend for our particular
+topology. This will likely be automated in the future, but for now you can
+just directly apply the configuration we have created that matches this test
+topology.
 
 ```bash
 kubectl apply -f test-infra/e2e/tests/003-network-topo.yaml

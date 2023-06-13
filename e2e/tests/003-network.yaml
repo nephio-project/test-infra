@@ -1,0 +1,14 @@
+apiVersion: config.porch.kpt.dev/v1alpha1
+kind: PackageVariant
+metadata:
+  name: network
+  annotations:
+    approval.nephio.org/policy: initial
+spec:
+  upstream:
+    repo: nephio-example-packages
+    package: network
+    revision: v1
+  downstream:
+    repo: mgmt
+    package: network
