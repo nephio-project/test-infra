@@ -21,7 +21,7 @@ RUNE2E=${2:-false}
 REPO=${3:-nephio-project/test-infra}
 BRANCH=${4:-main}
 
-STARTUP_SCRIPT_URL="https://raw.githubusercontent.com/$REPO/$BRANCH/e2e/provision/gce_init.sh"
+STARTUP_SCRIPT_URL="https://raw.githubusercontent.com/$REPO/$BRANCH/e2e/provision/init.sh"
 FULLREPO="https://github.com/$REPO.git"
 
 gcloud compute instances delete -q "$VM" || echo

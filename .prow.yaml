@@ -29,8 +29,8 @@ presubmits:
           args:
             - "-c"
             - |
-              cd e2e/terraform && terraform init && terraform plan && \
-              terraform apply -auto-approve; terraform destroy -auto-approve
+              set -eE; cd e2e/terraform; trap 'terraform destroy -auto-approve' EXIT;
+              terraform init && timeout 45m terraform apply -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -225,8 +225,8 @@ periodics:
           args:
             - "-c"
             - |
-              cd e2e/terraform && terraform init && terraform plan && \
-              terraform apply -auto-approve; terraform destroy -auto-approve
+              set -eE; cd e2e/terraform; trap 'terraform destroy -auto-approve' EXIT;
+              terraform init && timeout 45m terraform apply -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
