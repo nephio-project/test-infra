@@ -6,3 +6,4 @@ allow:
   - "BSD-2-Clause"
   - "BSD-2-Clause-FreeBSD"
   - "ISC"
+  - "MPL-2.0"
