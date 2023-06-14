@@ -20,3 +20,7 @@ gitea_db_password: c2VjcmV0
 
 gitea_username: nephio
 gitea_password: secret
+
+gtp5g_dest: /opt/gtp5g
+gtp5g_version: v0.6.8
+gtp5g_tarball_url: "https://github.com/free5gc/gtp5g/archive/refs/tags/{{ gtp5g_version }}.tar.gz"
