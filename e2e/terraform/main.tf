@@ -24,7 +24,7 @@ resource "google_compute_instance" "lab_instances" {
   allow_stopping_for_update = true
   metadata = {
     ssh-keys                = "${var.ansible_user}:${file(var.ssh_pub_key)}"
-    metadata_startup_script = file("${path.module}/../provision/gce_init.sh")
+    metadata_startup_script = file("${path.module}/../provision/init.sh")
     nephio-run-e2e          = false
   }
   boot_disk {
@@ -91,9 +91,9 @@ resource "google_compute_instance" "e2e_instances" {
     }
     inline = [
       "cd provision/",
-      "chmod +x gce_install_sandbox.sh",
+      "chmod +x install_sandbox.sh",
       "export DEBUG=true",
-      "timeout --preserve-status 30m ./gce_install_sandbox.sh"
+      "timeout --preserve-status 30m ./install_sandbox.sh"
     ]
   }
 }

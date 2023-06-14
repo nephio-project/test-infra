@@ -27,7 +27,7 @@ gcloud compute instances create --machine-type e2-standard-8 \
                                     --boot-disk-size 200GB \
                                     --image-family=ubuntu-2004-lts \
                                     --image-project=ubuntu-os-cloud \
-                                    --metadata=startup-script-url=https://raw.githubusercontent.com/nephio-project/test-infra/main/e2e/provision/gce_init.sh \
+                                    --metadata=startup-script-url=https://raw.githubusercontent.com/nephio-project/test-infra/main/e2e/provision/init.sh \
                                     nephio-r1-e2e
 ```
 
@@ -43,7 +43,7 @@ comma-delimited key=value pairs in the `--metadata` flag).
 - `nephio-test-infra-repo` defaults to
     `https://github.com/nephio-project/test-infra.git` but you can set it to
     your repository when testing changes to these scripts, and your repo will
-    then be pulled by the `gce_init.sh` instead.
+    then be pulled by the `init.sh` instead.
 - `nephio-test-infra-branch` defaults to `main` but you can use it along with
     the repo value to choose a branch in the repo for testing.
 
@@ -600,7 +600,7 @@ Order or create a VM with the following specification:
 
 ## Step 2: Kick off the install
 ```
-wget -O - https://raw.githubusercontent.com/nephio-project/test-infra/main/e2e/provision/gce_init.sh |  \
+wget -O - https://raw.githubusercontent.com/nephio-project/test-infra/main/e2e/provision/init.sh |  \
 sudo NEPHIO_DEBUG=false   \
      NEPHIO_USER=ubuntu  \
      bash
