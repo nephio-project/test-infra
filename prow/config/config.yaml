@@ -253,8 +253,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/dnn-fn \
-            --dockerfile=Dockerfile --destination=nephio/dnn-fn:${PULL_BASE_REF}
+          executor --context=${PWD} \
+            --dockerfile=krm-functions/dnn-fn/Dockerfile --destination=nephio/dnn-fn:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -288,8 +288,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/dnn-fn \
-            --dockerfile=Dockerfile --destination=nephio/dnn-fn:${BUILD_ID}
+          executor --context=${PWD} \
+            --dockerfile=krm-functions/dnn-fn/Dockerfile --destination=nephio/dnn-fn:${BUILD_ID}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -324,8 +324,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/interface-fn \
-            --dockerfile=Dockerfile --destination=nephio/interface-fn:${PULL_BASE_REF}
+          executor --context=${PWD} \
+            --dockerfile=krm-functions/interface-fn/Dockerfile --destination=nephio/interface-fn:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -359,8 +359,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/interface-fn \
-            --dockerfile=Dockerfile --destination=nephio/interface-fn:${BUILD_ID}
+          executor --context=${PWD} \
+            --dockerfile=krm-functions/interface-fn/Dockerfile --destination=nephio/interface-fn:${BUILD_ID}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -396,8 +396,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/ipam-fn \
-            --dockerfile=Dockerfile --destination=nephio/ipam-fn:${PULL_BASE_REF}
+          executor --context=${PWD} \
+            --dockerfile=krm-functions/ipam-fn/Dockerfile --destination=nephio/ipam-fn:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -431,8 +431,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/ipam-fn \
-            --dockerfile=Dockerfile --destination=nephio/ipam-fn:${BUILD_ID}
+          executor --context=${PWD} \
+            --dockerfile=krm-functions/ipam-fn/Dockerfile --destination=nephio/ipam-fn:${BUILD_ID}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -468,8 +468,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/nad-fn \
-            --dockerfile=DockerFile --destination=nephio/nad-fn:${PULL_BASE_REF}
+          executor --context=${PWD} \
+            --dockerfile=krm-functions/nad-fn/DockerFile --destination=nephio/nad-fn:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -503,8 +503,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/nad-fn \
-            --dockerfile=DockerFile --destination=nephio/nad-fn:${BUILD_ID}
+          executor --context=${PWD} \
+            --dockerfile=krm-functions/nad-fn/DockerFile --destination=nephio/nad-fn:${BUILD_ID}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -540,8 +540,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/nfdeploy-fn/ \
-            --dockerfile=amfdeployfn/Dockerfile --destination=nephio/amf-deploy-fn:${PULL_BASE_REF}
+          executor --context=${PWD} \
+            --dockerfile=krm-functions/nfdeploy-fn/amfdeployfn/Dockerfile --destination=nephio/amf-deploy-fn:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -575,8 +575,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/nfdeploy-fn/ \
-            --dockerfile=amfdeployfn/Dockerfile --destination=nephio/amf-deploy-fn:${BUILD_ID}
+          executor --context=${PWD} \
+            --dockerfile=krm-functions/nfdeploy-fn/amfdeployfn/Dockerfile --destination=nephio/amf-deploy-fn:${BUILD_ID}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -612,8 +612,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/nfdeploy-fn/ \
-            --dockerfile=smfdeployfn/Dockerfile --destination=nephio/smf-deploy-fn:${PULL_BASE_REF}
+          executor --context=${PWD} \
+            --dockerfile=krm-functions/nfdeploy-fn/smfdeployfn/Dockerfile --destination=nephio/smf-deploy-fn:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -647,8 +647,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/nfdeploy-fn/ \
-            --dockerfile=smfdeployfn/Dockerfile --destination=nephio/smf-deploy-fn:${BUILD_ID}
+          executor --context=${PWD} \
+            --dockerfile=krm-functions/nfdeploy-fn/smfdeployfn/Dockerfile --destination=nephio/smf-deploy-fn:${BUILD_ID}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -684,8 +684,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/nfdeploy-fn/ \
-            --dockerfile=upfdeployfn/Dockerfile --destination=nephio/upf-deploy-fn:${PULL_BASE_REF}
+          executor --context=${PWD} \
+            --dockerfile=krm-functions/nfdeploy-fn/upfdeployfn/Dockerfile --destination=nephio/upf-deploy-fn:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -719,8 +719,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/nfdeploy-fn/ \
-            --dockerfile=upfdeployfn/Dockerfile --destination=nephio/upf-deploy-fn:${BUILD_ID}
+          executor --context=${PWD} \
+            --dockerfile=krm-functions/nfdeploy-fn/upfdeployfn/Dockerfile --destination=nephio/upf-deploy-fn:${BUILD_ID}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -756,8 +756,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/vlan-fn \
-            --dockerfile=Dockerfile --destination=nephio/vlan-fn:${PULL_BASE_REF}
+          executor --context=${PWD} \
+            --dockerfile=krm-functions/vlan-fn/Dockerfile --destination=nephio/vlan-fn:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -791,8 +791,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/krm-functions/vlan-fn \
-            --dockerfile=Dockerfile --destination=nephio/vlan-fn:${BUILD_ID}
+          executor --context=${PWD} \
+            --dockerfile=krm-functions/vlan-fn/Dockerfile --destination=nephio/vlan-fn:${BUILD_ID}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -898,8 +898,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/operators/nephio-controller-manager \
-            --dockerfile=Dockerfile --destination=nephio/nephio-operator:${PULL_BASE_REF}
+          executor --context=${PWD} \
+            --dockerfile=operators/nephio-controller-manager/Dockerfile --destination=nephio/nephio-operator:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -933,8 +933,8 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/operators/nephio-controller-manager \
-            --dockerfile=Dockerfile --destination=nephio/nephio-operator:${BUILD_ID} \
+          executor --context=${PWD} \
+            --dockerfile=operators/nephio-controller-manager/Dockerfile --destination=nephio/nephio-operator:${BUILD_ID} \
             --destination=nephio/nephio-operator:latest
         volumeMounts:
           - name: kaniko-secret
