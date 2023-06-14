@@ -90,9 +90,10 @@ gcloud compute ssh ubuntu@nephio-r1-e2e -- \
                 kubectl port-forward --namespace=nephio-webui svc/nephio-webui 7007
 ```
 
-You can now navigate to
-[http://localhost:7007/config-as-data](http://localhost:7007/config-as-data) to
-browse the UI.
+You can now navigate to:
+- [http://localhost:7007/config-as-data](http://localhost:7007/config-as-data) to
+browse the Nephio Web UI
+- [http://localhost:3000/nephio](http://localhost:3000/nephio) to browse the Gitea UI
 
 ## Open terminal
 
@@ -112,7 +113,7 @@ Everyone else:
 gcloud compute ssh ubuntu@nephio-r1-e2e
 ```
 
-## Excercise
+## Exercise
 
 ### Step 1: Create regional cluster
 
@@ -166,7 +167,7 @@ nephio-example-packages-cdc6d453ae3e1bd0b64234d51d575e4a30980a77   nephio-worklo
 nephio-example-packages-c78ecc6bedc8bf68185f28a998718eed8432dc3b   nephio-workload-cluster   v4              v4         false    Published   nephio-example-packages
 nephio-example-packages-46b923a6bbd09c2ab7aa86c9853a96cbd38d1ed7   nephio-workload-cluster   v5              v5         false    Published   nephio-example-packages
 nephio-example-packages-17bffe318ac068f5f9ef22d44f08053e948a3683   nephio-workload-cluster   v6              v6         false    Published   nephio-example-packages
-nephio-example-packages-0fbaccf6c5e75a3eff7976a523bb4f42bb0118ce   nephio-workload-cluster   v7              v7         true     Published   nephio-example-packages
+nephio-example-packages-0fbaccf6c5e75a3eff7976a523bb4f42bb0118ce   nephio-workload-cluster   v7              v7         false    Published   nephio-example-packages
 nephio-example-packages-7895e28d847c0296a204007ed577cd2a4222d1ea   nephio-workload-cluster   v8              v8         true     Published   nephio-example-packages
 ```
 </details>
@@ -175,7 +176,7 @@ Then, use the NAME from that in the `clone` operation, and the resulting
 PackageRevision name to perform the `propose` and `approve` operations:
 
 ```bash
-kpt alpha rpkg clone -n default nephio-example-packages-0fbaccf6c5e75a3eff7976a523bb4f42bb0118ce --repository mgmt regional
+kpt alpha rpkg clone -n default nephio-example-packages-7895e28d847c0296a204007ed577cd2a4222d1ea --repository mgmt regional
 ```
 
 <details>
@@ -324,7 +325,7 @@ kubectl get machinesets
 
 ```console
 NAME                                   CLUSTER    REPLICAS   READY   AVAILABLE   AGE     VERSION
-regional-md-0-zhw2j-58d497c498xkz96z   regional   3          3       3           3h58m   v1.26.3
+regional-md-0-zhw2j-58d497c498xkz96z   regional   1          1       1           3h58m   v1.26.3
 ```
 </details>
 
@@ -518,6 +519,14 @@ PackageVariantSet).
 ```bash
 kubectl apply -f test-infra/e2e/tests/004-free5gc-operator.yaml
 ```
+
+<details>
+<summary>The output is similar to:</summary>
+
+```console
+packagevariantset.config.porch.kpt.dev/free5gc-operator created
+```
+</details>
 
 ### Step 6: Check Free5GC operator deployment
 
