@@ -60,8 +60,8 @@ resource "google_compute_instance" "e2e_instances" {
     }
   }
   provisioner "file" {
-    source      = "../provision"
-    destination = "/home/ubuntu/provision"
+    source      = "../../../test-infra"
+    destination = "/home/ubuntu/test-infra"
     connection {
       host        = self.network_interface[0].access_config[0].nat_ip
       type        = "ssh"
@@ -90,9 +90,9 @@ resource "google_compute_instance" "e2e_instances" {
       agent       = false
     }
     inline = [
-      "cd provision/",
-      "chmod +x install_sandbox.sh",
-      "DEBUG=true ./install_sandbox.sh"
+      "cd /home/ubuntu/test-infra/e2e/provision/",
+      "chmod +x init.sh",
+      "sudo -E NEPHIO_REPO_DIR=/home/ubuntu/test-infra NEPHIO_DEBUG=true NEPHIO_RUN_E2E=true ./init.sh"
     ]
   }
 }
