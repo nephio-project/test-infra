@@ -92,8 +92,7 @@ resource "google_compute_instance" "e2e_instances" {
     inline = [
       "cd provision/",
       "chmod +x install_sandbox.sh",
-      "export DEBUG=true",
-      "timeout --preserve-status 30m ./install_sandbox.sh"
+      "DEBUG=true ./install_sandbox.sh"
     ]
   }
 }
