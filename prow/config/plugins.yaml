@@ -16,6 +16,7 @@ plugins:
     - retitle
     - override
     - lifecycle
+    - cla
   nephio-project/test-infra:
     plugins:
     - config-updater
