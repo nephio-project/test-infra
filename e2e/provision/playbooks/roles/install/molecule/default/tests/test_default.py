@@ -27,10 +27,7 @@ def test_deployments(host):
             "porch-server",
         ],
         "nephio-system": [
-            "ipam-controller",
-            "nephio-5gc-controller",
-            "nf-injector-controller",
-            "package-deployment-controller-controller",
+            "nephio-controller"
         ],
         "nephio-webui": ["nephio-webui"],
         "resource-group-system": ["resource-group-controller-manager"],
