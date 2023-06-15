@@ -37,3 +37,12 @@ k8s_wait_exists "$kubeconfig" 600 "default" "cluster" "edge02"
 
 k8s_wait_ready "$kubeconfig" 600 "default" "cluster" "edge01"
 k8s_wait_ready "$kubeconfig" 600 "default" "cluster" "edge02"
+
+# Inter-connect worker nodes
+workers=""
+for cluster in regional edge01 edge02; do
+    _kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "$cluster")
+    workers+=$(kubectl get nodes -l node-role.kubernetes.io/control-plane!= -o jsonpath='{range .items[*]}"{.metadata.name}",{"\n"}{end}' --kubeconfig "$_kubeconfig")
+done
+echo "{\"workers\":[${workers::-1}]}" | tee /tmp/vars.json
+sudo containerlab deploy --topo "$TESTDIR/002-topo.gotmpl" --vars /tmp/vars.json --skip-post-deploy

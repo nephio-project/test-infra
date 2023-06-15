@@ -364,6 +364,48 @@ kubectl get secret edge02-kubeconfig -o jsonpath='{.data.value}' | base64 -d > $
 export KUBECONFIG=$HOME/.kube/config:$HOME/.kube/regional-kubeconfig:$HOME/.kube/edge01-kubeconfig:$HOME/.kube/edge02-kubeconfig
 ```
 
+Once the edge clusters are ready it's necessary to inter-connect them. This time
+we are going to use the [containerlab tool](https://containerlab.dev/) for that
+operation. Eventually inter-cluster networking will be automated as well, but it
+is not yet in this release.
+
+```bash
+workers=""
+for context in $(kubectl config get-contexts --no-headers --output name); do
+    workers+=$(kubectl get nodes -l node-role.kubernetes.io/control-plane!= -o jsonpath='{range .items[*]}"{.metadata.name}",{"\n"}{end}' --context "$context")
+done
+echo "{\"workers\":[${workers::-1}]}" | tee /tmp/vars.json
+sudo containerlab deploy --topo test-infra/e2e/tests/002-topo.gotmpl --vars /tmp/vars.json --skip-post-deploy
+```
+
+<details>
+<summary>The output is similar to:</summary>
+
+```console
+{"workers":["edge01-md-0-5xpjv-d578b7b8bxwph6d-6sv2n","edge02-md-0-fvpvh-99498794cxhfzsn-q5xvl","regional-md-0-p6zbf-586d7b54d8xw6b5x-qv77v"]}
+INFO[0000] Containerlab v0.41.2 started
+INFO[0000] Parsing & checking topology file: 002-topo.gotmpl
+INFO[0000] Could not read docker config: open /root/.docker/config.json: no such file or directory
+INFO[0000] Pulling ghcr.io/nokia/srlinux:latest Docker image
+INFO[0266] Done pulling ghcr.io/nokia/srlinux:latest
+INFO[0266] Creating lab directory: /tmp/test-infra/e2e/clab-free5gc-net
+INFO[0268] Creating docker network: Name="clab", IPv4Subnet="172.20.20.0/24", IPv6Subnet="2001:172:20:20::/64", MTU="1500"
+INFO[0271] Creating container: "N6"
+INFO[0276] Creating virtual wire: N6:e1-1 <--> edge02-md-0-fvpvh-99498794cxhfzsn-q5xvl:eth1
+INFO[0276] Creating virtual wire: N6:e1-2 <--> regional-md-0-p6zbf-586d7b54d8xw6b5x-qv77v:eth1
+INFO[0276] Creating virtual wire: N6:e1-0 <--> edge01-md-0-5xpjv-d578b7b8bxwph6d-6sv2n:eth1
+INFO[0277] Adding containerlab host entries to /etc/hosts file
++---+--------------------------------------------+--------------+-----------------------+---------------+---------+----------------+--------------------------+
+| # |                    Name                    | Container ID |         Image         |     Kind      |  State  |  IPv4 Address  |       IPv6 Address       |
++---+--------------------------------------------+--------------+-----------------------+---------------+---------+----------------+--------------------------+
+| 1 | edge01-md-0-5xpjv-d578b7b8bxwph6d-6sv2n    | 44e78769fc1e | kindest/node:v1.26.3  | ext-container | running | 172.18.0.11/16 | fc00:f853:ccd:e793::b/64 |
+| 2 | edge02-md-0-fvpvh-99498794cxhfzsn-q5xvl    | 38eb76c0323b | kindest/node:v1.26.3  | ext-container | running | 172.18.0.8/16  | fc00:f853:ccd:e793::8/64 |
+| 3 | regional-md-0-p6zbf-586d7b54d8xw6b5x-qv77v | 142a4f0cff7e | kindest/node:v1.26.3  | ext-container | running | 172.18.0.5/16  | fc00:f853:ccd:e793::5/64 |
+| 4 | net-free5gc-net-N6                         | 1581d603e174 | ghcr.io/nokia/srlinux | srl           | running | 172.20.20.2/24 | 2001:172:20:20::2/64     |
++---+--------------------------------------------+--------------+-----------------------+---------------+---------+----------------+--------------------------+
+```
+</details>
+
 Finally, we want to configure the resource backend to know about these clusters.
 The resource backend is an IP address and VLAN index management system. It is
 included for demonstration purposes, to show how Nephio package specialization
