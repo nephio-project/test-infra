@@ -89,9 +89,12 @@ Order or create a VM with the following specification:
 
 **Configure a route for Kubernetes**
 
-In some instllations, the IP range used by Kubernetes in the sandbox can clash with the IP address used by your VPN. In such cases, the VM will become unreachable during the sandbox installation. To avoid this situation, add the route below on your VM.
+In some installations, the IP range used by Kubernetes in the sandbox can clash with the
+IP address used by your VPN. In such cases, the VM will become unreachable during the
+sandbox installation. If you have this situation, add the route below on your VM.
 
-Log onto your VM and run the following commands, replacing **\<interface-name\>** and **\<interface-gateway-ip\>** with your VMs values: 
+Log onto your VM and run the following commands,
+replacing **\<interface-name\>** and **\<interface-gateway-ip\>** with your VMs values: 
 
 ```bash
 sudo bash -c 'cat << EOF > /etc/netplan/99-cloud-init-network.yaml
@@ -185,12 +188,12 @@ Googlers:
 gcloud compute ssh ubuntu@nephio-r1-e2e -- -o ProxyCommand='corp-ssh-helper %h %p'
 ```
 
-Everyone else on GCE:
+Others on GCE:
 
 ```bash
 gcloud compute ssh ubuntu@nephio-r1-e2e
 ```
-Everyone else on VMs:
+Others on VMs:
 
 ```bash
 ssh <user>@<vm-address>
