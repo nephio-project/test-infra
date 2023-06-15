@@ -40,5 +40,3 @@ provisioner:
         host_min_cpu_ram: 1
 verifier:
   name: testinfra
-  options:
-    sudo: true

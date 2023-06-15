@@ -68,12 +68,6 @@ else
     else
         ansible-playbook -vvv -i ./nephio.yaml playbooks/cluster.yml
     fi
-
-    # Put this in the ubuntu dir and make it accessible to world
-    mkdir "$HOME/.kube" && chmod 755 "$HOME/.kube"
-    sudo cp /root/.kube/config "$HOME/.kube"
-    sudo chown $USER:$USER "$HOME/.kube/config"
-    chmod 644 "$HOME/.kube/config"
 fi
 
 echo "Done installing Nephio Sandbox Environment"

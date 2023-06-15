@@ -33,21 +33,22 @@ def test_kernel_parameters_validation(host):
 
 
 def test_kind_cluster_creation(host):
-    kind = host.docker("kind-control-plane")
+    with host.sudo():
+        kind = host.docker("kind-control-plane")
+        assert kind.is_running
 
-    assert kind.is_running
-    destinations = host.check_output(
-        "docker inspect \
+        destinations = host.check_output(
+            "docker inspect \
 --format '{{range .Mounts }}{{.Destination}}{{\"\\n\"}}{{end}}' \
 kind-control-plane"
-    )
-    assert "/var/run/docker.sock" in destinations
-    sources = host.check_output(
-        "docker inspect \
+        )
+        assert "/var/run/docker.sock" in destinations
+        sources = host.check_output(
+            "docker inspect \
 --format '{{range .Mounts }}{{.Source}}{{\"\\n\"}}{{end}}' \
 kind-control-plane"
-    )
-    assert "/var/run/docker.sock" in sources
+        )
+        assert "/var/run/docker.sock" in sources
 
 
 def test_gitea_namespace_creation(host):

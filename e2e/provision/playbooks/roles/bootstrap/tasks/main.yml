@@ -33,7 +33,7 @@
 
 - name: Create management cluster
   become: true
-  ansible.builtin.command: kind create cluster --config=-
+  ansible.builtin.command: kind create cluster --kubeconfig /tmp/kubeconfig --config=-
   args:
     stdin: |
       kind: Cluster
@@ -47,8 +47,23 @@
   when: not 'kind' in bootstrap_kind_get_cluster.stdout
   changed_when: true
 
-- name: Create gitea namespace
+- name: Create .kube directory
+  ansible.builtin.file:
+    path: "{{ ansible_user_dir }}/.kube"
+    state: directory
+    mode: '0755'
+
+- name: Copy root kubeconfig file
   become: true
+  ansible.builtin.copy:
+    remote_src: true
+    src: /tmp/kubeconfig
+    dest: "{{ ansible_user_dir }}/.kube/config"
+    owner: "{{ ansible_user_uid }}"
+    group: "{{ ansible_user_gid }}"
+    mode: '0644'
+
+- name: Create gitea namespace
   kubernetes.core.k8s:
     state: present
     definition:
@@ -58,7 +73,6 @@
         name: gitea
 
 - name: Create gitea postgresql user password
-  become: true
   kubernetes.core.k8s:
     state: present
     definition:
@@ -76,7 +90,6 @@
         password: "{{ gitea_db_password }}"
 
 - name: Create gitea user password
-  become: true
   kubernetes.core.k8s:
     state: present
     definition:

@@ -43,6 +43,14 @@
     pkg_path: "{{ workdir }}"
     command: fn-render
 
+- name: Recursively restore ownership of a directory package
+  ansible.builtin.file:
+    path: "{{ workdir }}"
+    state: directory
+    owner: "{{ ansible_user_uid }}"
+    group: "{{ ansible_user_gid }}"
+    recurse: true
+
 - name: Get package differences between local and upstream
   kpt:
     pkg_path: "{{ workdir }}"
@@ -60,7 +68,6 @@
   register: kpt_resourcegroup
 
 - name: Init package
-  become: true
   kpt:
     pkg_path: "{{ workdir }}"
     version: "{{ version }}"
@@ -74,7 +81,6 @@
     var: kpt_live_init
 
 - name: Apply package
-  become: true
   kpt:
     pkg_path: "{{ workdir }}"
     version: "{{ version }}"
