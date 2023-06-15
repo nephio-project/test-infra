@@ -81,8 +81,8 @@ This install has been verified on VMs running on Openstack, AWS, and Azure.
 
 Order or create a VM with the following specification:
 
-- Linux Flavour: Ubuntu-22.04-jammy
-- 16 cores
+- Linux Flavour: Ubuntu-20.04-focal
+- 8 cores
 - 32 GB memory
 - 200 GB disk size
 - default user with sudo passwordless permissions
