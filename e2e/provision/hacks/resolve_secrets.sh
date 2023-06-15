@@ -29,7 +29,7 @@ function apply_kpt_pkg {
 
     echo "applying $name kpt package in $temp_dir . . ."
     pushd "$temp_dir" >/dev/null
-    kpt live --kubeconfig "$HOME/.kube/config" apply "$temp_dir/$name"
+    kpt live --kubeconfig "$HOME/.kube/config" apply "$temp_dir/$name" --reconcile-timeout 10m
     popd >/dev/null
     echo "applied $name kpt package in $temp_dir"
 }

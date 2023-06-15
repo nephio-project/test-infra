@@ -42,7 +42,7 @@ function deploy_kpt_pkg {
     kpt pkg tree "$localpkg"
     let retries=5
     while [[ $retries -gt 0 ]]; do
-        if kpt live --kubeconfig "$HOME/.kube/config" apply "$localpkg"; then
+        if kpt live --kubeconfig "$HOME/.kube/config" apply "$localpkg" --reconcile-timeout 10m; then
             retries=0
         else
             retries=$((retries - 1))
