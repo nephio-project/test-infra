@@ -12,6 +12,7 @@
   hosts: vm
   vars:
     container_engine: docker
+    clab_version: 0.41.2
   pre_tasks:
     - name: Install kubernetes python package
       become: true
@@ -38,3 +39,9 @@
       cni_plugins_dir: /opt/cni/bin
     - bootstrap
     - install
+  tasks:
+    - name: Install container lab tool
+      become: true
+      ansible.builtin.apt:
+        deb: "https://github.com/srl-labs/containerlab/releases/download/v{{ clab_version }}/containerlab_{{ clab_version }}_linux_{{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}.deb"
+      when: ansible_os_family == 'Debian' and ansible_architecture in ('arm64', 'x86_64')
