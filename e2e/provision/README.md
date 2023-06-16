@@ -1,10 +1,15 @@
-# Quick Start for GCE
+# Quick Start for GCE and VMs running in other environments
 
 ## Table of Contents
 
-- [Prerequisites](#prerequisites)
-- [Create a Virtual Machine](#create-a-virtual-machine)
-- [Follow installation](#follow-installation)
+- [Installing on GCE](#installing-on-gce)
+  - [GCE Prerequisites](#gce-prerequisites)
+  - [Create a Virtual Machine on GCE](#create-a-virtual-machine-on-gce)
+  - [Follow installation on GCE](#follow-installation-on-gce)
+- [Installing on a pre-provisioned VM](#installing-on-a-pre-provisioned-vm)
+  - [VM Prerequisites](#vm-prerequisites)
+  - [Kick off the installation on VM](#kick-off-installation-on-vm)
+  - [Follow installation on VM](#follow-installation-on-vm)
 - [Access to the User Interfaces](#access-to-the-user-interfaces)
 - [Open terminal](#open-terminal)
 - [Excercise](#excercise)
@@ -16,11 +21,13 @@
   - [Check Free5GC operator deployment](#step-6-check-free5GC-operator-deployment)
   - [Deploy AMF, SMF and UPF](#step-7-deploy-amf-smf-and-upf)
 
-## Prerequisites
+## Installing on GCE
+
+### GCE Prerequisites
 
 You need a account in GCP and `gcloud` available on your local environment.
 
-## Create a Virtual Machine
+### Create a Virtual Machine on GCE
 
 ```bash
 gcloud compute instances create --machine-type e2-standard-8 \
@@ -47,7 +54,7 @@ comma-delimited key=value pairs in the `--metadata` flag).
 - `nephio-test-infra-branch` defaults to `main` but you can use it along with
     the repo value to choose a branch in the repo for testing.
 
-## Follow installation
+### Follow installation on GCE
 
 If you want to watch the progress of the installation, give it about 30
 seconds to reach a network accessible state, and then ssh in and tail the
@@ -66,6 +73,71 @@ gcloud compute ssh ubuntu@nephio-r1-e2e -- \
                 sudo journalctl -u google-startup-scripts.service --follow
 ```
 
+## Installing on a pre-provisioned VM
+
+This install has been verified on VMs running on Openstack, AWS, and Azure. 
+
+### VM Prerequisites
+
+Order or create a VM with the following specification:
+
+- Linux Flavour: Ubuntu-20.04-focal
+- 8 cores
+- 32 GB memory
+- 200 GB disk size
+- default user with sudo passwordless permissions
+
+**Configure a route for Kubernetes**
+
+In some installations, the IP range used by Kubernetes in the sandbox can clash with the
+IP address used by your VPN. In such cases, the VM will become unreachable during the
+sandbox installation. If you have this situation, add the route below on your VM.
+
+Log onto your VM and run the following commands,
+replacing **\<interface-name\>** and **\<interface-gateway-ip\>** with your VMs values: 
+
+```bash
+sudo bash -c 'cat << EOF > /etc/netplan/99-cloud-init-network.yaml
+network:
+  ethernets:
+    <interface-name>:
+      routes:
+        - to: 172.18.2.6/32
+          via: <interface-gateway-ip>
+          metric: 100
+  version: 2
+EOF'
+
+sudo netplan apply
+```
+
+### Kick off installation on VM
+
+Log onto your VM and run the following command:
+
+```bash
+wget -O - https://raw.githubusercontent.com/nephio-project/test-infra/main/e2e/provision/init.sh |  \
+sudo NEPHIO_DEBUG=false   \
+     NEPHIO_USER=ubuntu  \
+     bash
+```
+
+The following environment variables can be used to configure the installation:
+
+| Variable               | Values           | Default Value | Description                                            |
+| ---------------------- | ---------------- | ------------- | ------------------------------------------------------ |
+| NEPHIO_USER            | userid           | ubuntu        | The user to install the sandbox on (must have sudo passwordless permissions) |
+| NEPHIO_DEBUG           | false or true    | false         | Controls debug output from the install                 |
+| NEPHIO_DEPLOYMENT_TYPE | r1 or one-summit | r1            | Controls the type of installation to be carried out    |
+| RUN_E2E                | false or true    | false         | Specifies whether end to end tests should be executed or not |
+| NEPHIO_REPO            | URL              | https://github.com/nephio-project/test-infra.git |URL of the repository to be used for installation |
+
+### Follow installation on VM
+
+Monitor the installation on your terminal.
+
+Log onto your VM using ssh on another terminal and use commands *docker* and *kubectl* to monitor the installation.
+
 ## Access to the User Interfaces
 
 Once it's done, ssh in and port forward the port to the UI (7007) and to
@@ -81,10 +153,19 @@ gcloud compute ssh ubuntu@nephio-r1-e2e -- \
                 kubectl port-forward --namespace=nephio-webui svc/nephio-webui 7007
 ```
 
-Everyone else:
+Others using GCE:
 
 ```bash
 gcloud compute ssh ubuntu@nephio-r1-e2e -- \
+                -L 7007:localhost:7007 \
+                -L 3000:172.18.0.200:3000 \
+                kubectl port-forward --namespace=nephio-webui svc/nephio-webui 7007
+```
+
+Others on VMs:
+
+```bash
+ssh <user>@<vm-address> \
                 -L 7007:localhost:7007 \
                 -L 3000:172.18.0.200:3000 \
                 kubectl port-forward --namespace=nephio-webui svc/nephio-webui 7007
@@ -107,10 +188,15 @@ Googlers:
 gcloud compute ssh ubuntu@nephio-r1-e2e -- -o ProxyCommand='corp-ssh-helper %h %p'
 ```
 
-Everyone else:
+Others on GCE:
 
 ```bash
 gcloud compute ssh ubuntu@nephio-r1-e2e
+```
+Others on VMs:
+
+```bash
+ssh <user>@<vm-address>
 ```
 
 ## Exercise
@@ -587,20 +673,3 @@ kubectl apply -f test-infra/e2e/tests/005-regional-free5gc-amf.yaml
 kubectl apply -f test-infra/e2e/tests/005-regional-free5gc-smf.yaml
 kubectl apply -f test-infra/e2e/tests/006-edge-free5gc-upf.yaml
 ```
-# Quick Start for VM running on Openstack
-
-## Step 1: Order or Create a VM using your local VM
-
-Order or create a VM with the following specification:
-- Linux Flavour: Ubuntu-22.04-jammy
-- 16 cores
-- 32 GB memory
-- 200 GB disk size
-- default user is "ubuntu" and "ubuntu" needs sudo passwordless permissions
-
-## Step 2: Kick off the install
-```
-wget -O - https://raw.githubusercontent.com/nephio-project/test-infra/main/e2e/provision/init.sh |  \
-sudo NEPHIO_DEBUG=false   \
-     NEPHIO_USER=ubuntu  \
-     bash
