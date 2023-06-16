@@ -36,11 +36,11 @@ cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
 # check the AMF
 k8s_wait_exists "$kubeconfig" 600 "default" "packagevariant" "regional-free5gc-amf-regional-free5gc-amf"
 k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "regional-free5gc-amf-regional-free5gc-amf"
-k8s_wait_exists "$cluster_kubeconfig" 600 "free5gc-amf" "deployment" "free5gc-amf"
-k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc" "deployment" "free5gc-amf"
+k8s_wait_exists "$cluster_kubeconfig" 600 "free5gc-cp" "deployment" "amf-regional"
+k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc-cp" "deployment" "amf-regional"
 
 # check the SMF
 k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "regional-free5gc-smf-regional-free5gc-smf"
 k8s_wait_exists "$kubeconfig" 600 "default" "packagevariant" "regional-free5gc-smf-regional-free5gc-smf"
-k8s_wait_exists "$cluster_kubeconfig" 600 "free5gc-amf" "deployment" "free5gc-smf"
-k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc" "deployment" "free5gc-smf"
+k8s_wait_exists "$cluster_kubeconfig" 600 "free5gc-cp" "deployment" "smf-regional"
+k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc-cp" "deployment" "smf-regional"
