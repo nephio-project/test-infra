@@ -28,29 +28,6 @@ function get_status {
     sudo kubectl get all -A -o wide
 }
 
-function deploy_kpt_pkg {
-    local pkg=$1
-    local name=$2
-
-    local temp=$(mktemp -d -t kpt-XXXX)
-    local localpkg="$temp/$name"
-    kpt pkg get --for-deployment "https://github.com/nephio-project/nephio-example-packages.git/$pkg" "$localpkg"
-    # sudo because docker
-    sudo kpt fn render "$localpkg"
-    kpt live init "$localpkg"
-    kubectl --kubeconfig "$HOME/.kube/config" api-resources
-    kpt pkg tree "$localpkg"
-    let retries=5
-    while [[ $retries -gt 0 ]]; do
-        if kpt live --kubeconfig "$HOME/.kube/config" apply "$localpkg" --reconcile-timeout 10m; then
-            retries=0
-        else
-            retries=$((retries - 1))
-            sleep 5
-        fi
-    done
-}
-
 # Install dependencies for it's ansible execution
 sudo apt-get update
 sudo -E DEBIAN_FRONTEND=noninteractive apt-get remove -q -y python3-openssl
@@ -90,12 +67,6 @@ else
     sudo cp /root/.kube/config "$HOME/.kube"
     sudo chown $USER:$USER "$HOME/.kube/config"
     chmod 644 "$HOME/.kube/config"
-
-    # I don't know how to make ansible do what I want, this is what I want
-    deploy_kpt_pkg "repository@repository/v3" "mgmt"
-    deploy_kpt_pkg "rootsync@rootsync/v3" "mgmt"
-
-    deploy_kpt_pkg "repository@repository/v3" "mgmt-staging"
 fi
 
 echo "Done installing Nephio Sandbox Environment"

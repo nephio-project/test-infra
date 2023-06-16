@@ -63,6 +63,12 @@ options:
           - resource-merge
           - fast-forward
           - force-delete-replace
+    for_deployment:
+        description:
+           - (Experimental) indicates if the fetched package is a deployable
+             instance that will be deployed to a cluster.
+        required: false
+        type: bool
     directory:
         description:
           - Directory of the kpt package.
@@ -290,7 +296,14 @@ class KptClient:
 
     # Fetch a package from a git repo.
     def pkg_get(
-        self, repo_uri, pkg_path, local_dest_directory, version, strategy, **kargs
+        self,
+        repo_uri,
+        pkg_path,
+        local_dest_directory,
+        version,
+        strategy,
+        for_deployment,
+        **kargs
     ):
         cmd = [self._kpt_cmd_path, "pkg", "get"]
         cmd.append(
@@ -302,6 +315,8 @@ class KptClient:
         )
         if local_dest_directory:
             cmd.append(local_dest_directory)
+        if for_deployment:
+            cmd.append("--for-deployment")
         if strategy and strategy in [
             "resource-merge",
             "fast-forward",
@@ -312,9 +327,9 @@ class KptClient:
         result = dict(changed=False, rc=0, cmd=" ".join(cmd))
 
         dest = (
-            (local_dest_directory if local_dest_directory else ".")
-            + "/"
-            + pkg_path.split("/")[-1]
+            local_dest_directory
+            if local_dest_directory
+            else "./" + pkg_path.split("/")[-1]
         )
         if not os.path.exists(dest):
             self._run(cmd)
@@ -356,7 +371,7 @@ class KptClient:
             cmd.extend(["--output", output])
         if results_dir:
             cmd.extend(["--results-dir", results_dir])
-        self._run(cmd)
+        self._run(cmd, False)
 
     # Initialize a package with the information needed for inventory tracking.
     def live_init(
@@ -424,7 +439,7 @@ class KptClient:
             cmd.extend(["--show-status-events", show_status_events])
         if context:
             cmd.extend(["--context", context])
-        self._run(cmd)
+        self._run(cmd, False)
 
 
 def main():
@@ -434,6 +449,7 @@ def main():
         version=dict(type="str", required=False),
         local_dest_directory=dict(type="str", required=False),
         strategy=dict(type="str", required=False),
+        for_deployment=dict(type="bool", required=False),
         directory=dict(type="str", required=False),
         diff_type=dict(type="bool", required=False),
         diff_tool=dict(type="str", required=False),

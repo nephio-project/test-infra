@@ -101,7 +101,6 @@
     - {pkg: resource-backend, version: resource-backend/v2, namespaces: [backend-system]}
   vars:
     repo_uri: https://github.com/nephio-project/nephio-example-packages
-    local_dest_directory: /tmp
     pkg: "{{ item.pkg }}"
     version: "{{ item.version }}"
     namespaces: "{{ item.namespaces }}"

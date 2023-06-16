@@ -8,9 +8,13 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
+- name: Define working directory
+  ansible.builtin.set_fact:
+    workdir: "{{ local_dest_directory | default('/tmp/kpt-pkg/' + pkg) }}"
+
 - name: Create base directory if it does not exist
   ansible.builtin.file:
-    path: "{{ local_dest_directory }}"
+    path: "{{ workdir | dirname }}"
     state: directory
 
 - name: Fetch package
@@ -18,17 +22,13 @@
     repo_uri: "{{ repo_uri }}"
     pkg_path: "{{ pkg }}"
     version: "{{ version }}"
-    local_dest_directory: "{{ local_dest_directory }}"
+    local_dest_directory: "{{ workdir }}"
+    for_deployment: "{{ for_deployment | default(false) | bool }}"
     command: pkg-get
 
-- name: Get the local path
-  ansible.builtin.set_fact:
-    directory: "{{ local_dest_directory }}/{{ pkg | split('/') | last }}"
-
 - name: Get package content information
-  become: true
   kpt:
-    directory: "{{ directory }}"
+    directory: "{{ workdir }}"
     command: pkg-tree
   register: kpt_pkg_tree
 
@@ -36,23 +36,16 @@
   ansible.builtin.debug:
     var: kpt_pkg_tree.stdout_lines
 
-- name: Check package has been initialized
-  ansible.builtin.stat:
-    path: "{{ directory }}/resourcegroup.yaml"
-  register: kpt_resourcegroup
-
 # TODO: Improve the render function
 - name: Render package
   become: true
   kpt:
-    pkg_path: "{{ directory }}"
+    pkg_path: "{{ workdir }}"
     command: fn-render
-  when: not kpt_resourcegroup.stat.exists
 
 - name: Get package differences between local and upstream
-  become: true
   kpt:
-    pkg_path: "{{ directory }}"
+    pkg_path: "{{ workdir }}"
     version: "{{ version }}"
     command: pkg-diff
   register: kpt_pkg_diff
@@ -61,16 +54,20 @@
   ansible.builtin.debug:
     var: kpt_pkg_diff.stdout_lines
 
+- name: Check package has been initialized
+  ansible.builtin.stat:
+    path: "{{ workdir }}/resourcegroup.yaml"
+  register: kpt_resourcegroup
+
 - name: Init package
   become: true
   kpt:
-    pkg_path: "{{ directory }}"
+    pkg_path: "{{ workdir }}"
     version: "{{ version }}"
     context: "{{ context }}"
     command: live-init
-  ignore_errors: true
   register: kpt_live_init
-  changed_when: false
+  when: not kpt_resourcegroup.stat.exists
 
 - name: Print package initialization
   ansible.builtin.debug:
@@ -79,7 +76,7 @@
 - name: Apply package
   become: true
   kpt:
-    pkg_path: "{{ directory }}"
+    pkg_path: "{{ workdir }}"
     version: "{{ version }}"
     context: "{{ context }}"
     command: live-apply
@@ -87,7 +84,6 @@
   register: kpt_apply
   until: kpt_apply is not failed
   retries: 5
-  changed_when: false
 
 - name: Wait for deployments
   ansible.builtin.include_tasks: wait_deployments.yml
