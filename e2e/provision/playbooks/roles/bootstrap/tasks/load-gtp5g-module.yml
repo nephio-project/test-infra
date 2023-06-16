@@ -1,0 +1,72 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- name: Load OS specific variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution|lower }}-{{ ansible_distribution_major_version|lower|replace('/', '_') }}.yml"
+        - "{{ ansible_distribution|lower }}.yml"
+        - "{{ ansible_os_family|lower }}.yml"
+      skip: true
+
+- name: Install compilation packages
+  become: true
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ build_pkgs }}"
+
+- name: Install Debian kernel development tools
+  become: true
+  ansible.builtin.package:
+    name: "linux-headers-{{ ansible_kernel }}"
+    state: present
+  when: ansible_os_family == 'Debian'
+
+- name: Get gtp5g module information
+  ansible.builtin.command: modinfo gtp5g
+  register: bootstrap_modinfo_gtp5g
+  ignore_errors: true
+  changed_when: false
+
+- name: Print gtp5g module information
+  ansible.builtin.debug:
+    var: bootstrap_modinfo_gtp5g
+
+- name: Create gtp5g destination folder
+  become: true
+  ansible.builtin.file:
+    mode: '0755'
+    state: directory
+    path: "{{ gtp5g_dest }}"
+    owner: "{{ ansible_user_uid }}"
+    group: "{{ ansible_user_gid }}"
+
+- name: Extract gtp5g driver source code
+  ansible.builtin.unarchive:
+    mode: '0755'
+    src: "{{ gtp5g_tarball_url }}"
+    dest: "{{ gtp5g_dest }}"
+    remote_src: true
+    owner: "{{ ansible_user_uid }}"
+    extra_opts: [--strip-components=1, --overwrite]
+
+- name: Configure gtp5g module
+  community.general.make:
+    chdir: "{{ gtp5g_dest }}"
+  when: '"ERROR: Module gtp5g not found." in bootstrap_modinfo_gtp5g.stderr'
+
+- name: Install gtp5g module
+  become: true
+  community.general.make:
+    chdir: "{{ gtp5g_dest }}"
+    target: install
+  when: '"ERROR: Module gtp5g not found." in bootstrap_modinfo_gtp5g.stderr'
