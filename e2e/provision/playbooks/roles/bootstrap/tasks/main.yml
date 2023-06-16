@@ -17,6 +17,9 @@
 - name: Set Kernel Parameters
   ansible.builtin.include_tasks: system-setup.yml
 
+- name: Force all notified handlers to run at this point
+  ansible.builtin.meta: flush_handlers
+
 - name: Get k8s clusters
   become: true
   ansible.builtin.command: kind get clusters
