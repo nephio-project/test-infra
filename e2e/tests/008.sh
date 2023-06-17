@@ -1,3 +1,4 @@
+#!/bin/bash
 #!/usr/bin/env bash
 # SPDX-license-identifier: Apache-2.0
 ##############################################################################
@@ -28,8 +29,47 @@ source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
+function k8s_upf_scale_test {
+    local current_cpu=$1
+    local current_memory=$2
+    local after_scale_cpu=$3
+    local after_scale_memory=$4
+    
+    echo "Comparing the new CPU/Memory before and after scaling"
+
+    if [ "$after_scaling_cpu" -le  "$current_cpu" ] && [ "$after_scale_memory" -le  "$current_memory" ]; then
+        echo "UPF POD Scaling Failed"
+        exit 1
+    else
+        echo "UPF Pod Scaling Successful"
+    fi
+    
+    exit 0
+}
+
+
 for cluster in "edge01" "edge02"; do
 
+    #Get the cluster kubeconfig
+    cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "$cluster")
+    
+    #Before scaling test get the running UPF POD ID
+    upf_pod_id=$(kubectl --kubeconfig $cluster_kubeconfig get pods -l app=free5gc-upf -l nf=upf -n free5gc-upf | grep upf | cut -d ' ' -f 1)
+
+    if [ -z "$upf_pod_id" ]; then
+    	echo "UPF PoD Not Found"
+    	exit 1
+    fi
+
+    #If the pod exists, Get the current CPU and Memory limit
+    current_cpu=$(kubectl --kubeconfig $cluster_kubeconfig describe pods $upf_pod_id -n free5gc-upf | awk '/cpu:/ {print $2}' | sed 's/m$//') 
+
+    current_memory=$(kubectl --kubeconfig $cluster_kubeconfig describe pods $upf_pod_id -n free5gc-upf | awk '/memory:/ {print $2}' | sed 's/Mi$//')
+
+    echo "Current CPU $current_cpu"
+    echo "Current Memory $current_memory"
+
+    #Scale the POD
     upf_deployment_pkg=$(kpt alpha rpkg get -n default --name free5gc-upf | grep packagevariant | grep $cluster | grep true | cut -d ' ' -f 1)
 
     upf_pkg_rev=$(kpt alpha rpkg copy -n default $upf_deployment_pkg --workspace ${cluster}_upf_scaling | cut -d ' ' -f 1)
@@ -45,9 +85,20 @@ for cluster in "edge01" "edge02"; do
 
     kpt alpha rpkg approve -n default "$upf_pkg_rev"
 
-    cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "$cluster")
 
     k8s_wait_exists "$cluster-kubeconfig" 600 "free5gc" "deployment" "free5gc-upf"
 
     k8s_wait_ready "$cluster-kubeconfig" 600 "free5gc" "deployment" "free5gc-upf"
+
+    #Get the new POD ID
+    upf_pod_id_scale=$(kubectl --kubeconfig $cluster_kubeconfig get pods -l app=free5gc-upf -l nf=upf -n free5gc-upf | grep upf | cut -d ' ' -f 1)
+
+    after_scaling_cpu=$(kubectl --kubeconfig $cluster_kubeconfig describe pods $upf_pod_id_scale -n free5gc-upf | awk '/cpu:/ {print $2}' | sed 's/m$//')
+
+    after_scaling_memory=$(kubectl --kubeconfig $cluster_kubeconfig describe pods $upf_pod_id_scale -n free5gc-upf | awk '/memory:/ {print $2}' | sed 's/Mi$//')
+
+    echo "After Scaling  $after_scaling_cpu $after_scaling_memory"
+
+    k8s_upf_scale_test $current_cpu $current_memory $after_scaling_cpu $after_scaling_memory
+
 done
