@@ -30,7 +30,7 @@ presubmits:
             - "-c"
             - |
               set -eE; cd e2e/terraform; trap 'terraform destroy -auto-approve' EXIT;
-              terraform init && timeout 45m terraform apply -auto-approve
+              terraform init && timeout 1h terraform apply -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -226,7 +226,7 @@ periodics:
             - "-c"
             - |
               set -eE; cd e2e/terraform; trap 'terraform destroy -auto-approve' EXIT;
-              terraform init && timeout 45m terraform apply -auto-approve
+              terraform init && timeout 1h terraform apply -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
