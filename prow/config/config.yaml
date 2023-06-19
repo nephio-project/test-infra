@@ -469,7 +469,7 @@ postsubmits:
         - "-c"
         - |
           executor --context=${PWD} \
-            --dockerfile=krm-functions/nad-fn/DockerFile --destination=nephio/nad-fn:${PULL_BASE_REF}
+            --dockerfile=krm-functions/nad-fn/Dockerfile --destination=nephio/nad-fn:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -504,7 +504,7 @@ postsubmits:
         - "-c"
         - |
           executor --context=${PWD} \
-            --dockerfile=krm-functions/nad-fn/DockerFile --destination=nephio/nad-fn:${BUILD_ID}
+            --dockerfile=krm-functions/nad-fn/Dockerfile --destination=nephio/nad-fn:${BUILD_ID}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
