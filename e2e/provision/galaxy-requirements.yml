@@ -18,7 +18,7 @@ roles:
   - name: andrewrothstein.kubectl
     version: v1.2.7
   - name: andrewrothstein.kpt
-    version: 0.0.1
+    version: 0.0.3
   - name: darkwizard242.cni
     version: 2.2.0
 
