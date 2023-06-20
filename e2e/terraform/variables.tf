@@ -11,7 +11,7 @@ variable "zone" {
 }
 
 variable "instance" {
-  default = "e2-standard-8"
+  default = "e2-standard-16"
 }
 
 variable "credentials" {
