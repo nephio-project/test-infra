@@ -21,8 +21,12 @@ lint: |
   ansible-lint -v -c ../../../.ansible-lint
   flake8
 platforms:
-  - name: bionic
+  - name: focal
     box: generic/ubuntu2004
+    provider_options:
+      gui: false
+  - name: jammy
+    box: generic/ubuntu2204
     provider_options:
       gui: false
 provisioner:
