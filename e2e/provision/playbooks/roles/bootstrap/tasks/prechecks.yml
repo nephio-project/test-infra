@@ -21,3 +21,11 @@
     fail_msg: >-
       Host does not have enough RAM - {{ ansible_facts.memtotal_mb / 1024 }} GB.
       Minimum required RAM - {{ host_min_cpu_ram }} GB
+
+- name: Checking host has minimal kernel version
+  ansible.builtin.assert:
+    that: >-
+      ansible_kernel.split('-')[0] is version('5.0.0', '>=')
+    fail_msg: >-
+      Host has {{ ansible_kernel }} Kernel version which doesn't meet the gtp5g
+      module requirements - For more information the website (https://github.com/free5gc/gtp5g#notice)

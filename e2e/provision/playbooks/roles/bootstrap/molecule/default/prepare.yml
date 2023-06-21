@@ -27,6 +27,7 @@
         name: kubernetes==26.1.0
   roles:
     - andrewrothstein.kind
+    - andrewrothstein.kubectl
     - role: andrewrothstein.docker_engine
       become: true
   tasks:
