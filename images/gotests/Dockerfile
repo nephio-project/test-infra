@@ -17,4 +17,4 @@ COPY --from=builder /go/src/controller-tools-0.12.0/cmd/type-scaffold/type-scaff
 
 COPY checklicense.sh /usr/local/bin/ 
 COPY lichen.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/checklicense.sh && chmod +x /usr/local/bin/lichen.sh
+RUN chmod +x /usr/local/bin/*.sh
