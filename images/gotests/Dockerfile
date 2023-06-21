@@ -1,9 +1,11 @@
 FROM golang:1.20.5-bullseye as builder
 ARG ctrl_tools_ver=0.12.0
-RUN  cd /go/src/ && wget https://github.com/kubernetes-sigs/controller-tools/archive/refs/tags/v$ctrl_tools_ver.tar.gz && \
-     tar xf v$ctrl_tools_ver.tar.gz && \
-     cd /go/src/controller-tools-$ctrl_tools_ver/cmd/controller-gen && go build && cd /go/src/controller-tools-$ctrl_tools_ver/cmd/helpgen && \
-     go build && cd /go/src/controller-tools-$ctrl_tools_ver/cmd/type-scaffold && go build
+WORKDIR /go/src/
+ADD https://github.com/kubernetes-sigs/controller-tools/archive/refs/tags/v$ctrl_tools_ver.tar.gz ./
+RUN tar -xzf v$ctrl_tools_ver.tar.gz
+
+WORKDIR /go/src/controller-tools-$ctrl_tools_ver/
+RUN go build -o /tmp/ ./...
 
 FROM golang:1.20.5-bullseye
 RUN apt-get  update && \
