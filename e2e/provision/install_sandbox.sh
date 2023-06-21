@@ -29,9 +29,23 @@ function get_status {
 }
 
 # Install dependencies for it's ansible execution
-sudo apt-get update
-sudo -E DEBIAN_FRONTEND=noninteractive apt-get remove -q -y python3-openssl
-sudo -E NEEDRESTART_SUSPEND=1 DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confnew" --allow-downgrades --allow-remove-essential --allow-change-held-packages -fuy install -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" python3-pip
+source /etc/os-release || source /usr/lib/os-release
+case ${ID,,} in
+ubuntu | debian)
+    sudo apt-get update
+    sudo -E DEBIAN_FRONTEND=noninteractive apt-get remove -q -y python3-openssl
+    sudo -E NEEDRESTART_SUSPEND=1 DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confnew" --allow-downgrades --allow-remove-essential --allow-change-held-packages -fuy install -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" python3-pip
+    ;;
+rhel | centos | fedora | rocky)
+    PKG_MANAGER=$(command -v dnf || command -v yum)
+    sudo $PKG_MANAGER install python3-pip -y
+    ;;
+*)
+    echo "OS not supported"
+    exit
+    ;;
+esac
+
 sudo pip install -r requirements.txt
 ansible-galaxy role install -r galaxy-requirements.yml
 ansible-galaxy collection install -r galaxy-requirements.yml

@@ -34,8 +34,21 @@ REPO_DIR=${NEPHIO_REPO_DIR:-$HOME/test-infra}
 echo "$DEBUG, $DEPLOYMENT_TYPE, $RUN_E2E, $REPO, $BRANCH, $NEPHIO_USER, $HOME, $REPO_DIR"
 
 if ! command -v git >/dev/null; then
-    apt-get update
-    apt-get install -y git
+    source /etc/os-release || source /usr/lib/os-release
+    case ${ID,,} in
+    ubuntu | debian)
+        apt-get update
+        apt-get install -y git
+        ;;
+    rhel | centos | fedora | rocky)
+        PKG_MANAGER=$(command -v dnf || command -v yum)
+        $PKG_MANAGER install git -y
+        ;;
+    *)
+        echo "OS not supported"
+        exit
+        ;;
+    esac
 fi
 
 if [ ! -d "$REPO_DIR" ]; then

@@ -48,9 +48,9 @@ flowchart TD
     C --> D(Checking host has minimal kernel version)
     D -->|Load gtp5g kernel module| E(Load OS specific variables)
     E --> F(Install compilation packages)
-    F --> G{ansible_os_family == 'Debian'?}
+    F --> G{ansible_os_family == 'Debian/RedHat'?}
     G -- true --> H(Install Debian kernel development tools)
-    H --> I(Install Debian kernel development tools) --> J
+    H --> I(Install Debian/RedHat kernel development tools) --> J
     G -- false --> J(Get gtp5g module information)
     J --> K(Create gtp5g destination folder)
     K --> L(Extract gtp5g driver source code)
