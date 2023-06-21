@@ -8,12 +8,15 @@ WORKDIR /go/src/controller-tools-$ctrl_tools_ver/
 RUN go build -o /tmp/ ./...
 
 FROM golang:1.20.5-bullseye
-RUN apt-get  update && \
-    apt-get -y install make && \
-    wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.53.3 && \
-    wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s v2.16.0 && \
-    go install github.com/google/addlicense@v1.1.1 && \
-    go install github.com/uw-labs/lichen@v0.1.7
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN apt-get update && \
+  apt-get install -y --no-install-recommends \
+  make=4.3-4.1 && \
+  rm -rf /var/lib/apt/lists/* && \
+  wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.53.3 && \
+  wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s v2.16.0 && \
+  go install github.com/google/addlicense@v1.1.1 && \
+  go install github.com/uw-labs/lichen@v0.1.7
 
 COPY --from=builder /tmp/controller-gen /go/bin
 COPY --from=builder /tmp/helpgen /go/bin
