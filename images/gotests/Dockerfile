@@ -15,10 +15,9 @@ RUN apt-get  update && \
     go install github.com/google/addlicense@v1.1.1 && \
     go install github.com/uw-labs/lichen@v0.1.7
 
-ARG ctrl_tools_ver=0.12.0
-COPY --from=builder /go/src/controller-tools-$ctrl_tools_ver/cmd/controller-gen/controller-gen /go/bin
-COPY --from=builder /go/src/controller-tools-$ctrl_tools_ver/cmd/helpgen/helpgen /go/bin
-COPY --from=builder /go/src/controller-tools-$ctrl_tools_ver/cmd/type-scaffold/type-scaffold /go/bin
+COPY --from=builder /tmp/controller-gen /go/bin
+COPY --from=builder /tmp/helpgen /go/bin
+COPY --from=builder /tmp/type-scaffold /go/bin
 
 COPY lichen.sh checklicense.sh /usr/local/bin/
 COPY lichen.yaml /etc/
