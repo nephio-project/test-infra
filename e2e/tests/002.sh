@@ -29,18 +29,23 @@ kubeconfig="$HOME/.kube/config"
 
 k8s_apply "$kubeconfig" "$TESTDIR/002-edge-clusters.yaml"
 
-k8s_wait_exists "$kubeconfig" 600 "default" "workloadcluster" "edge01"
-k8s_wait_exists "$kubeconfig" 600 "default" "workloadcluster" "edge02"
+# Wait for cluster resources creation
+for cluster in edge01 edge02; do
+    k8s_wait_exists "$kubeconfig" 600 "default" "workloadcluster" "$cluster"
+    k8s_wait_exists "$kubeconfig" 600 "default" "cluster" "$cluster"
+done
 
-k8s_wait_exists "$kubeconfig" 600 "default" "cluster" "edge01"
-k8s_wait_exists "$kubeconfig" 600 "default" "cluster" "edge02"
-
-k8s_wait_ready "$kubeconfig" 600 "default" "cluster" "edge01"
-k8s_wait_ready "$kubeconfig" 600 "default" "cluster" "edge02"
+# Wait for cluster readiness
+for cluster in $(kubectl get cluster -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --kubeconfig "$kubeconfig"); do
+    k8s_wait_ready "$kubeconfig" 600 "default" "cluster" "$cluster"
+    for machineset in $(kubectl get machineset -l cluster.x-k8s.io/cluster-name="$cluster" -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --kubeconfig "$kubeconfig"); do
+        k8s_wait_ready "$kubeconfig" 600 "default" "machineset" "$machineset"
+    done
+done
 
 # Inter-connect worker nodes
 workers=""
-for cluster in regional edge01 edge02; do
+for cluster in $(kubectl get cluster -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --kubeconfig "$kubeconfig"); do
     _kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "$cluster")
     workers+=$(kubectl get nodes -l node-role.kubernetes.io/control-plane!= -o jsonpath='{range .items[*]}"{.metadata.name}",{"\n"}{end}' --kubeconfig "$_kubeconfig")
 done

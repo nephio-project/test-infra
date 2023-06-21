@@ -10,12 +10,15 @@
 
 name: free5gc-net
 prefix: net
+mgmt:
+  network: kind
 topology:
   kinds:
     srl:
-      image: ghcr.io/nokia/srlinux
+      type: ixrd3
+      image: ghcr.io/nokia/srlinux:22.11.2-116
   nodes:
-    N6:
+    leaf:
       kind: srl
 {{- range .workers }}
     {{ . }}:
@@ -23,5 +26,5 @@ topology:
 {{- end }}
   links:
 {{- range $i, $worker := .workers }}
-    - endpoints: ["N6:e1-{{ $i }}", "{{ $worker }}:eth1"]
+    - endpoints: ["leaf:e1-{{ $i }}", "{{ $worker }}:eth1"]
 {{- end }}

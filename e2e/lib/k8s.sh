@@ -111,6 +111,7 @@ function k8s_get_capi_kubeconfig {
     local cluster=$3
 
     local file=$(tempfile)
+    k8s_wait_exists "$kubeconfig" 600 "$namespace" "secret" "${cluster}-kubeconfig" >/dev/null 2>&1
     kubectl --kubeconfig "$kubeconfig" -n "$namespace" get secret "${cluster}-kubeconfig" -o jsonpath='{.data.value}' | base64 -d >"$file"
     echo "$file"
 }
