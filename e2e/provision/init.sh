@@ -28,10 +28,10 @@ RUN_E2E=${NEPHIO_RUN_E2E:-$(get_metadata nephio-run-e2e "false")}
 REPO=${NEPHIO_REPO:-$(get_metadata nephio-test-infra-repo "https://github.com/nephio-project/test-infra.git")}
 BRANCH=${NEPHIO_BRANCH:-$(get_metadata nephio-test-infra-branch "main")}
 NEPHIO_USER=${NEPHIO_USER:-ubuntu}
-HOME=${HOME:-/home/$NEPHIO_USER}
+HOME=${NEPHIO_HOME:-/home/$NEPHIO_USER}
 REPO_DIR=${NEPHIO_REPO_DIR:-$HOME/test-infra}
 
-echo "$DEBUG, $DEPLOYMENT_TYPE, $RUN_E2E, $REPO, $BRANCH, $NEPHIO_USER, $REPO_DIR"
+echo "$DEBUG, $DEPLOYMENT_TYPE, $RUN_E2E, $REPO, $BRANCH, $NEPHIO_USER, $HOME, $REPO_DIR"
 
 if ! command -v git >/dev/null; then
     apt-get update
@@ -52,6 +52,7 @@ cp "$REPO_DIR/e2e/provision/bash_config.sh" "$HOME/.bash_aliases"
 chown "$NEPHIO_USER:$NEPHIO_USER" "$HOME/.bash_aliases"
 
 sed -e "s/vagrant/$NEPHIO_USER/" <"$REPO_DIR/e2e/provision/nephio.yaml" >"$HOME/nephio.yaml"
+
 cd "$REPO_DIR/e2e/provision"
 export DEBUG DEPLOYMENT_TYPE
 runuser -u "$NEPHIO_USER" ./install_sandbox.sh
