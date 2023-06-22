@@ -458,7 +458,7 @@ is not yet in this release.
 
 ```bash
 workers=""
-for context in $(kubectl config get-contexts --no-headers --output name); do
+for context in $(kubectl config get-contexts --no-headers --output name | sort); do
     workers+=$(kubectl get nodes -l node-role.kubernetes.io/control-plane!= -o jsonpath='{range .items[*]}"{.metadata.name}",{"\n"}{end}' --context "$context")
 done
 echo "{\"workers\":[${workers::-1}]}" | tee /tmp/vars.json
