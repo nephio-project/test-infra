@@ -108,3 +108,106 @@ def test_cluster_api_deployments_creation(host):
     for namespace, deployments in expected.items():
         for deploy in deployments:
             _check_k8s_deployment(host, deploy, namespace)
+
+
+def _check_api_resources(host, expected):
+    for group, resources in expected.items():
+        got = host.check_output(
+            "kubectl api-resources --output=name --api-group=" + group
+        )
+        for resource in resources:
+            assert resource + "." + group in got
+
+
+def test_api_resources_created_for_cluster_api(host):
+    expected = {
+        "addons.cluster.x-k8s.io": [
+            "clusterresourcesetbindings",
+            "clusterresourcesets",
+        ],
+        "bootstrap.cluster.x-k8s.io": [
+            "kubeadmconfigs",
+            "kubeadmconfigtemplates",
+        ],
+        "cluster.x-k8s.io": [
+            "clusterclasses",
+            "clusters",
+            "machinedeployments",
+            "machinehealthchecks",
+            "machinepools",
+            "machines",
+            "machinesets",
+        ],
+        "controlplane.cluster.x-k8s.io": [
+            "kubeadmcontrolplanes",
+            "kubeadmcontrolplanetemplates",
+        ],
+        "infrastructure.cluster.x-k8s.io": [
+            "dockerclusters",
+            "dockerclustertemplates",
+            "dockermachinepools",
+            "dockermachines",
+            "dockermachinetemplates",
+        ],
+        "ipam.cluster.x-k8s.io": [
+            "ipaddressclaims",
+            "ipaddresses",
+        ],
+        "runtime.cluster.x-k8s.io": ["extensionconfigs"],
+    }
+    _check_api_resources(host, expected)
+
+
+def test_api_resources_created_for_metallb(host):
+    expected = {
+        "metallb.io": [
+            "addresspools",
+            "bfdprofiles",
+            "bgpadvertisements",
+            "bgppeers",
+            "communities",
+            "ipaddresspools",
+            "ipaddresspools",
+            "l2advertisements",
+        ],
+    }
+    _check_api_resources(host, expected)
+
+
+def test_api_resources_created_for_cert_manager(host):
+    expected = {
+        "acme.cert-manager.io": [
+            "challenges",
+            "orders",
+        ],
+        "cert-manager.io": [
+            "certificaterequests",
+            "certificates",
+            "clusterissuers",
+            "issuers",
+        ],
+    }
+    _check_api_resources(host, expected)
+
+
+def test_api_resources_created_for_resource_backend(host):
+    expected = {
+        "inv.nephio.org": [
+            "endpoints",
+            "links",
+            "nodes",
+            "targets",
+        ],
+        "ipam.resource.nephio.org": [
+            "ipclaims",
+            "ipprefixes",
+            "networkinstances",
+        ],
+        "topo.nephio.org": ["rawtopologies"],
+        "vlan.resource.nephio.org": [
+            "vlanclaims",
+            "vlanindices",
+            "vlans",
+        ],
+    }
+    _check_api_resources(host, expected)
