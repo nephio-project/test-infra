@@ -24,7 +24,6 @@
     context: kind-kind
 
 - name: Create gitea user password in nephio-system namespace
-  become: true
   kubernetes.core.k8s:
     context: kind-kind
     state: present

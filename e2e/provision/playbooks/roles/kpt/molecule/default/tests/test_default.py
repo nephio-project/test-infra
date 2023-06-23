@@ -16,16 +16,16 @@
 
 def test_deployments(host):
     got = host.check_output(
-        "sudo kubectl get deploy --no-headers -o custom-columns=':metadata.name'"
+        "kubectl get deploy --no-headers -o custom-columns=':metadata.name'"
     )
     assert "my-nginx" == got
-    cmd = host.run("sudo kubectl rollout status deployment/my-nginx")
+    cmd = host.run("kubectl rollout status deployment/my-nginx")
     assert cmd.succeeded
     assert cmd.rc == 0
 
 
 def test_services(host):
     got = host.check_output(
-        "sudo kubectl get service --no-headers -o custom-columns=':metadata.name'"
+        "kubectl get service --no-headers -o custom-columns=':metadata.name'"
     )
     assert "my-nginx-svc" in got

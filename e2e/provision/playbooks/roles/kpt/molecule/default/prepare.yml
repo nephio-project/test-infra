@@ -46,5 +46,19 @@
       failed_when: (kind_get_cluster.rc not in [0, 1])
     - name: Create k8s cluster
       become: true
-      ansible.builtin.command: kind create cluster --image kindest/node:v1.27.1
+      ansible.builtin.command: kind create cluster --image kindest/node:v1.27.1 --kubeconfig=/tmp/kubeconfig
       when: not 'kind' in kind_get_cluster.stdout
+    - name: Create .kube directory
+      ansible.builtin.file:
+        path: "{{ ansible_user_dir }}/.kube"
+        state: directory
+        mode: '0755'
+    - name: Copy root kubeconfig file
+      become: true
+      ansible.builtin.copy:
+        remote_src: true
+        src: /tmp/kubeconfig
+        dest: "{{ ansible_user_dir }}/.kube/config"
+        owner: "{{ ansible_user_uid }}"
+        group: "{{ ansible_user_gid }}"
+        mode: '0644'

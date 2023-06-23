@@ -90,8 +90,10 @@ flowchart TD
     Q --> R(Get k8s clusters)
     R --> S{not 'kind' in bootstrap_kind_get_cluster.stdout?}
     S -- true --> T(Create management cluster)
+    T --> U(Create .kube directory)
     S -- false --> U
-    T --> U(Create gitea namespace)
-    U --> V(Create gitea postgresql user password)
-    V --> W(Deploy base packages)
+    U --> V(Copy root kubeconfig file)
+    V --> W(Create gitea namespace)
+    W --> Y(Create gitea postgresql user password)
+    Y --> Z(Deploy base packages)
 ```
