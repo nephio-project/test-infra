@@ -10,7 +10,7 @@
 ##############################################################################
 ## TEST METADATA
 ## TEST-NAME: Vertically Scale free5gc UPF in Edge Clusters
-## Usage : 008.sh <Capacity> , Capacity>5G
+## Usage : 008.sh <Capacity> , Capacity > 5G
 
 set -o pipefail
 set -o errexit
@@ -29,22 +29,18 @@ source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
-function k8s_upf_scale_test {
-    local current_cpu=$1
-    local current_memory=$2
-    local after_scale_cpu=$3
-    local after_scale_memory=$4
-    
-    echo "Comparing the new CPU/Memory before and after scaling"
 
-    if [ "$after_scaling_cpu" -le  "$current_cpu" ] && [ "$after_scale_memory" -le  "$current_memory" ]; then
-        echo "UPF POD Scaling Failed"
-        exit 1
-    else
-        echo "UPF Pod Scaling Successful"
-    fi
+function _check_scale {
+    local metric=$1
+    local previous=$2
+    local current=$3
     
-    exit 0
+    echo "UPF - Comparing the new $metric after scaling"
+    if [ "$previous" -le  "$current" ]; then
+        echo "UPF $metric scaling Failed"
+        exit 1
+    fi
+    echo "UPF - $metric Pod Scaling Successful"
 }
 
 
@@ -93,12 +89,18 @@ for cluster in "edge01" "edge02"; do
     #Get the new POD ID
     upf_pod_id_scale=$(kubectl --kubeconfig $cluster_kubeconfig get pods -l app=free5gc-upf -l nf=upf -n free5gc-upf | grep upf | cut -d ' ' -f 1)
 
+    if [ -z "$upf_pod_id_scale" ]; then
+    	echo "UPF PoD afer Scaling Not Found"
+    	exit 1
+    fi
+    
     after_scaling_cpu=$(kubectl --kubeconfig $cluster_kubeconfig get pods -l app=free5gc-upf -l nf=upf -n free5gc-upf -o jsonpath='{range .items[*].spec.containers[*]}{.resources.requests.cpu}{"\n"}{end}' |sed 's/m$//') 
 
     after_scaling_memory=$(kubectl --kubeconfig $cluster_kubeconfig get pods -l app=free5gc-upf -l nf=upf -n free5gc-upf -o jsonpath='{range .items[*].spec.containers[*]}{.resources.requests.memory}{"\n"}{end}' |sed 's/Mi$//')
 
     echo "After Scaling  $after_scaling_cpu $after_scaling_memory"
 
-    k8s_upf_scale_test $current_cpu $current_memory $after_scaling_cpu $after_scaling_memory
+   _check_scale "CPU" $current_cpu $after_scaling_cpu
+   _check_scale "Memory" $current_memory $after_scaling_memory
 
 done
