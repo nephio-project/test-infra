@@ -62,10 +62,10 @@ for cluster in "edge01" "edge02"; do
     fi
 
     #If the pod exists, Get the current CPU and Memory limit
-    current_cpu=$(kubectl --kubeconfig $cluster_kubeconfig describe pods $upf_pod_id -n free5gc-upf | awk '/cpu:/ {print $2}' | sed 's/m$//') 
+    current_cpu=$(kubectl --kubeconfig $cluster_kubeconfig get pods -l app=free5gc-upf -l nf=upf -n free5gc-upf -o jsonpath='{range .items[*].spec.containers[*]}{.resources.requests.cpu}{"\n"}{end}' |sed 's/m$//') 
 
-    current_memory=$(kubectl --kubeconfig $cluster_kubeconfig describe pods $upf_pod_id -n free5gc-upf | awk '/memory:/ {print $2}' | sed 's/Mi$//')
-
+    current_memory=$(kubectl --kubeconfig $cluster_kubeconfig get pods -l app=free5gc-upf -l nf=upf -n free5gc-upf -o jsonpath='{range .items[*].spec.containers[*]}{.resources.requests.memory}{"\n"}{end}' |sed 's/Mi$//')
+    
     echo "Current CPU $current_cpu"
     echo "Current Memory $current_memory"
 
@@ -93,9 +93,9 @@ for cluster in "edge01" "edge02"; do
     #Get the new POD ID
     upf_pod_id_scale=$(kubectl --kubeconfig $cluster_kubeconfig get pods -l app=free5gc-upf -l nf=upf -n free5gc-upf | grep upf | cut -d ' ' -f 1)
 
-    after_scaling_cpu=$(kubectl --kubeconfig $cluster_kubeconfig describe pods $upf_pod_id_scale -n free5gc-upf | awk '/cpu:/ {print $2}' | sed 's/m$//')
+    after_scaling_cpu=$(kubectl --kubeconfig $cluster_kubeconfig get pods -l app=free5gc-upf -l nf=upf -n free5gc-upf -o jsonpath='{range .items[*].spec.containers[*]}{.resources.requests.cpu}{"\n"}{end}' |sed 's/m$//') 
 
-    after_scaling_memory=$(kubectl --kubeconfig $cluster_kubeconfig describe pods $upf_pod_id_scale -n free5gc-upf | awk '/memory:/ {print $2}' | sed 's/Mi$//')
+    after_scaling_memory=$(kubectl --kubeconfig $cluster_kubeconfig get pods -l app=free5gc-upf -l nf=upf -n free5gc-upf -o jsonpath='{range .items[*].spec.containers[*]}{.resources.requests.memory}{"\n"}{end}' |sed 's/Mi$//')
 
     echo "After Scaling  $after_scaling_cpu $after_scaling_memory"
 
