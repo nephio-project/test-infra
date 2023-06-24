@@ -12,6 +12,29 @@ set -o pipefail
 set -o errexit
 set -o nounset
 
+# get_status() - Print the current status of the management cluster
+function get_status {
+    set +o xtrace
+    if [ -f /proc/stat ]; then
+        printf "CPU usage: "
+        grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage " %"}'
+    fi
+    if [ -f /proc/pressure/io ]; then
+        printf "I/O Pressure Stall Information (PSI): "
+        grep full /proc/pressure/io | awk '{ sub(/avg300=/, ""); print $4 }'
+    fi
+    if [ -f /proc/zoneinfo ]; then
+        printf "Memory free(Kb):"
+        awk -v low="$(grep low /proc/zoneinfo | awk '{k+=$2}END{print k}')" '{a[$1]=$2}  END{ print a["MemFree:"]+a["Active(file):"]+a["Inactive(file):"]+a["SReclaimable:"]-(12*low);}' /proc/meminfo
+    fi
+    if command -v kubectl >/dev/null; then
+        echo "Kubernetes Events:"
+        kubectl get events
+        echo "Kubernetes Resources:"
+        kubectl get all -A -o wide
+    fi
+}
+
 function get_metadata {
     local md=$1
     local df=$2
@@ -32,6 +55,7 @@ HOME=${NEPHIO_HOME:-/home/$NEPHIO_USER}
 REPO_DIR=${NEPHIO_REPO_DIR:-$HOME/test-infra}
 
 echo "$DEBUG, $DEPLOYMENT_TYPE, $RUN_E2E, $REPO, $BRANCH, $NEPHIO_USER, $HOME, $REPO_DIR"
+trap get_status ERR
 
 if ! command -v git >/dev/null; then
     apt-get update
