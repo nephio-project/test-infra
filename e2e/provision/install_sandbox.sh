@@ -15,19 +15,6 @@ set -o nounset
 
 export HOME=${HOME:-/home/ubuntu/}
 
-# get_status() - Print the current status of the management cluster
-function get_status {
-    set +o xtrace
-    printf "CPU usage: "
-    grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage " %"}'
-    printf "Memory free(Kb):"
-    awk -v low="$(grep low /proc/zoneinfo | awk '{k+=$2}END{print k}')" '{a[$1]=$2}  END{ print a["MemFree:"]+a["Active(file):"]+a["Inactive(file):"]+a["SReclaimable:"]-(12*low);}' /proc/meminfo
-    echo "Kubernetes Events:"
-    sudo kubectl get events
-    echo "Kubernetes Resources:"
-    sudo kubectl get all -A -o wide
-}
-
 # Install dependencies for it's ansible execution
 sudo apt-get update
 sudo -E DEBIAN_FRONTEND=noninteractive apt-get remove -q -y python3-openssl
@@ -54,8 +41,6 @@ if [ "${DEPLOYMENT_TYPE:-r1}" == "one-summit" ]; then
     done
     popd >/dev/null
 else
-    trap get_status ERR
-
     mkdir -p ~/.ssh/
     touch ~/.ssh/config
     if ! grep -q "StrictHostKeyChecking no" ~/.ssh/config; then
