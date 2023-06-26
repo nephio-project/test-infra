@@ -26,5 +26,5 @@ topology:
 {{- end }}
   links:
 {{- range $i, $worker := .workers }}
-    - endpoints: ["leaf:e1-{{ $i }}", "{{ $worker }}:eth1"]
+    - endpoints: ["leaf:e1-{{ $i | add 1 }}", "{{ $worker }}:eth1"]
 {{- end }}
