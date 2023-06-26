@@ -22,11 +22,11 @@ spec:
         nephio.org/cluster-name: edge02
   links:
   - endpoints: 
-    - { nodeName: srl, interfaceName: e1-0}
+    - { nodeName: srl, interfaceName: e1-1}
     - { nodeName: edge01, interfaceName: eth1}
   - endpoints: 
-    - { nodeName: srl, interfaceName: e1-1}
+    - { nodeName: srl, interfaceName: e1-2}
     - { nodeName: edge02, interfaceName: eth1}
   - endpoints:
-    - { nodeName: srl, interfaceName: e1-2}
+    - { nodeName: srl, interfaceName: e1-3}
     - { nodeName: regional, interfaceName: eth1}
