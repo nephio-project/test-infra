@@ -1,7 +1,7 @@
 apiVersion: config.porch.kpt.dev/v1alpha2
 kind: PackageVariantSet
 metadata:
-  name: edge-free5gc-ueransim
+  name: edge-ueransim
 spec:
   upstream:
     repo: nephio-example-packages
@@ -15,7 +15,7 @@ spec:
         nephio.org/site-type: edge
     template:
       downstream:
-        package: free5gc-ueransim
+        package: ueransim
       annotations:
         approval.nephio.org/policy: initial
       injectors:
