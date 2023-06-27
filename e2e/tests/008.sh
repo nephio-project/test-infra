@@ -130,7 +130,7 @@ for cluster in "edge01" "edge02"; do
 
     if [[ -z $found ]]; then
         echo "Timed out waiting for new pod to deploy"
-        return 1
+        exit 1
     fi
 
     after_scaling_cpu=$(_get_first_container_cpu $cluster_kubeconfig free5gc-upf $upf_pod_id_scale)
