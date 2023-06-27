@@ -21,7 +21,9 @@ function testing_run_test {
     local testfile=$1
 
     local testname=$(testing_get_test_metadata "$testfile" "TEST-NAME")
+    int_start=$(date +%s)
     echo "+++++ $(date): starting $testfile $testname"
     /bin/bash "$testfile"
     echo "+++++ $(date): finished $testfile $testname"
+    printf "%s secs\n" "$(($(date +%s) - int_start))"
 }
