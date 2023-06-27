@@ -15,6 +15,7 @@
       ansible.builtin.raw: apt-get update --allow-releaseinfo-change
       become: true
       changed_when: false
+      when: ansible_distribution == 'Ubuntu'
     - name: Install pip package
       become: true
       ansible.builtin.package:
