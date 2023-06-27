@@ -21,17 +21,11 @@ source "${LIBDIR}/k8s.sh"
 kubeconfig="$HOME/.kube/config"
 for cluster in $(kubectl get cluster -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --sort-by=.metadata.name --kubeconfig "$kubeconfig"); do
     _kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "$cluster")
-    worker=$(kubectl get nodes -l node-role.kubernetes.io/control-plane!= -o jsonpath='{range .items[*]}"{.metadata.name}"{"\n"}{end}' --kubeconfig "$_kubeconfig")
-    echo docker exec $worker ip link add link eth1 name eth1.2 type vlan id 2
-    echo docker exec $worker ip link add link eth1 name eth1.2 type vlan id 2 | /bin/bash
-    echo docker exec $worker ip link add link eth1 name eth1.3 type vlan id 3
-    echo docker exec $worker ip link add link eth1 name eth1.3 type vlan id 3 | /bin/bash
-    echo docker exec $worker ip link add link eth1 name eth1.4 type vlan id 4
-    echo docker exec $worker ip link add link eth1 name eth1.4 type vlan id 4 | /bin/bash
-    echo docker exec $worker ip link set up eth1.2
-    echo docker exec $worker ip link set up eth1.2 | /bin/bash
-    echo docker exec $worker ip link set up eth1.3
-    echo docker exec $worker ip link set up eth1.3 | /bin/bash
-    echo docker exec $worker ip link set up eth1.4
-    echo docker exec $worker ip link set up eth1.4 | /bin/bash
+    workers=$(kubectl get nodes -l node-role.kubernetes.io/control-plane!= -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --kubeconfig "$_kubeconfig")
+    for worker in $workers; do
+        for i in {2..4}; do
+            docker exec "$worker" ip link add link eth1 name "eth1.$i" type vlan id "$i"
+            docker exec "$worker" ip link set up "eth1.$i"
+        done
+    done
 done
