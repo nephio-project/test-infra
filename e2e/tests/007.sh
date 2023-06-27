@@ -27,14 +27,14 @@ source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
-k8s_apply "$kubeconfig" "$TESTDIR/007-edge-free5gc-ueransim.yaml"
+k8s_apply "$kubeconfig" "$TESTDIR/007-edge-ueransim.yaml"
 
 for cluster in "edge01" "edge02"; do
-    k8s_wait_exists "$kubeconfig" 600 "default" "packagevariant" "edge-free5gc-ueransim-${cluster}-free5gc-ueransim"
+    k8s_wait_exists "$kubeconfig" 600 "default" "packagevariant" "edge-ueransim-${cluster}-ueransim"
 done
 
 for cluster in "edge01" "edge02"; do
-    k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "edge-free5gc-ueransim-${cluster}-free5gc-ueransim"
+    k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "edge-ueransim-${cluster}-ueransim"
 done
 
 for cluster in "edge01" "edge02"; do
