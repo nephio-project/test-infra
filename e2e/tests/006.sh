@@ -10,7 +10,7 @@
 ##############################################################################
 
 ## TEST METADATA
-## TEST-NAME: Deploy free5gc UPF to edge clusters
+## TEST-NAME: Deploy free5gc AMF and SMF to regional clusters
 ##
 
 set -o pipefail
@@ -27,18 +27,20 @@ source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
-k8s_apply "$kubeconfig" "$TESTDIR/006-edge-free5gc-upf.yaml"
+# apply both AMF and SMF so they both start processing
+k8s_apply "$kubeconfig" "$TESTDIR/006-regional-free5gc-amf.yaml"
+k8s_apply "$kubeconfig" "$TESTDIR/006-regional-free5gc-smf.yaml"
 
-for cluster in "edge01" "edge02"; do
-    k8s_wait_exists "$kubeconfig" 600 "default" "packagevariant" "edge-free5gc-upf-${cluster}-free5gc-upf"
-done
+cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
 
-for cluster in "edge01" "edge02"; do
-    k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "edge-free5gc-upf-${cluster}-free5gc-upf"
-done
+# check the AMF
+k8s_wait_exists "$kubeconfig" 600 "default" "packagevariant" "regional-free5gc-amf-regional-free5gc-amf"
+k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "regional-free5gc-amf-regional-free5gc-amf"
+k8s_wait_exists "$cluster_kubeconfig" 600 "free5gc-cp" "deployment" "amf-regional"
+k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc-cp" "deployment" "amf-regional"
 
-for cluster in "edge01" "edge02"; do
-    cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "$cluster")
-    k8s_wait_exists "$cluster_kubeconfig" 600 "free5gc-upf" "deployment" "free5gc-upf"
-    k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc-upf" "deployment" "free5gc-upf"
-done
+# check the SMF
+k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "regional-free5gc-smf-regional-free5gc-smf"
+k8s_wait_exists "$kubeconfig" 600 "default" "packagevariant" "regional-free5gc-smf-regional-free5gc-smf"
+k8s_wait_exists "$cluster_kubeconfig" 600 "free5gc-cp" "deployment" "smf-regional"
+k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc-cp" "deployment" "smf-regional"
