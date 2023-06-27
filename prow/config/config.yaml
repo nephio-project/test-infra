@@ -188,7 +188,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -224,7 +224,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -271,7 +271,7 @@ postsubmits:
                 path: config.json
   - name: build-push-image-configinject-fn-commit-conf
     cluster: default
-    run_if_changed: 'krm-functions/configinject-fn/.*'
+    always_run: true
     branches:
     - "main"
     annotations:
@@ -296,7 +296,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -332,7 +332,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -342,7 +342,7 @@ postsubmits:
                 path: config.json
   - name: build-push-image-dnn-fn-commit-conf
     cluster: default
-    run_if_changed: 'krm-functions/dnn-fn/.*'
+    always_run: true
     branches:
     - "main"
     annotations:
@@ -367,7 +367,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -403,7 +403,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -413,7 +413,7 @@ postsubmits:
                 path: config.json
   - name: build-push-image-interface-fn-commit-conf
     cluster: default
-    run_if_changed: 'krm-functions/interface-fn/.*'
+    always_run: true
     branches:
     - "main"
     annotations:
@@ -438,7 +438,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -475,7 +475,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -485,7 +485,7 @@ postsubmits:
                 path: config.json
   - name: build-push-image-ipam-fn-commit-conf
     cluster: default
-    run_if_changed: 'krm-functions/ipam-fn/.*'
+    always_run: true
     branches:
     - "main"
     annotations:
@@ -510,7 +510,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -547,7 +547,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -557,7 +557,7 @@ postsubmits:
                 path: config.json
   - name: build-push-image-nad-fn-commit-conf
     cluster: default
-    run_if_changed: 'krm-functions/nad-fn/.*'
+    always_run: true
     branches:
     - "main"
     annotations:
@@ -582,7 +582,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -619,7 +619,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -629,7 +629,7 @@ postsubmits:
                 path: config.json
   - name: build-push-image-amfdeployfn-commit-conf
     cluster: default
-    run_if_changed: 'krm-functions/nfdeploy-fn/amfdeployfn/.*'
+    always_run: true
     branches:
     - "main"
     annotations:
@@ -654,7 +654,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -691,7 +691,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -701,7 +701,7 @@ postsubmits:
                 path: config.json
   - name: build-push-image-smfdeployfn-commit-conf
     cluster: default
-    run_if_changed: 'krm-functions/nfdeploy-fn/smfdeployfn/.*'
+    always_run: true
     branches:
     - "main"
     annotations:
@@ -726,7 +726,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -763,7 +763,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -773,7 +773,7 @@ postsubmits:
                 path: config.json
   - name: build-push-image-upfdeployfn-commit-conf
     cluster: default
-    run_if_changed: 'krm-functions/nfdeploy-fn/upfdeployfn/.*'
+    always_run: true
     branches:
     - "main"
     annotations:
@@ -798,7 +798,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -835,7 +835,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -845,7 +845,7 @@ postsubmits:
                 path: config.json
   - name: build-push-image-vlan-fn-commit-conf
     cluster: default
-    run_if_changed: 'krm-functions/vlan-fn/.*'
+    always_run: true
     branches:
     - "main"
     annotations:
@@ -870,7 +870,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -906,7 +906,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -916,7 +916,7 @@ postsubmits:
                 path: config.json
   - name: build-push-image-spec-operator-commit-conf
     cluster: default
-    run_if_changed: 'controllers/specializer-operator/.*'
+    always_run: true
     branches:
     - "main"
     annotations:
@@ -941,7 +941,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -977,7 +977,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -987,7 +987,7 @@ postsubmits:
                 path: config.json
   - name: build-push-image-nephio-operator-commit-conf
     cluster: default
-    run_if_changed: 'operators/nephio-controller-manager/.*'
+    always_run: true
     branches:
     - "main"
     annotations:
@@ -1013,7 +1013,7 @@ postsubmits:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
