@@ -28,10 +28,17 @@ function get_status {
         awk -v low="$(grep low /proc/zoneinfo | awk '{k+=$2}END{print k}')" '{a[$1]=$2}  END{ print a["MemFree:"]+a["Active(file):"]+a["Inactive(file):"]+a["SReclaimable:"]-(12*low);}' /proc/meminfo
     fi
     if command -v kubectl >/dev/null; then
-        echo "Kubernetes Events:"
-        kubectl get events
-        echo "Kubernetes Resources:"
-        kubectl get all -A -o wide
+        KUBECONFIG=$HOME/.kube/config
+        for kubeconfig in $(sudo find /tmp/ -name "kubeconfig-*"); do
+            KUBECONFIG+=":$kubeconfig"
+        done
+        export KUBECONFIG
+        for context in $(kubectl config get-contexts --no-headers --output name); do
+            echo "Kubernetes Events ($context):"
+            kubectl get events --sort-by='.lastTimestamp' -A --context "$context"
+            echo "Kubernetes Resources ($context):"
+            kubectl get all -A -o wide --context "$context"
+        done
     fi
 }
 
