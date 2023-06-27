@@ -9,7 +9,8 @@
 ##############################################################################
 
 build_pkgs:
-  - gcc
   - make
-  - gcc-10
-  - linux-headers-{{ ansible_kernel }}
+  - kernel-devel
+  - kernel-headers
+  - elfutils-libelf
+  - elfutils-libelf-devel

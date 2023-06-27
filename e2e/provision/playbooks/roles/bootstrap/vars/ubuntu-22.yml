@@ -12,3 +12,4 @@ build_pkgs:
   - gcc
   - make
   - gcc-12
+  - linux-headers-{{ ansible_kernel }}

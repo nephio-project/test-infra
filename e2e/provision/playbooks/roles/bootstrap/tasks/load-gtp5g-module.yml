@@ -17,19 +17,13 @@
         - "{{ ansible_os_family | lower }}.yml"
       skip: true
 
-- name: Install compilation packages
+- name: Install compilation packages and kernel development tools on {{ ansible_os_family }}
   become: true
   ansible.builtin.package:
     name: "{{ item }}"
     state: present
   with_items: "{{ build_pkgs }}"
-
-- name: Install Debian kernel development tools
-  become: true
-  ansible.builtin.package:
-    name: "linux-headers-{{ ansible_kernel }}"
-    state: present
-  when: ansible_os_family == 'Debian'
+  when: ansible_os_family in ['Debian', 'RedHat']
 
 - name: Get gtp5g module information
   ansible.builtin.command: modinfo gtp5g

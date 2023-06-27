@@ -29,6 +29,10 @@ platforms:
     box: generic/ubuntu2204
     provider_options:
       gui: false
+  - name: fedora34
+    box: generic/fedora34
+    provider_options:
+      gui: false
 provisioner:
   name: ansible
   env:

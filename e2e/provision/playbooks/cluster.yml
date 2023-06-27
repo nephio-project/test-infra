@@ -60,3 +60,14 @@
       ansible.builtin.apt:
         deb: "https://github.com/srl-labs/containerlab/releases/download/v{{ clab_version }}/containerlab_{{ clab_version }}_linux_{{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}.deb"
       when: ansible_os_family == 'Debian' and ansible_architecture in ('arm64', 'x86_64')
+    - name: Install container lab on RedHat family OS
+      block:
+        - name: Install container lab
+          ansible.builtin.yum:
+            name: "https://github.com/srl-labs/containerlab/releases/download/v{{ clab_version }}/containerlab_{{ clab_version }}_linux_{{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}.rpm"
+            state: present
+            disable_gpg_check: true
+        - name: Configure SELinux for clab
+          ansible.builtin.shell: setsebool -P selinuxuser_execmod 1
+      become: true
+      when: ansible_os_family == 'RedHat' and ansible_architecture in ('arm64', 'x86_64')
