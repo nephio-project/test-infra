@@ -234,6 +234,77 @@ postsubmits:
                 path: config.json
 
   nephio-project/nephio:
+  - name: build-push-image-configinject-fn-release-conf
+    cluster: default
+    always_run: true
+    branches:
+    - "^v.*$"
+    annotations:
+      description: Build and Push Image to DockerHub when release tag is created
+    decorate: true
+    decoration_config:
+      censor_secrets: true
+    max_concurrency: 0
+    spec:
+      containers:
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:debug
+        command:
+        - "/bin/sh"
+        - "-c"
+        - |
+          executor --context=${PWD} \
+            --dockerfile=krm-functions/configinject-fn/Dockerfile --destination=nephio/configinject-fn:${PULL_BASE_REF}
+        volumeMounts:
+          - name: kaniko-secret
+            mountPath: /kaniko/.docker/
+        resources:
+          requests:
+            cpu: 2
+            memory: 2Gi
+      volumes:
+        - name: kaniko-secret
+          secret:
+            secretName: regcred
+            items:
+              - key: .dockerconfigjson
+                path: config.json
+  - name: build-push-image-configinject-fn-commit-conf
+    cluster: default
+    run_if_changed: 'krm-functions/configinject-fn/.*'
+    branches:
+    - "main"
+    annotations:
+      description: Build and Push Image to DockerHub every commit
+    decorate: true
+    decoration_config:
+      censor_secrets: true
+    max_concurrency: 0
+    spec:
+      containers:
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:debug
+        command:
+        - "/bin/sh"
+        - "-c"
+        - |
+          executor --context=${PWD} \
+            --dockerfile=krm-functions/configinject-fn/Dockerfile --destination=nephio/configinject-fn:${BUILD_ID}
+        volumeMounts:
+          - name: kaniko-secret
+            mountPath: /kaniko/.docker/
+        resources:
+          requests:
+            cpu: 2
+            memory: 2Gi
+      volumes:
+        - name: kaniko-secret
+          secret:
+            secretName: regcred
+            items:
+              - key: .dockerconfigjson
+                path: config.json
+
   - name: build-push-image-dnn-fn-release-conf
     cluster: default
     always_run: true
