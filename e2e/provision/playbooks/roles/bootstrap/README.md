@@ -47,7 +47,7 @@ flowchart TD
     B --> C(Checking host has minimum RAM)
     C --> D(Checking host has minimal kernel version)
     D -->|Load gtp5g kernel module| E(Load OS specific variables)
-    E --> F(Install compilation packages)
+    E --> F(nstall compilation packages and kernel development tools on Debian/RedHat)
     F --> G{ansible_os_family == 'Debian/RedHat'?}
     G -- true --> H(Install Debian kernel development tools)
     H --> I(Install Debian/RedHat kernel development tools) --> J
