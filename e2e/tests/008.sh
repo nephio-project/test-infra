@@ -63,6 +63,7 @@ function _get_first_container_memory {
 for cluster in "edge01" "edge02"; do
 
     #Get the cluster kubeconfig
+    echo "Getting kubeconfig for $cluster"
     cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "$cluster")
 
     #Before scaling test get the running UPF POD ID
@@ -133,7 +134,13 @@ for cluster in "edge01" "edge02"; do
         exit 1
     fi
 
+    # Verify pod actually reaches ready state
+    k8s_wait_ready "$cluster-kubeconfig" 600 "free5gc-upf" "deployment" "upf-${cluster}"
+
+    echo "Getting CPU for $upf_pod_id_scale"
     after_scaling_cpu=$(_get_first_container_cpu $cluster_kubeconfig free5gc-upf $upf_pod_id_scale)
+
+    echo "Getting Memory for $upf_pod_id_scale"
     after_scaling_memory=$(_get_first_container_memory $cluster_kubeconfig free5gc-upf $upf_pod_id_scale)
 
     echo "After Scaling  $after_scaling_cpu $after_scaling_memory"
