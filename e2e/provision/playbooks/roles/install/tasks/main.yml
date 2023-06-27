@@ -15,6 +15,7 @@
     - {pkg: porch-dev, version: porch-dev/v2, namespaces: [porch-fn-system, porch-system]}
     - {pkg: nephio-controllers, version: nephio-controllers/v5, namespaces: [nephio-system]}
     - {pkg: configsync, version: configsync/v1, namespaces: [config-management-monitoring, config-management-system, resource-group-system]}
+    - {pkg: network-config, version: network-config/v1, namespaces: []}
     - {pkg: nephio-stock-repos, version: nephio-stock-repos/v1, namespaces: []}
   vars:
     repo_uri: https://github.com/nephio-project/nephio-example-packages.git

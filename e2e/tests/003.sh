@@ -36,7 +36,7 @@ k8s_apply "$kubeconfig" "$TESTDIR/003-secret.yaml"
 
 export LEAF_IP=$(docker inspect net-free5gc-net-leaf -f '{{.NetworkSettings.Networks.kind.IPAddress}}')
 
-envsubst < "$TESTDIR/003-network-topo.tmpl" >  "$TESTDIR/003-network-topo.yaml"
+envsubst <"$TESTDIR/003-network-topo.tmpl" >"$TESTDIR/003-network-topo.yaml"
 
 k8s_apply "$kubeconfig" "$TESTDIR/003-network-topo.yaml"
 regional_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")

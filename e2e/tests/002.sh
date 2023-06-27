@@ -51,3 +51,6 @@ for cluster in $(kubectl get cluster -o jsonpath='{range .items[*]}{.metadata.na
 done
 echo "{\"workers\":[${workers::-1}]}" | tee /tmp/vars.json
 sudo containerlab deploy --topo "$TESTDIR/002-topo.gotmpl" --vars /tmp/vars.json
+
+# Configure VLAN interfaces
+$E2EDIR/provision/hacks/vlan-interfaces.sh

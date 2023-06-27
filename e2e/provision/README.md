@@ -493,6 +493,41 @@ INFO[0277] Adding containerlab host entries to /etc/hosts file
 ```
 </details>
 
+We also need to configure the nodes for the VLANs we will be using. Again, this
+will be automated in a future release that addresses node setup and
+inter-cluster networking. But for now, you must run a script that creates them
+in each of the worker nodes.
+
+```bash
+./test-infra/e2e/provision/hacks/vlan-interfaces.sh
+```
+
+<details>
+<summary>The output is similar to:</summary>
+
+```console
+docker exec "edge01-md-0-znvpq-56ff577758xjgj8b-qbrzh" ip link add link eth1 name eth1.2 type vlan id 2
+docker exec "edge01-md-0-znvpq-56ff577758xjgj8b-qbrzh" ip link add link eth1 name eth1.3 type vlan id 3
+docker exec "edge01-md-0-znvpq-56ff577758xjgj8b-qbrzh" ip link add link eth1 name eth1.4 type vlan id 4
+docker exec "edge01-md-0-znvpq-56ff577758xjgj8b-qbrzh" ip link set up eth1.2
+docker exec "edge01-md-0-znvpq-56ff577758xjgj8b-qbrzh" ip link set up eth1.3
+docker exec "edge01-md-0-znvpq-56ff577758xjgj8b-qbrzh" ip link set up eth1.4
+docker exec "edge02-md-0-kk5rv-6d944f5f4cx8fb4n-42ttj" ip link add link eth1 name eth1.2 type vlan id 2
+docker exec "edge02-md-0-kk5rv-6d944f5f4cx8fb4n-42ttj" ip link add link eth1 name eth1.3 type vlan id 3
+docker exec "edge02-md-0-kk5rv-6d944f5f4cx8fb4n-42ttj" ip link add link eth1 name eth1.4 type vlan id 4
+docker exec "edge02-md-0-kk5rv-6d944f5f4cx8fb4n-42ttj" ip link set up eth1.2
+docker exec "edge02-md-0-kk5rv-6d944f5f4cx8fb4n-42ttj" ip link set up eth1.3
+docker exec "edge02-md-0-kk5rv-6d944f5f4cx8fb4n-42ttj" ip link set up eth1.4
+docker exec "regional-md-0-6hqq6-79bf858cd5xcxzl8-6x9d7" ip link add link eth1 name eth1.2 type vlan id 2
+docker exec "regional-md-0-6hqq6-79bf858cd5xcxzl8-6x9d7" ip link add link eth1 name eth1.3 type vlan id 3
+docker exec "regional-md-0-6hqq6-79bf858cd5xcxzl8-6x9d7" ip link add link eth1 name eth1.4 type vlan id 4
+docker exec "regional-md-0-6hqq6-79bf858cd5xcxzl8-6x9d7" ip link set up eth1.2
+docker exec "regional-md-0-6hqq6-79bf858cd5xcxzl8-6x9d7" ip link set up eth1.3
+docker exec "regional-md-0-6hqq6-79bf858cd5xcxzl8-6x9d7" ip link set up eth1.4
+```
+</details>
+
+
 Finally, we want to configure the resource backend to know about these clusters.
 The resource backend is an IP address and VLAN index management system. It is
 included for demonstration purposes, to show how Nephio package specialization
@@ -712,7 +747,11 @@ unit. Or you can use a topology controller to create them. But for now, let's do
 manually.
 
 ```bash
-kubectl apply -f test-infra/e2e/tests/005-regional-free5gc-amf.yaml
-kubectl apply -f test-infra/e2e/tests/005-regional-free5gc-smf.yaml
-kubectl apply -f test-infra/e2e/tests/006-edge-free5gc-upf.yaml
+kubectl apply -f test-infra/e2e/tests/005-edge-free5gc-upf.yaml
+kubectl apply -f test-infra/e2e/tests/006-regional-free5gc-amf.yaml
+kubectl apply -f test-infra/e2e/tests/006-regional-free5gc-smf.yaml
 ```
+
+Free5gc requires that the SMF and AMF be explicitly configured with information
+about each UPF. Therefore, the AMF and SMF packages will remain in an "unready"
+state until the UPF packages have all been published.
