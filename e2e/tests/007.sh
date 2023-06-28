@@ -35,24 +35,16 @@ port=$(kubectl --kubeconfig $regional_kubeconfig -n free5gc-cp get svc webui-ser
 
 curl -u admin:free5gc -d "@${TESTDIR}/007-subscriber.json" -H 'Content-Type: application/json' "http://${ip}:${port}/api/subscriber/imsi-208930000000003/20893"
 
-# Deploy UERANSIM to the edge clusters
+# Deploy UERANSIM to edge01
 
-k8s_apply "$kubeconfig" "$TESTDIR/007-edge-ueransim.yaml"
+k8s_apply "$kubeconfig" "$TESTDIR/007-edge01-ueransim.yaml"
 
-for cluster in "edge01" "edge02"; do
-    k8s_wait_exists "$kubeconfig" 600 "default" "packagevariant" "edge-ueransim-${cluster}-ueransim"
-done
+k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "edge01-ueransim"
 
-for cluster in "edge01" "edge02"; do
-    k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "edge-ueransim-${cluster}-ueransim"
-done
-
-for cluster in "edge01" "edge02"; do
-    cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "$cluster")
-    k8s_wait_exists "$cluster_kubeconfig" 600 "ueransim" "deployment" "ueransim-gnb"
-    k8s_wait_exists "$cluster_kubeconfig" 600 "ueransim" "deployment" "ueransim-ue"
-    k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "ueransim" "deployment" "ueransim-gnb"
-    k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "ueransim" "deployment" "ueransim-ue"
-    ue_pod_name=${kubectl--kubeconfig $cluster_kubeconfig get pods -n ueransim  -l app=ueransim -l component=ue}
-    k8s_exec $cluster_kubeconfig "ueransim" $ue_pod_name "ping -I uesimtun0 google.com"
-done
+edge01_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "edge01")
+k8s_wait_exists "$edge01_kubeconfig" 600 "ueransim" "deployment" "ueransimgnb-edge01"
+k8s_wait_exists "$edge01_kubeconfig" 600 "ueransim" "deployment" "ueransimue-edge01"
+k8s_wait_ready_replicas "$edge01_kubeconfig" 600 "ueransim" "deployment" "ueransimgnb-edge01"
+k8s_wait_ready_replicas "$edge01_kubeconfig" 600 "ueransim" "deployment" "ueransimue-edge01"
+ue_pod_name=$(kubectl --kubeconfig $edge01_kubeconfig get pods -n ueransim  -l app=ueransim -l component=ue -o jsonpath='{.items[0].metadata.name}')
+k8s_exec $edge01_kubeconfig "ueransim" $ue_pod_name "ping -I uesimtun0 google.com"
