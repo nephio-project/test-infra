@@ -63,6 +63,19 @@
     group: "{{ ansible_user_gid }}"
     mode: '0644'
 
+- name: Wait for Kind Nodes to become ready
+  kubernetes.core.k8s:
+    context: kind-kind
+    definition:
+      apiVersion: v1
+      kind: Node
+      metadata:
+        name: kind-control-plane
+    wait: true
+    wait_condition:
+      type: Ready
+      status: true
+
 - name: Create gitea namespace
   kubernetes.core.k8s:
     state: present
@@ -88,6 +101,7 @@
       data:
         postgres-password: "{{ gitea_postgres_password }}"
         password: "{{ gitea_db_password }}"
+  no_log: true
 
 - name: Create gitea user password
   kubernetes.core.k8s:
@@ -102,6 +116,7 @@
       stringData:
         username: "{{ gitea_username }}"
         password: "{{ gitea_password }}"
+  no_log: true
 
 - name: Deploy base packages
   ansible.builtin.include_role:

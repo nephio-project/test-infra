@@ -26,4 +26,7 @@ function testing_run_test {
     /bin/bash "$testfile"
     echo "+++++ $(date): finished $testfile $testname"
     printf "%s secs\n" "$(($(date +%s) - int_start))"
+
+    echo "Porch Controller logs"
+    kubectl logs deployment/porch-controllers -n porch-system --since "$(($(date +%s) - int_start))s" | sed -e '/PackageVariant/!d;/resources changed/!d'
 }

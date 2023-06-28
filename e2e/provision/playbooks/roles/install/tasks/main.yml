@@ -38,6 +38,7 @@
       stringData:
         username: "{{ gitea_username }}"
         password: "{{ gitea_password }}"
+  no_log: true
 
 - name: Deploy Nephio webui
   ansible.builtin.include_role:

@@ -68,6 +68,26 @@
             state: present
             disable_gpg_check: true
         - name: Configure SELinux for clab
-          ansible.builtin.shell: setsebool -P selinuxuser_execmod 1
+          ansible.posix.seboolean:
+            name: selinuxuser_execmod
+            state: true
+            persistent: true
       become: true
       when: ansible_os_family == 'RedHat' and ansible_architecture in ('arm64', 'x86_64')
+    - name: Wait for repositories
+      kubernetes.core.k8s:
+        context: kind-kind
+        definition:
+          apiVersion: config.porch.kpt.dev/v1alpha1
+          kind: Repository
+          metadata:
+            name: "{{ item }}"
+            namespace: default
+        wait: true
+        wait_condition:
+          type: Ready
+          status: true
+      loop:
+        - nephio-example-packages
+        - mgmt
+        - mgmt-staging
