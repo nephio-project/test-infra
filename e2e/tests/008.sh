@@ -35,7 +35,7 @@ function _check_scale {
     local current=$3
 
     echo "UPF - Comparing the new $metric after scaling"
-    if [ "$previous" -le "$current" ]; then
+    if [ "$previous" -ge "$current" ]; then
         echo "UPF $metric scaling Failed"
         exit 1
     fi
