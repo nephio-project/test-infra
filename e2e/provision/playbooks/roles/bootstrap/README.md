@@ -93,7 +93,8 @@ flowchart TD
     T --> U(Create .kube directory)
     S -- false --> U
     U --> V(Copy root kubeconfig file)
-    V --> W(Create gitea namespace)
-    W --> Y(Create gitea postgresql user password)
-    Y --> Z(Deploy base packages)
+    V --> W(Wait for Kind Nodes to become ready)
+    W --> Y(Create gitea namespace)
+    Y --> Z(Create gitea postgresql user password)
+    Z --> AA(Deploy base packages)
 ```
