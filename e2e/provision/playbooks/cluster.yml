@@ -68,6 +68,9 @@
             state: present
             disable_gpg_check: true
         - name: Configure SELinux for clab
-          ansible.builtin.shell: setsebool -P selinuxuser_execmod 1
+          ansible.posix.seboolean:
+            name: selinuxuser_execmod
+            state: true
+            persistent: true
       become: true
       when: ansible_os_family == 'RedHat' and ansible_architecture in ('arm64', 'x86_64')
