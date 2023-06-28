@@ -74,3 +74,20 @@
             persistent: true
       become: true
       when: ansible_os_family == 'RedHat' and ansible_architecture in ('arm64', 'x86_64')
+    - name: Wait for repositories
+      kubernetes.core.k8s:
+        context: kind-kind
+        definition:
+          apiVersion: config.porch.kpt.dev/v1alpha1
+          kind: Repository
+          metadata:
+            name: "{{ item }}"
+            namespace: default
+        wait: true
+        wait_condition:
+          type: Ready
+          status: true
+      loop:
+        - nephio-example-packages
+        - mgmt
+        - mgmt-staging
