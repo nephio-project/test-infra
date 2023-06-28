@@ -27,22 +27,24 @@ source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
-k8s_apply "$kubeconfig" "$TESTDIR/007-edge-ueransim.yaml"
+# Register a subscriber with free5gc
 
-for cluster in "edge01" "edge02"; do
-    k8s_wait_exists "$kubeconfig" 600 "default" "packagevariant" "edge-ueransim-${cluster}-ueransim"
-done
+regional_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
+ip=$(kubectl --kubeconfig $regional_kubeconfig get node -o jsonpath='{.items[0].status.addresses[?(.type=="InternalIP")].address}')
+port=$(kubectl --kubeconfig $regional_kubeconfig -n free5gc-cp get svc webui-service -o jsonpath='{.spec.ports[0].nodePort}')
 
-for cluster in "edge01" "edge02"; do
-    k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "edge-ueransim-${cluster}-ueransim"
-done
+curl -d "@${TESTDIR}/007-subscriber.json" -H 'Token: admin' -H 'Content-Type: application/json' "http://${ip}:${port}/api/subscriber/imsi-208930000000003/20893"
 
-for cluster in "edge01" "edge02"; do
-    cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "$cluster")
-    k8s_wait_exists "$cluster_kubeconfig" 600 "ueransim" "deployment" "ueransim-gnb"
-    k8s_wait_exists "$cluster_kubeconfig" 600 "ueransim" "deployment" "ueransim-ue"
-    k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "ueransim" "deployment" "ueransim-gnb"
-    k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "ueransim" "deployment" "ueransim-ue"
-    ue_pod_name=${kubectl--kubeconfig $cluster_kubeconfig get pods -n ueransim  -l app=ueransim -l component=ue}
-    k8s_exec $cluster_kubeconfig "ueransim" $ue_pod_name "ping -I uesimtun0 google.com"
-done
+# Deploy UERANSIM to edge01
+
+k8s_apply "$kubeconfig" "$TESTDIR/007-edge01-ueransim.yaml"
+
+k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "edge01-ueransim"
+
+edge01_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "edge01")
+k8s_wait_exists "$edge01_kubeconfig" 600 "ueransim" "deployment" "ueransimgnb-edge01"
+k8s_wait_exists "$edge01_kubeconfig" 600 "ueransim" "deployment" "ueransimue-edge01"
+k8s_wait_ready_replicas "$edge01_kubeconfig" 600 "ueransim" "deployment" "ueransimgnb-edge01"
+k8s_wait_ready_replicas "$edge01_kubeconfig" 600 "ueransim" "deployment" "ueransimue-edge01"
+ue_pod_name=$(kubectl --kubeconfig $edge01_kubeconfig get pods -n ueransim  -l app=ueransim -l component=ue -o jsonpath='{.items[0].metadata.name}')
+k8s_exec $edge01_kubeconfig "ueransim" $ue_pod_name "ping -I uesimtun0 google.com"
