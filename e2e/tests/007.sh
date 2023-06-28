@@ -27,6 +27,16 @@ source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
+# Register a subscriber with free5gc
+
+regional_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
+ip=$(kubectl --kubeconfig $regional_kubeconfig get node -o jsonpath='{.items[0].status.addresses[?(.type=="InternalIP")].address}')
+port=$(kubectl --kubeconfig $regional_kubeconfig -n free5gc-cp get svc webui-service -o jsonpath='{.spec.ports[0].nodePort}')
+
+curl --verbose -u admin:free5gc -d "@${TESTDIR}/007-subscriber.json" -H 'Content-Type: application/json' "http://${ip}:${port}/api/subscriber/imsi-208930000000003/20893"
+
+# Deploy UERANSIM to the edge clusters
+
 k8s_apply "$kubeconfig" "$TESTDIR/007-edge-ueransim.yaml"
 
 for cluster in "edge01" "edge02"; do
