@@ -541,6 +541,7 @@ the specific clusters. There is a pre-defined PackageVariant in the tests
 directory for this:
 
 ```bash
+./test-infra/e2e/provision/hacks/network-topo.sh
 kubectl apply -f test-infra/e2e/tests/003-network.yaml
 ```
 
