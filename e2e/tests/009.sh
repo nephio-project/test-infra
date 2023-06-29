@@ -17,9 +17,6 @@ set -o errexit
 set -o nounset
 [[ ${DEBUG:-false} != "true" ]] || set -o xtrace
 
-# Set the new values for maxSessions and maxNFConnections as parameters
-new_capacity_values=${1:1001,2:11}
-
 export HOME=${HOME:-/home/ubuntu/}
 export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
 export TESTDIR=${TESTDIR:-$E2EDIR/tests}
@@ -35,7 +32,7 @@ cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
 
 #Before scaling test get the running SMF POD ID
 echo "Getting pod for SMF in cluster regional"
-smf_pod_id=$(kubectl --kubeconfig $cluster_kubeconfig get pods -l name=smf-regional -n free5gc-smf | grep smf | head -1 | cut -d ' ' -f 1)
+smf_pod_id=$(kubectl --kubeconfig $cluster_kubeconfig get pods -l name=smf-regional -n free5gc-cp | grep smf | head -1 | cut -d ' ' -f 1)
 
 if [ -z "$smf_pod_id" ]; then
     echo "SMF Pod Not Found"
@@ -44,16 +41,16 @@ fi
 
 echo "Getting CPU for $smf_pod_id"
 #If the pod exists, Get the current CPU and Memory limit
-current_cpu=$(k8s_get_first_container_cpu_requests $cluster_kubeconfig free5gc-smf $smf_pod_id)
+current_cpu=$(k8s_get_first_container_cpu_requests $cluster_kubeconfig free5gc-cp $smf_pod_id)
 
 echo "Getting memory for $smf_pod_id"
-current_memory=$(k8s_get_first_container_memory_requests $cluster_kubeconfig free5gc-smf $smf_pod_id)
+current_memory=$(k8s_get_first_container_memory_requests $cluster_kubeconfig free5gc-cp $smf_pod_id)
 
 echo "Current CPU $current_cpu"
 echo "Current Memory $current_memory"
 
 #Scale the POD
-smf_deployment_pkg=$(kubectl --kubeconfig $kubeconfig get packagevariant regional-free5gc-smf -o jsonpath='{.status.downstreamTargets[0].name}')
+smf_deployment_pkg=$(kubectl --kubeconfig $kubeconfig get packagevariant regional-free5gc-smf-regional-free5gc-smf -o jsonpath='{.status.downstreamTargets[0].name}')
 echo "Copying $smf_deployment_pkg"
 ws="regional-smf-scaling"
 smf_pkg_rev=$(kpt alpha rpkg copy -n default $smf_deployment_pkg --workspace $ws | cut -d ' ' -f 1)
@@ -67,8 +64,8 @@ cp -r $ws /tmp
 
 echo "Updating the capacity"
 
-kpt fn eval --image gcr.io/kpt-fn/search-replace:v0.2.0 $ws -- by-path='spec.maxSessions' by-file-path='**/capacity.yaml' put-value=${new_capacity_values%%,*}
-kpt fn eval --image gcr.io/kpt-fn/search-replace:v0.2.0 $ws -- by-path='spec.maxNFConnections' by-file-path='**/capacity.yaml' put-value=${new_capacity_values#*,}
+kpt fn eval --image gcr.io/kpt-fn/search-replace:v0.2.0 $ws -- by-path='spec.maxSessions' by-file-path='**/capacity.yaml' put-value=10000
+kpt fn eval --image gcr.io/kpt-fn/search-replace:v0.2.0 $ws -- by-path='spec.maxNFConnections' by-file-path='**/capacity.yaml' put-value=50
 
 diff -r /tmp/$ws $ws || echo
 
@@ -87,7 +84,7 @@ timeout=600
 found=""
 while [[ -z $found && $timeout -gt 0 ]]; do
     echo "$timeout: checking if new pod has deployed"
-    smf_pod_id_scale=$(kubectl --kubeconfig $cluster_kubeconfig get pods -l name=smf-regional -n free5gc-smf | grep smf | head -1 | cut -d ' ' -f 1)
+    smf_pod_id_scale=$(kubectl --kubeconfig $cluster_kubeconfig get pods -l name=smf-regional -n free5gc-cp | grep smf | head -1 | cut -d ' ' -f 1)
     if [[ ! -z $smf_pod_id_scale && $smf_pod_id_scale != $smf_pod_id ]]; then
         found=$smf_pod_id_scale
     fi
@@ -103,15 +100,15 @@ if [[ -z $found ]]; then
 fi
 
 # Verify pod actually reaches ready state
-k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc-smf" "deployment" "smf-regional"
+k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc-cp" "deployment" "smf-regional"
 
 echo "Getting CPU for $smf_pod_id_scale"
-after_scaling_cpu=$(_get_first_container_cpu $cluster_kubeconfig free5gc-smf $smf_pod_id_scale)
+after_scaling_cpu=$(k8s_get_first_container_cpu_requests $cluster_kubeconfig free5gc-cp $smf_pod_id_scale)
 
 echo "Getting Memory for $smf_pod_id_scale"
-after_scaling_memory=$(_get_first_container_memory $cluster_kubeconfig free5gc-smf $smf_pod_id_scale)
+after_scaling_memory=$(k8s_get_first_container_memory_requests $cluster_kubeconfig free5gc-cp $smf_pod_id_scale)
 
 echo "After Scaling  $after_scaling_cpu $after_scaling_memory"
 
-_k8s_check_scale "CPU" $current_cpu $after_scaling_cpu
-_k8s_check_scale "Memory" $current_memory $after_scaling_memory
+k8s_check_scale "SMF" "CPU" $current_cpu $after_scaling_cpu
+k8s_check_scale "SMF" "Memory" $current_memory $after_scaling_memory

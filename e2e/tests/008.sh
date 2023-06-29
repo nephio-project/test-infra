@@ -29,7 +29,7 @@ source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
-for cluster in "edge01" "edge02"; do
+for cluster in "edge01"; do
 
     #Get the cluster kubeconfig
     echo "Getting kubeconfig for $cluster"

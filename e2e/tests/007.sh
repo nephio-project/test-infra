@@ -48,10 +48,23 @@ k8s_wait_ready_replicas "$edge01_kubeconfig" 600 "ueransim" "deployment" "uerans
 k8s_wait_ready_replicas "$edge01_kubeconfig" 600 "ueransim" "deployment" "ueransimue-edge01"
 ue_pod_name=$(kubectl --kubeconfig $edge01_kubeconfig get pods -n ueransim -l app=ueransim -l component=ue -o jsonpath='{.items[0].metadata.name}')
 
-ip_a=$(k8s_exec $edge01_kubeconfig "ueransim" $ue_pod_name "ip address show")
-if [[ $ip_a == *"uesimtun0"* ]]; then
-    k8s_exec $edge01_kubeconfig "ueransim" $ue_pod_name "ping -I uesimtun0 -c 3 172.0.0.1"
-else
-    echo "There is no uesimtun0 network interface"
+timeout=600
+found=""
+while [[ -z $found && $timeout -gt 0 ]]; do
+    echo "$timeout: waiting for tunnel to be established"
+    ip_a=$(k8s_exec $edge01_kubeconfig "ueransim" $ue_pod_name "ip address show")
+    if [[ $ip_a == *"uesimtun0"* ]]; then
+        found="yes"
+    fi
+    timeout=$((timeout - 5))
+    if [[ -z $found && $timeout -gt 0 ]]; then
+        sleep 5
+    fi
+done
+
+if [[ -z $found ]]; then
+    echo "Timed out waiting for tunnel"
     exit 1
 fi
+
+k8s_exec $edge01_kubeconfig "ueransim" $ue_pod_name "ping -I uesimtun0 -c 3 172.0.0.1"
