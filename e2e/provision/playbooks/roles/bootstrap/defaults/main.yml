@@ -13,7 +13,7 @@ host_min_cpu_ram: 16  # minimum required CPU RAM before install; value in GB
 host_min_root_disk_space: 50  # minimum required disk space before install; value in GB
 
 container_engine: docker
-kubernetes_version: v1.27.1
+kubernetes_version: v1.26.3
 
 gitea_postgres_password: c2VjcmV0  # echo -n "secret" | base64
 gitea_db_password: c2VjcmV0
