@@ -157,18 +157,11 @@ function k8s_check_scale {
     echo "$NF - $metric Pod Scaling Successful"
 }
 
-function k8s_get_first_container_cpu_requests {
+function k8s_get_first_container_requests {
     local kubeconfig=$1
     local namespace=$2
     local pod_id=$3
+    local resource_type=$4
 
-    kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath='{.spec.containers[0].resources.requests.cpu}'
-}
-
-function k8s_get_first_container_memory_requests {
-    local kubeconfig=$1
-    local namespace=$2
-    local pod_id=$3
-
-    kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath='{.spec.containers[0].resources.requests.memory}'
+    kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath="{.spec.containers[0].resources.requests.$resource_type}"
 }
