@@ -41,6 +41,32 @@ rm -f ~/.ssh/id_rsa*
 echo -e "\n\n\n" | ssh-keygen -t rsa -N ""
 cat "$HOME/.ssh/id_rsa.pub" >>"$HOME/.ssh/authorized_keys"
 
+sudo mkdir -p /etc/ansible/
+sudo tee /etc/ansible/ansible.cfg <<EOT
+[ssh_connection]
+# Enabling Pipelining
+pipelining=True
+# Enable SSH Multiplexing
+ansible_ssh_common_args = -o ControlMaster=auto -o ControlPersist=30m -o ConnectionAttempts=100
+retries=2
+
+[defaults]
+# Increase the forks
+forks = 20
+# Enable mitogen
+strategy_plugins = $(dirname "$(sudo find / -name mitogen_linear.py | head -n 1)")
+# Enable timing information
+callback_whitelist = timer, profile_tasks
+
+# Disable host key checking
+host_key_checking=False
+
+# Enable facts caching mechanism
+gathering = smart
+fact_caching = jsonfile
+fact_caching_connection = /tmp
+EOT
+
 if [ "${DEPLOYMENT_TYPE:-r1}" == "one-summit" ]; then
     [[ -d "$HOME/workshop" ]] || git clone --depth 1 https://github.com/nephio-project/one-summit-22-workshop.git "$HOME/workshop"
     mkdir -p "$HOME/workshop/nephio-ansible-install/inventory"
@@ -55,12 +81,6 @@ if [ "${DEPLOYMENT_TYPE:-r1}" == "one-summit" ]; then
     done
     popd >/dev/null
 else
-    mkdir -p ~/.ssh/
-    touch ~/.ssh/config
-    if ! grep -q "StrictHostKeyChecking no" ~/.ssh/config; then
-        echo "StrictHostKeyChecking no" >>~/.ssh/config
-    fi
-    chmod 600 ~/.ssh/config
     # Management cluster creation
     if [[ ${DEBUG:-false} != "true" ]]; then
         ansible-playbook -i ./nephio.yaml playbooks/cluster.yml
