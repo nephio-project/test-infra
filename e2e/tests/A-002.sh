@@ -32,19 +32,6 @@ k8s_apply "$kubeconfig" "$TESTDIR/002-edge-clusters.yaml"
 # Wait for cluster resources creation
 for cluster in edge01 edge02; do
     k8s_wait_exists "$kubeconfig" 600 "default" "workloadcluster" "$cluster"
-    k8s_wait_exists "$kubeconfig" 600 "default" "cl" "$cluster"
+    k8s_wait_exists "$kubeconfig" 600 "default" "cluster" "$cluster"
+    k8s_wait_ready "$kubeconfig" 600 "default" "cluster" "$cluster"
 done
-
-# Wait for cluster readiness
-for cluster in $(kubectl get cl -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --kubeconfig "$kubeconfig"); do
-    k8s_wait_ready "$kubeconfig" 600 "default" "cl" "$cluster"
-    for machineset in $(kubectl get machineset -l cluster.x-k8s.io/cluster-name="$cluster" -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --kubeconfig "$kubeconfig"); do
-        k8s_wait_ready "$kubeconfig" 600 "default" "machineset" "$machineset"
-    done
-done
-
-# Inter-connect worker nodes
-$E2EDIR/provision/hacks/inter-connect_workers.sh
-
-# Configure VLAN interfaces
-$E2EDIR/provision/hacks/vlan-interfaces.sh

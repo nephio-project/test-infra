@@ -16,9 +16,19 @@ set -o nounset
 export HOME=${HOME:-/home/ubuntu/}
 export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
 export TESTDIR=${TESTDIR:-$E2EDIR/tests}
+export PARALLEL=${PARALLEL:-false}
 
 source "$E2EDIR/lib/testing.sh"
 
-for t in $TESTDIR/*.sh; do
-    testing_run_test "$t"
+if [[ ${PARALLEL} == "false" ]]; then
+    for t in $TESTDIR/*.sh; do
+        testing_run_test "$t"
+    done
+    exit 0
+fi
+
+## Run in parallel as much as possible
+
+for tg in $(ls -1 $TESTDIR/*.sh | sed -e "s?$TESTDIR/??" | cut -d '-' -f 1 | sort | uniq); do
+    testing_run_group $TESTDIR $tg
 done
