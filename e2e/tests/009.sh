@@ -58,11 +58,11 @@ function _k8s_check_scale {
                 echo "SMF $metric Scaling Failed"
                 exit 1
             fi
-                echo "UPF - $metric Pod Scaling Successful"
+                echo "SMF - $metric Pod Scaling Successful"
         else
             previous=$(echo "scale=5; $previous / 1000" | bc )
             echo "Previous after scaling : $previous"
-            echo "UPF - Comparing the new $metric after scaling"
+            echo "SMF - Comparing the new $metric after scaling"
             if (( $(echo "$previous >= $current" | bc -l) )); then
                 echo "SMF $metric Scaling Failed"
                 exit 1
