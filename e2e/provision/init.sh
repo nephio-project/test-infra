@@ -97,9 +97,12 @@ chown "$NEPHIO_USER:$NEPHIO_USER" "$HOME/.bash_aliases"
 
 sed -e "s/vagrant/$NEPHIO_USER/" <"$REPO_DIR/e2e/provision/nephio.yaml" >"$HOME/nephio.yaml"
 
+# Sandbox Creation
+int_start=$(date +%s)
 cd "$REPO_DIR/e2e/provision"
 export DEBUG DEPLOYMENT_TYPE
 runuser -u "$NEPHIO_USER" ./install_sandbox.sh
+printf "%s secs\n" "$(($(date +%s) - int_start))"
 
 # Grant Docker permissions to current user
 if ! getent group docker | grep -q "$NEPHIO_USER"; then
