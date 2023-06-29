@@ -126,41 +126,80 @@ function k8s_exec {
     kubectl --kubeconfig $kubeconfig -n $resource_namespace exec $resource_name -- /bin/bash -c "$command"
     return $?
 }
+
+function _k8s_quantity_factor {
+    local value=$1
+    local factor=1
+
+    # See https://kubernetes.io/docs/reference/kubernetes-api/common-definitions/quantity/
+    if [[ $value == *Ki* ]]; then
+        factor=1024
+    elif [[ $value == *Mi* ]]; then
+        factor=$(expr 1024 '*' 1024)
+    elif [[ $value == *Gi* ]]; then
+        factor=$(expr 1024 '*' 1024 '*' 1024)
+    elif [[ $value == *Ti* ]]; then
+        factor=$(expr 1024 '*' 1024 '*' 1024 '*' 1024)
+    elif [[ $value == *Pi* ]]; then
+        factor=$(expr 1024 '*' 1024 '*' 1024 '*' 1024 '*' 1024)
+    elif [[ $value == *Ei* ]]; then
+        factor=$(expr 1024 '*' 1024 '*' 1024 '*' 1024 '*' 1024 '*' 1024)
+    elif [[ $value == *K* ]]; then
+        factor=1000
+    elif [[ $value == *M* ]]; then
+        factor=$(expr 1000 '*' 1000)
+    elif [[ $value == *G* ]]; then
+        factor=$(expr 1000 '*' 1000 '*' 1000)
+    elif [[ $value == *T* ]]; then
+        factor=$(expr 1000 '*' 1000 '*' 1000 '*' 1000)
+    elif [[ $value == *P* ]]; then
+        factor=$(expr 1000 '*' 1000 '*' 1000 '*' 1000 '*' 1000)
+    elif [[ $value == *E* ]]; then
+        factor=$(expr 1000 '*' 1000 '*' 1000 '*' 1000 '*' 1000 '*' 1000)
+    elif [[ $value == *m* ]]; then
+        factor="0.001"
+    fi
+
+    echo $factor
+}
+
 function k8s_check_scale {
-    
     local NF=$1
     local metric=$2
-    local previous=$3
-    local current=$4
+    local previous_raw=$3
+    local current_raw=$4
 
+    local current_factor=$(_k8s_quantity_factor $current_raw)
+    local previous_factor=$(_k8s_quantity_factor $previous_raw)
 
-    if [ "$metric" == "CPU" ]; then   
-        if [[ $current == *"m"* ]]; then
-            current="${current//m/}"
-            echo "Current : $current"
-     
-            echo "$NF - Comparing the new $metric after scaling"
-            if [ "$previous" -ge  "$current" ]; then
-                echo "$NF $metric scaling Failed"
-                exit 1
-            fi
-                echo "$NF - $metric Pod Scaling Successful"
-        else
-            previous=$(echo "scale=5; $previous / 1000" | bc )
-            echo "Previous after scaling : $previous"
-            echo "$NF - Comparing the new $metric after scaling"
-            if (( $(echo "$previous >= $current" | bc -l) )); then 
-                echo "$NF $metric scaling Failed"
-                exit 1
-            fi
-            echo "$NF - $metric Pod Scaling Successful"
-        fi 
-    elif [ "$metric" == "Memory" ]; then
-        echo "$NF - Comparing the new $metric after scaling"
-        if [ "$previous" -ge  "$current" ]; then
-            echo "$NF $metric scaling Failed"
-            exit 1
-        fi
-        echo "$NF - $metric Pod Scaling Successful"
+    local current=$(echo "$current_raw" | tr -d '[a-zA-Z]')
+    local previous=$(echo "$previous_raw" | tr -d '[a-zA-Z]')
+
+    local current_scaled=$(echo "$current * $current_factor" | bc)
+    local previous_scaled=$(echo "$previous * $previous_factor" | bc)
+    local success=$(echo "$previous_scaled < $current_scaled" | bc)
+
+    echo "Current : $current_raw ($current_scaled), Previous: $previous_raw ($previous_scaled)"
+    echo "$NF - Comparing the new $metric after scaling"
+    if [ "$success" == "0" ]; then
+        echo "$NF $metric scaling Failed"
+        exit 1
     fi
+    echo "$NF - $metric Pod Scaling Successful"
+}
+
+function k8s_get_first_container_cpu_requests {
+    local kubeconfig=$1
+    local namespace=$2
+    local pod_id=$3
+
+    kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath='{.spec.containers[0].resources.requests.cpu}'
+}
+
+function k8s_get_first_container_memory_requests {
+    local kubeconfig=$1
+    local namespace=$2
+    local pod_id=$3
+
+    kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath='{.spec.containers[0].resources.requests.memory}'
 }

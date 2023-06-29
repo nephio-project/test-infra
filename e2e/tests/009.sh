@@ -29,62 +29,6 @@ source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
-function _k8s_check_scale {
-    local metric=$1
-    local previous=$2
-    local current=$3
-
-
-    if [ "$metric" == "CPU" ]; then
-        if [[ $current == *"m"* ]]; then
-            current="${current//m/}"
-            echo "Current : $current"
-
-            echo "SMF - Comparing the new $metric after scaling"
-            if [ "$previous" -ge  "$current" ]; then
-                echo "SMF $metric Scaling Failed"
-                exit 1
-            fi
-                echo "SMF - $metric Pod Scaling Successful"
-        else
-            previous=$(echo "scale=5; $previous / 1000" | bc )
-            echo "Previous after scaling : $previous"
-            echo "SMF - Comparing the new $metric after scaling"
-            if (( $(echo "$previous >= $current" | bc -l) )); then
-                echo "SMF $metric Scaling Failed"
-                exit 1
-            fi
-            echo "SMF - $metric Pod Scaling Successful"
-        fi
-    elif [ "$metric" == "Memory" ]; then
-        echo "SMF - Comparing the new $metric after scaling"
-        if [ "$previous" -ge  "$current" ]; then
-            echo "SMF $metric Scaling Failed"
-            exit 1
-        fi
-        echo "SMF - $metric Pod Scaling Successful"
-    fi
-}
-
-function _get_first_container_cpu {
-    local kubeconfig=$1
-    local namespace=$2
-    local pod_id=$3
-
-    # we probably need to convert these to some uniform units
-    kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath='{range .spec.containers[*]}{.resources.requests.cpu}{"\n"}{end}' | head -1
-}
-
-function _get_first_container_memory {
-    local kubeconfig=$1
-    local namespace=$2
-    local pod_id=$3
-
-    # we probably need to convert these to some uniform units
-    kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath='{range .spec.containers[*]}{.resources.requests.memory}{"\n"}{end}' | head -1 | sed 's/[GM]i$//'
-}
-
-
 #Get the cluster kubeconfig
 echo "Getting kubeconfig for regional"
 cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
@@ -100,10 +44,10 @@ fi
 
 echo "Getting CPU for $smf_pod_id"
 #If the pod exists, Get the current CPU and Memory limit
-current_cpu=$(_get_first_container_cpu $cluster_kubeconfig free5gc-smf $smf_pod_id)
+current_cpu=$(k8s_get_first_container_cpu_requests $cluster_kubeconfig free5gc-smf $smf_pod_id)
 
 echo "Getting memory for $smf_pod_id"
-current_memory=$(_get_first_container_memory $cluster_kubeconfig free5gc-smf $smf_pod_id)
+current_memory=$(k8s_get_first_container_memory_requests $cluster_kubeconfig free5gc-smf $smf_pod_id)
 
 echo "Current CPU $current_cpu"
 echo "Current Memory $current_memory"
@@ -158,7 +102,7 @@ if [[ -z $found ]]; then
 fi
 
 # Verify pod actually reaches ready state
-k8s_wait_ready "$cluster-kubeconfig" 600 "free5gc-smf" "deployment" "smf-regional"
+k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc-smf" "deployment" "smf-regional"
 
 echo "Getting CPU for $smf_pod_id_scale"
 after_scaling_cpu=$(_get_first_container_cpu $cluster_kubeconfig free5gc-smf $smf_pod_id_scale)
@@ -170,5 +114,3 @@ echo "After Scaling  $after_scaling_cpu $after_scaling_memory"
 
 _k8s_check_scale "CPU" $current_cpu $after_scaling_cpu
 _k8s_check_scale "Memory" $current_memory $after_scaling_memory
-
-

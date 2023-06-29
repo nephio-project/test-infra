@@ -29,25 +29,6 @@ source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
-
-function _get_first_container_cpu {
-    local kubeconfig=$1
-    local namespace=$2
-    local pod_id=$3
-
-    # we probably need to convert these to some uniform units
-    kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath='{range .spec.containers[*]}{.resources.requests.cpu}{"\n"}{end}' | head -1
-}
-
-function _get_first_container_memory {
-    local kubeconfig=$1
-    local namespace=$2
-    local pod_id=$3
-
-    # we probably need to convert these to some uniform units
-    kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath='{range .spec.containers[*]}{.resources.requests.memory}{"\n"}{end}' | head -1 | sed 's/[GM]i$//'
-}
-
 for cluster in "edge01" "edge02"; do
 
     #Get the cluster kubeconfig
@@ -59,16 +40,16 @@ for cluster in "edge01" "edge02"; do
     upf_pod_id=$(kubectl --kubeconfig $cluster_kubeconfig get pods -l name=upf-${cluster} -n free5gc-upf | grep upf | head -1 | cut -d ' ' -f 1)
 
     if [ -z "$upf_pod_id" ]; then
-        echo "UPF PoD Not Found"
+        echo "UPF Pod Not Found"
         exit 1
     fi
 
     echo "Getting CPU for $upf_pod_id"
     #If the pod exists, Get the current CPU and Memory limit
-    current_cpu=$(_get_first_container_cpu $cluster_kubeconfig free5gc-upf $upf_pod_id)
+    current_cpu=$(k8s_get_first_container_cpu_requests $cluster_kubeconfig free5gc-upf $upf_pod_id)
 
     echo "Getting memory for $upf_pod_id"
-    current_memory=$(_get_first_container_memory $cluster_kubeconfig free5gc-upf $upf_pod_id)
+    current_memory=$(k8s_get_first_container_memory_requests $cluster_kubeconfig free5gc-upf $upf_pod_id)
 
     echo "Current CPU $current_cpu"
     echo "Current Memory $current_memory"
@@ -126,10 +107,10 @@ for cluster in "edge01" "edge02"; do
     k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc-upf" "deployment" "upf-${cluster}"
 
     echo "Getting CPU for $upf_pod_id_scale"
-    after_scaling_cpu=$(_get_first_container_cpu $cluster_kubeconfig free5gc-upf $upf_pod_id_scale)
+    after_scaling_cpu=$(k8s_get_first_container_cpu_requests $cluster_kubeconfig free5gc-upf $upf_pod_id_scale)
 
     echo "Getting Memory for $upf_pod_id_scale"
-    after_scaling_memory=$(_get_first_container_memory $cluster_kubeconfig free5gc-upf $upf_pod_id_scale)
+    after_scaling_memory=$(k8s_get_first_container_memory_requests $cluster_kubeconfig free5gc-upf $upf_pod_id_scale)
 
     echo "After Scaling  $after_scaling_cpu $after_scaling_memory"
 
