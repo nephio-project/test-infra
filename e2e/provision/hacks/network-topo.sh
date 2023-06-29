@@ -12,6 +12,11 @@
 set -o pipefail
 set -o errexit
 set -o nounset
+[[ ${DEBUG:-false} != "true" ]] || set -o xtrace
+export HOME=${HOME:-/home/ubuntu/}
+export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
+export TESTDIR=${TESTDIR:-$E2EDIR/tests}
+export LIBDIR=${LIBDIR:-$E2EDIR/lib}
 
 export LEAF_IP=$(docker inspect net-free5gc-net-leaf -f '{{.NetworkSettings.Networks.kind.IPAddress}}')
 
