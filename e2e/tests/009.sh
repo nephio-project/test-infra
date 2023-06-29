@@ -100,10 +100,10 @@ fi
 
 echo "Getting CPU for $smf_pod_id"
 #If the pod exists, Get the current CPU and Memory limit
-current_cpu=$(_get_first_container_cpu regional_kubeconfig free5gc-smf $smf_pod_id)
+current_cpu=$(_get_first_container_cpu $cluster_kubeconfig free5gc-smf $smf_pod_id)
 
 echo "Getting memory for $smf_pod_id"
-current_memory=$(_get_first_container_memory regional_kubeconfig free5gc-smf $smf_pod_id)
+current_memory=$(_get_first_container_memory $cluster_kubeconfig free5gc-smf $smf_pod_id)
 
 echo "Current CPU $current_cpu"
 echo "Current Memory $current_memory"
