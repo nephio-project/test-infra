@@ -77,6 +77,7 @@ kpt alpha rpkg push -n default "$smf_pkg_rev" $ws
 
 echo "Proposing update"
 kpt alpha rpkg propose -n default "$smf_pkg_rev"
+sleep 5
 
 echo "Approving update"
 kpt alpha rpkg approve -n default "$smf_pkg_rev"

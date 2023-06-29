@@ -45,6 +45,7 @@ upstream_pkg_rev=$(kpt alpha rpkg get --name free5gc-cp --revision v1 -o jsonpat
 pkg_rev=$(kpt alpha rpkg clone -n default "$upstream_pkg_rev" --repository regional free5gc-cp | cut -f 1 -d ' ')
 
 kpt alpha rpkg propose -n default "$pkg_rev"
+sleep 5
 kpt alpha rpkg approve -n default "$pkg_rev"
 
 k8s_wait_exists "$regional_kubeconfig" 600 "free5gc-cp" "statefulset" "mongodb"
