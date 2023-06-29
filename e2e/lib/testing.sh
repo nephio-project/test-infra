@@ -22,7 +22,7 @@ function testing_run_test {
     local skiplogs=${2:-false}
 
     local testname=$(testing_get_test_metadata "$testfile" "TEST-NAME")
-    int_start=$(date +%s)
+    local int_start=$(date +%s)
     echo "+++++ $(date): starting $testfile $testname"
     /bin/bash "$testfile"
     echo "+++++ $(date): finished $testfile $testname"
@@ -38,7 +38,7 @@ function testing_run_group {
     local testdir=$1
     local tg=$2
 
-    int_start=$(date +%s)
+    local int_start=$(date +%s)
     echo "+++++ $(date): starting test group $tg in $testdir"
     for t in $TESTDIR/$tg-*.sh; do
         if [[ $t == *-post.sh ]]; then
