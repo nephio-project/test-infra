@@ -123,6 +123,6 @@ function k8s_exec {
     local command=$4
 
     echo "executing command $command on $resource_name in namespace $resource_namespace using $kubeconfig"
-    kubectl --kubeconfig $kubeconfig -n $resource_namespace exec -it $resource_name -- /bin/bash -c "$command"
+    kubectl --kubeconfig $kubeconfig -n $resource_namespace exec $resource_name -- /bin/bash -c "$command"
     return $?
 }
