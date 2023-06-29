@@ -53,9 +53,9 @@ function _k8s_check_scale {
             current="${current//m/}"
             echo "Current : $current"
 
-            echo "UPF - Comparing the new $metric after scaling"
+            echo "SMF - Comparing the new $metric after scaling"
             if [ "$previous" -ge  "$current" ]; then
-                echo "UPF $metric scaling Failed"
+                echo "SMF $metric Scaling Failed"
                 exit 1
             fi
                 echo "UPF - $metric Pod Scaling Successful"
@@ -64,18 +64,18 @@ function _k8s_check_scale {
             echo "Previous after scaling : $previous"
             echo "UPF - Comparing the new $metric after scaling"
             if (( $(echo "$previous >= $current" | bc -l) )); then
-                echo "UPF $metric scaling Failed"
+                echo "SMF $metric Scaling Failed"
                 exit 1
             fi
-            echo "UPF - $metric Pod Scaling Successful"
+            echo "SMF - $metric Pod Scaling Successful"
         fi
     elif [ "$metric" == "Memory" ]; then
-        echo "UPF - Comparing the new $metric after scaling"
+        echo "SMF - Comparing the new $metric after scaling"
         if [ "$previous" -ge  "$current" ]; then
-            echo "UPF $metric scaling Failed"
+            echo "SMF $metric Scaling Failed"
             exit 1
         fi
-        echo "UPF - $metric Pod Scaling Successful"
+        echo "SMF - $metric Pod Scaling Successful"
     fi
 }
 
