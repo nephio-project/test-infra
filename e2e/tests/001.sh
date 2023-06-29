@@ -34,7 +34,7 @@ kpt fn eval --image "gcr.io/kpt-fn/set-labels:v0.2.0" regional -- "nephio.org/si
 kpt alpha rpkg push -n default "$regional_pkg_rev" regional
 
 kpt alpha rpkg propose -n default "$regional_pkg_rev"
-sleep 5
+k8s_wait_exists "$kubeconfig" 600 "default" "packagerev" "$regional_pkg_rev"
 kpt alpha rpkg approve -n default "$regional_pkg_rev"
 
 k8s_wait_exists "$kubeconfig" 600 "default" "workloadcluster" "regional"
