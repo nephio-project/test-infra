@@ -16,7 +16,8 @@ set -o nounset
 export HOME=${HOME:-/home/ubuntu/}
 export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
 export TESTDIR=${TESTDIR:-$E2EDIR/tests}
-export PARALLEL=${PARALLEL:-false}
+
+export PARALLEL=${1:-false}
 
 source "$E2EDIR/lib/testing.sh"
 

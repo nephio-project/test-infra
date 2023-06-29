@@ -106,4 +106,6 @@ printf "%s secs\n" "$(($(date +%s) - int_start))"
 
 if [[ $RUN_E2E == "true" ]]; then
     runuser -u "$NEPHIO_USER" "$REPO_DIR/e2e/e2e.sh"
+elif [[ $RUN_E2E == "parallel" ]]; then
+    runuser -u "$NEPHIO_USER" "$REPO_DIR/e2e/e2e.sh true"
 fi
