@@ -29,7 +29,6 @@ source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
-
 function _get_first_container_cpu {
     local kubeconfig=$1
     local namespace=$2

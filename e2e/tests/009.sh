@@ -34,23 +34,22 @@ function _k8s_check_scale {
     local previous=$2
     local current=$3
 
-
     if [ "$metric" == "CPU" ]; then
         if [[ $current == *"m"* ]]; then
             current="${current//m/}"
             echo "Current : $current"
 
             echo "SMF - Comparing the new $metric after scaling"
-            if [ "$previous" -ge  "$current" ]; then
+            if [ "$previous" -ge "$current" ]; then
                 echo "SMF $metric Scaling Failed"
                 exit 1
             fi
-                echo "SMF - $metric Pod Scaling Successful"
+            echo "SMF - $metric Pod Scaling Successful"
         else
-            previous=$(echo "scale=5; $previous / 1000" | bc )
+            previous=$(echo "scale=5; $previous / 1000" | bc)
             echo "Previous after scaling : $previous"
             echo "SMF - Comparing the new $metric after scaling"
-            if (( $(echo "$previous >= $current" | bc -l) )); then
+            if (($(echo "$previous >= $current" | bc -l))); then
                 echo "SMF $metric Scaling Failed"
                 exit 1
             fi
@@ -58,7 +57,7 @@ function _k8s_check_scale {
         fi
     elif [ "$metric" == "Memory" ]; then
         echo "SMF - Comparing the new $metric after scaling"
-        if [ "$previous" -ge  "$current" ]; then
+        if [ "$previous" -ge "$current" ]; then
             echo "SMF $metric Scaling Failed"
             exit 1
         fi
@@ -83,7 +82,6 @@ function _get_first_container_memory {
     # we probably need to convert these to some uniform units
     kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath='{range .spec.containers[*]}{.resources.requests.memory}{"\n"}{end}' | head -1 | sed 's/[GM]i$//'
 }
-
 
 #Get the cluster kubeconfig
 echo "Getting kubeconfig for regional"
@@ -170,5 +168,3 @@ echo "After Scaling  $after_scaling_cpu $after_scaling_memory"
 
 _k8s_check_scale "CPU" $current_cpu $after_scaling_cpu
 _k8s_check_scale "Memory" $current_memory $after_scaling_memory
-
-

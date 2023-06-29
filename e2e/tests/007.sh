@@ -46,7 +46,7 @@ k8s_wait_exists "$edge01_kubeconfig" 600 "ueransim" "deployment" "ueransimgnb-ed
 k8s_wait_exists "$edge01_kubeconfig" 600 "ueransim" "deployment" "ueransimue-edge01"
 k8s_wait_ready_replicas "$edge01_kubeconfig" 600 "ueransim" "deployment" "ueransimgnb-edge01"
 k8s_wait_ready_replicas "$edge01_kubeconfig" 600 "ueransim" "deployment" "ueransimue-edge01"
-ue_pod_name=$(kubectl --kubeconfig $edge01_kubeconfig get pods -n ueransim  -l app=ueransim -l component=ue -o jsonpath='{.items[0].metadata.name}')
+ue_pod_name=$(kubectl --kubeconfig $edge01_kubeconfig get pods -n ueransim -l app=ueransim -l component=ue -o jsonpath='{.items[0].metadata.name}')
 
 ip_a=$(k8s_exec $edge01_kubeconfig "ueransim" $ue_pod_name "ip address show")
 if [[ $ip_a == *"uesimtun0"* ]]; then
