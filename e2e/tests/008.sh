@@ -98,6 +98,7 @@ for cluster in "edge01" "edge02"; do
 
     echo "Proposing update"
     kpt alpha rpkg propose -n default "$upf_pkg_rev"
+    sleep 5
 
     echo "Approving update"
     kpt alpha rpkg approve -n default "$upf_pkg_rev"
