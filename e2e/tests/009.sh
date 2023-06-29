@@ -29,19 +29,6 @@ source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
-#function _check_scale {
-#    local metric=$1
-#    local previous=$2
-#    local current=$3
-#
-#    echo "SMF - Comparing the new $metric after scaling"
-#    if [ "$previous" -le "$current" ]; then
-#        echo "SMF - $metric Pod Scaling Failed"
-#        exit 1
-#    fi
-#    echo "SMF - $metric Pod Scaling Successful"
-#}
-
 function _k8s_check_scale {
     local metric=$1
     local previous=$2
