@@ -72,7 +72,7 @@ function _get_first_container_cpu {
     local pod_id=$3
 
     # we probably need to convert these to some uniform units
-    kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath='{range .spec.containers[*]}{.resources.requests.cpu}{"\n"}{end}' | head -1 | sed 's/m$//'
+    kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath='{range .spec.containers[*]}{.resources.requests.cpu}{"\n"}{end}' | head -1
 }
 
 function _get_first_container_memory {
@@ -81,7 +81,7 @@ function _get_first_container_memory {
     local pod_id=$3
 
     # we probably need to convert these to some uniform units
-    kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath='{range .spec.containers[*]}{.resources.requests.memory}{"\n"}{end}' | head -1 | sed 's/[GM]i$//'
+    kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath='{range .spec.containers[*]}{.resources.requests.memory}{"\n"}{end}' | head -1
 }
 
 
