@@ -19,7 +19,6 @@ function testing_get_test_metadata {
 
 function testing_run_test {
     local testfile=$1
-    local skiplogs=${2:-false}
 
     local testname=$(testing_get_test_metadata "$testfile" "TEST-NAME")
     local int_start=$(date +%s)
@@ -28,7 +27,7 @@ function testing_run_test {
     echo "+++++ $(date): finished $testfile $testname"
     printf "%s secs\n" "$(($(date +%s) - int_start))"
 
-    if [[ $skiplogs != "true" ]]; then
+    if [[ ${DEBUG:-false} == "true" ]]; then
         echo "Porch Controller logs"
         kubectl logs deployment/porch-controllers -n porch-system --since "$(($(date +%s) - int_start))s" | sed -e '/PackageVariant/!d;/resources changed/!d'
     fi
@@ -42,16 +41,18 @@ function testing_run_group {
     echo "+++++ $(date): starting test group $tg in $testdir"
     for t in $TESTDIR/$tg-*.sh; do
         if [[ $t == *-post.sh ]]; then
-          wait
-          testing_run_test "$t" "true"
+            wait
+            testing_run_test "$t"
         else
-          testing_run_test "$t" "true" &
+            testing_run_test "$t" &
         fi
     done
     wait
     echo "+++++ $(date): finished test group $tg in $testdir"
     printf "Test Group Time $tg: %s secs\n" "$(($(date +%s) - int_start))"
 
-    echo "Porch Controller logs"
-    kubectl logs deployment/porch-controllers -n porch-system --since "$(($(date +%s) - int_start))s" | sed -e '/PackageVariant/!d;/resources changed/!d'
+    if [[ ${DEBUG:-false} == "true" ]]; then
+        echo "Porch Controller logs"
+        kubectl logs deployment/porch-controllers -n porch-system --since "$(($(date +%s) - int_start))s" | sed -e '/PackageVariant/!d;/resources changed/!d'
+    fi
 }
