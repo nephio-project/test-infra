@@ -18,7 +18,7 @@ set -o nounset
 [[ ${DEBUG:-false} != "true" ]] || set -o xtrace
 
 # Set the new values for maxSessions and maxNFConnections as parameters
-new_capacity_values=${1:1000,2:10}
+new_capacity_values=${1:1001,2:11}
 
 export HOME=${HOME:-/home/ubuntu/}
 export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
