@@ -34,9 +34,7 @@ k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "network"
 ## Apply the network topology
 k8s_apply "$kubeconfig" "$TESTDIR/003-secret.yaml"
 
-export LEAF_IP=$(docker inspect net-free5gc-net-leaf -f '{{.NetworkSettings.Networks.kind.IPAddress}}')
-
-envsubst <"$TESTDIR/003-network-topo.tmpl" >"$TESTDIR/003-network-topo.yaml"
+$E2EDIR/provision/hacks/network-topo.sh
 
 k8s_apply "$kubeconfig" "$TESTDIR/003-network-topo.yaml"
 regional_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
