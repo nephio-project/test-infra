@@ -126,3 +126,41 @@ function k8s_exec {
     kubectl --kubeconfig $kubeconfig -n $resource_namespace exec $resource_name -- /bin/bash -c "$command"
     return $?
 }
+function k8s_check_scale {
+    
+    local NF=$1
+    local metric=$2
+    local previous=$3
+    local current=$4
+
+
+    if [ "$metric" == "CPU" ]; then   
+        if [[ $current == *"m"* ]]; then
+            current="${current//m/}"
+            echo "Current : $current"
+     
+            echo "$NF - Comparing the new $metric after scaling"
+            if [ "$previous" -ge  "$current" ]; then
+                echo "$NF $metric scaling Failed"
+                exit 1
+            fi
+                echo "$NF - $metric Pod Scaling Successful"
+        else
+            previous=$(echo "scale=5; $previous / 1000" | bc )
+            echo "Previous after scaling : $previous"
+            echo "$NF - Comparing the new $metric after scaling"
+            if (( $(echo "$previous >= $current" | bc -l) )); then 
+                echo "$NF $metric scaling Failed"
+                exit 1
+            fi
+            echo "$NF - $metric Pod Scaling Successful"
+        fi 
+    elif [ "$metric" == "Memory" ]; then
+        echo "$NF - Comparing the new $metric after scaling"
+        if [ "$previous" -ge  "$current" ]; then
+            echo "$NF $metric scaling Failed"
+            exit 1
+        fi
+        echo "$NF - $metric Pod Scaling Successful"
+    fi
+}

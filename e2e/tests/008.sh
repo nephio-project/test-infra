@@ -29,18 +29,6 @@ source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
-function _check_scale {
-    local metric=$1
-    local previous=$2
-    local current=$3
-
-    echo "UPF - Comparing the new $metric after scaling"
-    if [ "$previous" -ge "$current" ]; then
-        echo "UPF $metric scaling Failed"
-        exit 1
-    fi
-    echo "UPF - $metric Pod Scaling Successful"
-}
 
 function _get_first_container_cpu {
     local kubeconfig=$1
@@ -48,7 +36,7 @@ function _get_first_container_cpu {
     local pod_id=$3
 
     # we probably need to convert these to some uniform units
-    kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath='{range .spec.containers[*]}{.resources.requests.cpu}{"\n"}{end}' | head -1 | sed 's/m$//'
+    kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath='{range .spec.containers[*]}{.resources.requests.cpu}{"\n"}{end}' | head -1
 }
 
 function _get_first_container_memory {
@@ -145,7 +133,7 @@ for cluster in "edge01" "edge02"; do
 
     echo "After Scaling  $after_scaling_cpu $after_scaling_memory"
 
-    _check_scale "CPU" $current_cpu $after_scaling_cpu
-    _check_scale "Memory" $current_memory $after_scaling_memory
+    k8s_check_scale "UPF" "CPU" $current_cpu $after_scaling_cpu
+    k8s_check_scale "UPF" "Memory" $current_memory $after_scaling_memory
 
 done
