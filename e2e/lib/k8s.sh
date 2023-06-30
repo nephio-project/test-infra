@@ -127,40 +127,15 @@ function k8s_exec {
     return $?
 }
 
-function _k8s_quantity_factor {
+function _k8s_absolute_unit {
     local value=$1
-    local factor=1
 
     # See https://kubernetes.io/docs/reference/kubernetes-api/common-definitions/quantity/
-    if [[ $value == *Ki* ]]; then
-        factor=1024
-    elif [[ $value == *Mi* ]]; then
-        factor=$(expr 1024 '*' 1024)
-    elif [[ $value == *Gi* ]]; then
-        factor=$(expr 1024 '*' 1024 '*' 1024)
-    elif [[ $value == *Ti* ]]; then
-        factor=$(expr 1024 '*' 1024 '*' 1024 '*' 1024)
-    elif [[ $value == *Pi* ]]; then
-        factor=$(expr 1024 '*' 1024 '*' 1024 '*' 1024 '*' 1024)
-    elif [[ $value == *Ei* ]]; then
-        factor=$(expr 1024 '*' 1024 '*' 1024 '*' 1024 '*' 1024 '*' 1024)
-    elif [[ $value == *K* ]]; then
-        factor=1000
-    elif [[ $value == *M* ]]; then
-        factor=$(expr 1000 '*' 1000)
-    elif [[ $value == *G* ]]; then
-        factor=$(expr 1000 '*' 1000 '*' 1000)
-    elif [[ $value == *T* ]]; then
-        factor=$(expr 1000 '*' 1000 '*' 1000 '*' 1000)
-    elif [[ $value == *P* ]]; then
-        factor=$(expr 1000 '*' 1000 '*' 1000 '*' 1000 '*' 1000)
-    elif [[ $value == *E* ]]; then
-        factor=$(expr 1000 '*' 1000 '*' 1000 '*' 1000 '*' 1000 '*' 1000)
-    elif [[ $value == *m* ]]; then
-        factor="0.001"
+    if [[ $value == *m* ]]; then
+        echo "${value//m/} * 0.001" | bc
+    else
+        echo "$value" | numfmt --from auto
     fi
-
-    echo $factor
 }
 
 function k8s_check_scale {
@@ -169,14 +144,8 @@ function k8s_check_scale {
     local previous_raw=$3
     local current_raw=$4
 
-    local current_factor=$(_k8s_quantity_factor $current_raw)
-    local previous_factor=$(_k8s_quantity_factor $previous_raw)
-
-    local current=$(echo "$current_raw" | tr -d '[a-zA-Z]')
-    local previous=$(echo "$previous_raw" | tr -d '[a-zA-Z]')
-
-    local current_scaled=$(echo "$current * $current_factor" | bc)
-    local previous_scaled=$(echo "$previous * $previous_factor" | bc)
+    local current_scaled=$(_k8s_absolute_unit $4)
+    local previous_scaled=$(_k8s_absolute_unit $3)
     local success=$(echo "$previous_scaled < $current_scaled" | bc)
 
     echo "Current : $current_raw ($current_scaled), Previous: $previous_raw ($previous_scaled)"
@@ -188,18 +157,11 @@ function k8s_check_scale {
     echo "$NF - $metric Pod Scaling Successful"
 }
 
-function k8s_get_first_container_cpu_requests {
+function k8s_get_first_container_requests {
     local kubeconfig=$1
     local namespace=$2
     local pod_id=$3
+    local resource_type=$4
 
-    kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath='{.spec.containers[0].resources.requests.cpu}'
-}
-
-function k8s_get_first_container_memory_requests {
-    local kubeconfig=$1
-    local namespace=$2
-    local pod_id=$3
-
-    kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath='{.spec.containers[0].resources.requests.memory}'
+    kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath="{.spec.containers[0].resources.requests.$resource_type}"
 }

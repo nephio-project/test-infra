@@ -41,10 +41,10 @@ fi
 
 echo "Getting CPU for $smf_pod_id"
 #If the pod exists, Get the current CPU and Memory limit
-current_cpu=$(k8s_get_first_container_cpu_requests $cluster_kubeconfig free5gc-cp $smf_pod_id)
+current_cpu=$(k8s_get_first_container_requests $cluster_kubeconfig free5gc-cp $smf_pod_id "cpu")
 
 echo "Getting memory for $smf_pod_id"
-current_memory=$(k8s_get_first_container_memory_requests $cluster_kubeconfig free5gc-cp $smf_pod_id)
+current_memory=$(k8s_get_first_container_requests $cluster_kubeconfig free5gc-cp $smf_pod_id "memory")
 
 echo "Current CPU $current_cpu"
 echo "Current Memory $current_memory"
@@ -74,7 +74,7 @@ kpt alpha rpkg push -n default "$smf_pkg_rev" $ws
 
 echo "Proposing update"
 kpt alpha rpkg propose -n default "$smf_pkg_rev"
-sleep 5
+k8s_wait_exists "$kubeconfig" 600 "default" "packagerev" "$smf_pkg_rev"
 
 echo "Approving update"
 kpt alpha rpkg approve -n default "$smf_pkg_rev"
@@ -103,10 +103,10 @@ fi
 k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc-cp" "deployment" "smf-regional"
 
 echo "Getting CPU for $smf_pod_id_scale"
-after_scaling_cpu=$(k8s_get_first_container_cpu_requests $cluster_kubeconfig free5gc-cp $smf_pod_id_scale)
+after_scaling_cpu=$(k8s_get_first_container_requests $cluster_kubeconfig free5gc-cp $smf_pod_id_scale "cpu")
 
 echo "Getting Memory for $smf_pod_id_scale"
-after_scaling_memory=$(k8s_get_first_container_memory_requests $cluster_kubeconfig free5gc-cp $smf_pod_id_scale)
+after_scaling_memory=$(k8s_get_first_container_requests $cluster_kubeconfig free5gc-cp $smf_pod_id_scale "memory")
 
 echo "After Scaling  $after_scaling_cpu $after_scaling_memory"
 
