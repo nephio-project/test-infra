@@ -40,6 +40,13 @@
     - bootstrap
     - install
   tasks:
+    - name: Grant Docker permissions to user
+      ansible.builtin.user:
+        name: "{{ ansible_user_id }}"
+        groups: docker
+        append: true
+      become: true
+      when: ( container_engine is not defined ) or ( container_engine == "docker" )
     - name: Deploy repositories
       ansible.builtin.include_role:
         name: kpt

@@ -1,3 +1,4 @@
 ansible # GPLv3
 jmespath # MIT
 pygithub # LGPL
+mitogen # BSD
