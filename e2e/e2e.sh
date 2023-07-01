@@ -17,7 +17,7 @@ export HOME=${HOME:-/home/ubuntu/}
 export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
 export TESTDIR=${TESTDIR:-$E2EDIR/tests}
 
-export PARALLEL=${1:-false}
+export PARALLEL=${1:-true}
 
 source "$E2EDIR/lib/testing.sh"
 
