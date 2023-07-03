@@ -18,7 +18,7 @@ Available variables are listed below, along with default values (see defaults/ma
 | host_min_cpu_ram         | no       | 16         |                           | Minimum RAM required (GB)                                     |
 | host_min_root_disk_space | no       | 50         |                           | Minimum disk space required (GB)                              |
 | container_engine         | no       | docker     | docker                    | Container engine utilized for the management cluster creation |
-| kubernetes_version       | no       | v1.26.3    |                           | Kubernetes version used for the management cluster            |
+| kubernetes_version       | no       | v1.27.1    |                           | Kubernetes version used for the management cluster            |
 | gitea_postgres_password  | no       | c2VjcmV0   |                           | `postgres-password` secret value for gitea database service   |
 | gitea_db_password        | no       | c2VjcmV0   |                           | `password` secret value for gitea service                     |
 | gitea_username           | no       | nephio     |                           | Gitea admin user name                                         |
