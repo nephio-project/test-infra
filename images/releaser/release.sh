@@ -13,4 +13,4 @@ echo $repo
 
 oras tag docker.io/"$1" $digest
 
-oras push --artifact-type sbom/example docker.io/$repo:digest.sbom $digest.sbom
+oras push --artifact-type sbom/example docker.io/$repo:$digest.sbom $digest.sbom
