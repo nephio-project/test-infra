@@ -51,15 +51,21 @@ ansible_ssh_common_args = -o ControlMaster=auto -o ControlPersist=30m -o Connect
 retries=2
 
 [defaults]
+# Log Path
+log_path = /var/log/deploy_sandbox.log
 # Increase the forks
 forks = 20
 # Enable mitogen
 strategy_plugins = $(dirname "$(sudo find / -name mitogen_linear.py | head -n 1)")
 # Enable timing information
-callback_whitelist = timer, profile_tasks
+callbacks_enabled = timer, profile_tasks, profile_roles
+# The playbooks is only run on the implicit localhost.
+# Silence warning about empty hosts inventory.
+localhost_warning = False
+deprecation_warnings = False
 
 # Disable host key checking
-host_key_checking=False
+host_key_checking = False
 
 # Enable facts caching mechanism
 gathering = smart
