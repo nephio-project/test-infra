@@ -19,7 +19,7 @@ export TESTDIR=${TESTDIR:-$E2EDIR/tests}
 export LIBDIR=${LIBDIR:-$E2EDIR/lib}
 source "${LIBDIR}/k8s.sh"
 kubeconfig="$HOME/.kube/config"
-for cluster in $(kubectl get cluster -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --sort-by=.metadata.name --kubeconfig "$kubeconfig"); do
+for cluster in $(kubectl get clusters.cluster.x-k8s.io -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --sort-by=.metadata.name --kubeconfig "$kubeconfig"); do
     _kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "$cluster")
     workers=$(kubectl get nodes -l node-role.kubernetes.io/control-plane!= -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --kubeconfig "$_kubeconfig")
     for worker in $workers; do
