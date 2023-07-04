@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 digest_raw=$(crane digest "$1")
-digest=$(echo $digest_raw| sed s/:/-/g)
+digest=$(echo "${digest_raw//:/-}")
 echo "Image digest: $digest_raw"
 echo $digest_raw > $ARTIFACTS/trivy.log
 trivy image "$1" >> $ARTIFACTS/trivy.log 2>&1
