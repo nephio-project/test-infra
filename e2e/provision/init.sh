@@ -86,7 +86,12 @@ if [ ! -d "$REPO_DIR" ]; then
     runuser -u "$NEPHIO_USER" git clone "$REPO" "$REPO_DIR"
     if [[ $BRANCH != "main" ]]; then
         pushd "$REPO_DIR" >/dev/null
-        runuser -u "$NEPHIO_USER" -- git checkout -b "$BRANCH" --track "origin/$BRANCH"
+        TAG=$(git tag --list $BRANCH)
+        if [[ $TAG == $BRANCH ]]; then
+            runuser -u "$NEPHIO_USER" -- git checkout --detach "$TAG"
+        else
+            runuser -u "$NEPHIO_USER" -- git checkout -b "$BRANCH" --track "origin/$BRANCH"
+        fi
         popd >/dev/null
     fi
 fi
