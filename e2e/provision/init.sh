@@ -86,7 +86,7 @@ if [ ! -d "$REPO_DIR" ]; then
     runuser -u "$NEPHIO_USER" git clone "$REPO" "$REPO_DIR"
     if [[ $BRANCH != "main" ]]; then
         pushd "$REPO_DIR" >/dev/null
-        TAG=$(runuser -u "$NEPHIO_USER" git tag --list $BRANCH)
+        TAG=$(runuser -u "$NEPHIO_USER" -- git tag --list $BRANCH)
         if [[ $TAG == $BRANCH ]]; then
             runuser -u "$NEPHIO_USER" -- git checkout --detach "$TAG"
         else
