@@ -18,6 +18,7 @@ mock_modules:
   - kpt
 mock_roles:
   - andrewrothstein.kubectl
+  - andrewrothstein.kind
   - andrewrothstein.docker_engine
   - andrewrothstein.podman
   - andrewrothstein.kpt
