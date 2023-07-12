@@ -122,17 +122,33 @@
   ansible.builtin.include_role:
     name: kpt
   loop:
-    - {pkg: metallb, version: metallb/v1, namespaces: [metallb-system]}
-    - {pkg: metallb-sandbox-config, version: metallb-sandbox-config/v1, namespaces: []}
-    - {pkg: cert-manager, version: cert-manager/v2, namespaces: [cert-manager]}
-    - {pkg: gitea, version: gitea/v3, namespaces: [gitea]}
-    - {pkg: cluster-capi, version: cluster-capi/v4, namespaces: [capi-system, capi-kubeadm-control-plane-system, capi-kubeadm-bootstrap-system]}
-    - {pkg: cluster-capi-infrastructure-docker, version: cluster-capi-infrastructure-docker/v1, namespaces: [capd-system]}
-    - {pkg: cluster-capi-kind-docker-templates, version: cluster-capi-kind-docker-templates/v1, namespaces: [default]}
-    - {pkg: resource-backend, version: resource-backend/v2, namespaces: [backend-system]}
+    - {pkg: metallb, version: metallb/v1}
+    - {pkg: metallb-sandbox-config, version: metallb-sandbox-config/v1}
+    - {pkg: cert-manager, version: cert-manager/v2}
+    - {pkg: gitea, version: gitea/v3}
+    - {pkg: cluster-capi, version: cluster-capi/v4}
+    - {pkg: cluster-capi-infrastructure-docker, version: cluster-capi-infrastructure-docker/v1}
+    - {pkg: cluster-capi-kind-docker-templates, version: cluster-capi-kind-docker-templates/v1}
+    - {pkg: resource-backend, version: resource-backend/v2}
   vars:
     repo_uri: https://github.com/nephio-project/nephio-example-packages
     pkg: "{{ item.pkg }}"
     version: "{{ item.version }}"
-    namespaces: "{{ item.namespaces }}"
+    context: kind-kind
+
+- name: Wait for deployments
+  ansible.builtin.include_tasks: wait_deployments.yml
+  loop:
+    - metallb-system
+    - cert-manager
+    - gitea
+    - capi-system
+    - capi-kubeadm-control-plane-system
+    - capi-kubeadm-bootstrap-system
+    - capd-system
+    - default
+    - backend-system
+  loop_control:
+    loop_var: namespace
+  vars:
     context: kind-kind

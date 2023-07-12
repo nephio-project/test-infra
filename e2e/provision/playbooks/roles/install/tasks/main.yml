@@ -12,16 +12,29 @@
   ansible.builtin.include_role:
     name: kpt
   loop:
-    - {pkg: porch-dev, version: porch-dev/v2, namespaces: [porch-fn-system, porch-system]}
-    - {pkg: nephio-controllers, version: nephio-controllers/v5, namespaces: [nephio-system]}
-    - {pkg: configsync, version: configsync/v1, namespaces: [config-management-monitoring, config-management-system, resource-group-system]}
-    - {pkg: network-config, version: network-config/v1, namespaces: []}
-    - {pkg: nephio-stock-repos, version: nephio-stock-repos/v1, namespaces: []}
+    - {pkg: porch-dev, version: porch-dev/v2}
+    - {pkg: nephio-controllers, version: nephio-controllers/v5}
+    - {pkg: configsync, version: configsync/v1}
+    - {pkg: network-config, version: network-config/v1}
+    - {pkg: nephio-stock-repos, version: nephio-stock-repos/v1}
   vars:
     repo_uri: https://github.com/nephio-project/nephio-example-packages.git
     pkg: "{{ item.pkg }}"
     version: "{{ item.version }}"
-    namespaces: "{{ item.namespaces }}"
+    context: kind-kind
+
+- name: Wait for deployments
+  ansible.builtin.include_tasks: wait_deployments.yml
+  loop:
+    - porch-fn-system
+    - porch-system
+    - nephio-system
+    - config-management-monitoring
+    - config-management-system
+    - resource-group-system
+  loop_control:
+    loop_var: namespace
+  vars:
     context: kind-kind
 
 - name: Create gitea user password in nephio-system namespace
@@ -43,11 +56,14 @@
 - name: Deploy Nephio webui
   ansible.builtin.include_role:
     name: kpt
-  loop:
-    - {pkg: nephio-webui, version: v7, namespaces: [nephio-webui]}
   vars:
     repo_uri: https://github.com/nephio-project/nephio-packages.git
-    pkg: "{{ item.pkg }}"
-    version: "{{ item.version }}"
-    namespaces: "{{ item.namespaces }}"
+    pkg: nephio-webui
+    version: v7
     context: kind-kind
+
+- name: Wait for Nephio webui deployment
+  ansible.builtin.include_tasks: wait_deployments.yml
+  vars:
+    context: kind-kind
+    namespace: nephio-webui

@@ -51,15 +51,14 @@
       ansible.builtin.include_role:
         name: kpt
       loop:
-        - {pkg: repository, version: repository/v3, namespaces: [], dest: /tmp/repository/mgmt}
-        - {pkg: rootsync, version: rootsync/v3, namespaces: [], dest: /tmp/rootsync/mgmt}
-        - {pkg: repository, version: repository/v3, namespaces: [], dest: /tmp/repository/mgmt-staging}
+        - {pkg: repository, version: repository/v3, dest: /tmp/repository/mgmt}
+        - {pkg: rootsync, version: rootsync/v3, dest: /tmp/rootsync/mgmt}
+        - {pkg: repository, version: repository/v3, dest: /tmp/repository/mgmt-staging}
       vars:
         repo_uri: https://github.com/nephio-project/nephio-example-packages
         local_dest_directory: "{{ item.dest }}"
         pkg: "{{ item.pkg }}"
         version: "{{ item.version }}"
-        namespaces: "{{ item.namespaces }}"
         for_deployment: true
         context: kind-kind
     - name: Install container lab tool

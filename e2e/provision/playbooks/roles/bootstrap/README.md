@@ -97,4 +97,6 @@ flowchart TD
     W --> Y(Create gitea namespace)
     Y --> Z(Create gitea postgresql user password)
     Z --> AA(Deploy base packages)
+    AA --> |Wait for deployments| AB(Get deployment resources)
+    AB --> AC(Wait for deployments)
 ```
