@@ -61,6 +61,17 @@
         version: "{{ item.version }}"
         for_deployment: true
         context: kind-kind
+        kpt_async: 900
+        kpt_poll: 0
+    - name: Wait for packages to be applied
+      ansible.builtin.async_status:
+        jid: "{{ item.ansible_job_id }}"
+      register: job_result
+      with_items: "{{ all_kpt_apply }}"
+      when: all_kpt_apply is defined
+      until: job_result.finished
+      retries: 90
+      delay: 10
     - name: Install container lab tool
       become: true
       ansible.builtin.apt:

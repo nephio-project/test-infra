@@ -69,11 +69,13 @@ None
 
 ```mermaid
 flowchart TD
-    A[main.yml] --> B(Deploy Nephio packages)
-    B --> |Wait for deployments| C(Get deployment resources)
-    C --> D(Wait for deployments)
-    D --> E(Create gitea user password in nephio-system namespace)
-    E --> F(Deploy Nephio webui)
-    F --> |Wait for Nephio webui deployment| G(Get deployment resources)
-    G --> H(Wait for deployments)
+    A[main.yml] --> B(Init job ids array)
+    B --> C(Deploy Nephio packages)
+    C --> D(Wait for packages to be applied)
+    D --> |Wait for deployments| E(Get deployment resources)
+    E --> F(Wait for deployments)
+    F --> G(Create gitea user password in nephio-system namespace)
+    G --> H(Deploy Nephio webui)
+    H --> |Wait for Nephio webui deployment| I(Get deployment resources)
+    I --> J(Wait for deployments)
 ```

@@ -8,20 +8,37 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
+- name: Init job ids array
+  ansible.builtin.set_fact:
+    all_kpt_apply: []
+
 - name: Deploy Nephio packages
   ansible.builtin.include_role:
     name: kpt
   loop:
-    - {pkg: porch-dev, version: porch-dev/v2}
-    - {pkg: nephio-controllers, version: nephio-controllers/v5}
-    - {pkg: configsync, version: configsync/v1}
-    - {pkg: network-config, version: network-config/v1}
-    - {pkg: nephio-stock-repos, version: nephio-stock-repos/v1}
+    - {pkg: porch-dev, version: porch-dev/v2, async: 480, poll: 5}
+    - {pkg: nephio-controllers, version: nephio-controllers/v5, async: 480, poll: 5}
+    - {pkg: configsync, version: configsync/v1, async: 240, poll: 5}
+    - {pkg: network-config, version: network-config/v1, async: 480, poll: 0}
+    - {pkg: nephio-stock-repos, version: nephio-stock-repos/v1, async: 60, poll: 0}
   vars:
     repo_uri: https://github.com/nephio-project/nephio-example-packages.git
     pkg: "{{ item.pkg }}"
     version: "{{ item.version }}"
     context: kind-kind
+    reconcile_async: 10m
+    kpt_async: "{{ item.async }}"
+    kpt_poll: "{{ item.poll }}"
+
+- name: Wait for packages to be applied
+  ansible.builtin.async_status:
+    jid: "{{ item.ansible_job_id }}"
+  register: job_result
+  loop: "{{ all_kpt_apply }}"
+  when: all_kpt_apply is defined
+  until: job_result.finished
+  retries: 60
+  delay: 5
 
 - name: Wait for deployments
   ansible.builtin.include_tasks: wait_deployments.yml
@@ -61,6 +78,9 @@
     pkg: nephio-webui
     version: v7
     context: kind-kind
+    reconcile_timeout: 10m
+    kpt_async: 600
+    kpt_poll: 5
 
 - name: Wait for Nephio webui deployment
   ansible.builtin.include_tasks: wait_deployments.yml
