@@ -1,5 +1,0 @@
----
-- name: Deploy microk8s on host
-  hosts: all
-  roles:
-    - role: deploy_mk8s
