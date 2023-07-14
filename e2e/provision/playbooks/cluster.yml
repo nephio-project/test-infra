@@ -27,13 +27,13 @@
     - andrewrothstein.kind
     - andrewrothstein.kubectl
     - role: andrewrothstein.kpt
-      kpt_ver: '1.0.0-beta.32'
+      kpt_ver: '1.0.0-beta.38'
       kpt_checksums:
-        '1.0.0-beta.32':
-          linux_amd64: sha256:efda99796dafdfa9c4264dbe2eceb252518c4bba11b352228fdc5d7f40c48d8c
-          linux_arm64: sha256:adb379f71f77b31d263e75eed0749143fc6d8cab7e6e92c804045dc20f4464ae
-          darwin_amd64: sha256:94b38117bd0e9a51363fb45be4c7eff4f78973b17e0277806c2b66f631b25388
-          darwin_arm64: sha256:e330662b4e8637301d4a9464708068dcc4bfd46b9e142987d1b0b1ece4238aa7
+        '1.0.0-beta.38':
+          linux_amd64: sha256:e58b13b6069c70a5f0c4154aa2a548b09a9d21b9e9e7c2d935807f9943d92db4
+          linux_arm64: sha256:168fd10c69e446e8e9d408a338e937b51ba4d7bd3bf986691c1e97c52a1e3d7d
+          darwin_amd64: sha256:488943eca09e2a994a2a57d85729e49af241eac69bd0e3e6c1ad76507bcb6357
+          darwin_arm64: sha256:8673953ad01ae806d93b5fffcaf42482ddbace7d0cd81424391b57d6c7ad6665
     - role: darkwizard242.cni
       become: true
       cni_plugins_dir: /opt/cni/bin
