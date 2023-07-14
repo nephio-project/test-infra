@@ -12,7 +12,7 @@
   hosts: vm
   vars:
     container_engine: docker
-    clab_version: 0.41.2
+    clab_version: 0.42.0
   pre_tasks:
     - name: Install kubernetes python package
       become: true
