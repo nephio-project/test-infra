@@ -118,21 +118,54 @@
         password: "{{ gitea_password }}"
   no_log: true
 
+- name: Init job ids array
+  ansible.builtin.set_fact:
+    all_kpt_apply: []
+
 - name: Deploy base packages
   ansible.builtin.include_role:
     name: kpt
   loop:
-    - {pkg: metallb, version: metallb/v1, namespaces: [metallb-system]}
-    - {pkg: metallb-sandbox-config, version: metallb-sandbox-config/v1, namespaces: []}
-    - {pkg: cert-manager, version: cert-manager/v2, namespaces: [cert-manager]}
-    - {pkg: gitea, version: gitea/v3, namespaces: [gitea]}
-    - {pkg: cluster-capi, version: cluster-capi/v4, namespaces: [capi-system, capi-kubeadm-control-plane-system, capi-kubeadm-bootstrap-system]}
-    - {pkg: cluster-capi-infrastructure-docker, version: cluster-capi-infrastructure-docker/v1, namespaces: [capd-system]}
-    - {pkg: cluster-capi-kind-docker-templates, version: cluster-capi-kind-docker-templates/v1, namespaces: [default]}
-    - {pkg: resource-backend, version: resource-backend/v2, namespaces: [backend-system]}
+    - {pkg: cert-manager, version: cert-manager/v2, async: 660, poll: 0}
+    - {pkg: gitea, version: gitea/v3, async: 780, poll: 0}
+    - {pkg: resource-backend, version: resource-backend/v2, async: 780, poll: 0}
+    - {pkg: metallb, version: metallb/v1, async: 1020, poll: 5}
+    - {pkg: metallb-sandbox-config, version: metallb-sandbox-config/v1, async: 660, poll: 0}
+    - {pkg: cluster-capi, version: cluster-capi/v4, async: 900, poll: 5}
+    - {pkg: cluster-capi-infrastructure-docker, version: cluster-capi-infrastructure-docker/v1, async: 780, poll: 5}
+    - {pkg: cluster-capi-kind-docker-templates, version: cluster-capi-kind-docker-templates/v1, async: 1500, poll: 0}
   vars:
     repo_uri: https://github.com/nephio-project/nephio-example-packages
     pkg: "{{ item.pkg }}"
     version: "{{ item.version }}"
-    namespaces: "{{ item.namespaces }}"
+    context: kind-kind
+    reconcile_async: 10m
+    kpt_async: "{{ item.async }}"
+    kpt_poll: "{{ item.poll }}"
+
+- name: Wait for packages to be applied
+  ansible.builtin.async_status:
+    jid: "{{ item.ansible_job_id }}"
+  register: job_result
+  with_items: "{{ all_kpt_apply }}"
+  when: all_kpt_apply is defined
+  until: job_result.finished
+  retries: 100
+  delay: 15
+
+- name: Wait for deployments
+  ansible.builtin.include_tasks: wait_deployments.yml
+  loop:
+    - metallb-system
+    - cert-manager
+    - gitea
+    - capi-system
+    - capi-kubeadm-control-plane-system
+    - capi-kubeadm-bootstrap-system
+    - capd-system
+    - default
+    - backend-system
+  loop_control:
+    loop_var: namespace
+  vars:
     context: kind-kind

@@ -96,5 +96,9 @@ flowchart TD
     V --> W(Wait for Kind Nodes to become ready)
     W --> Y(Create gitea namespace)
     Y --> Z(Create gitea postgresql user password)
-    Z --> AA(Deploy base packages)
+    Z --> AA(Init job ids array)
+    AA --> AB(Deploy base packages)
+    AB --> AC(Wait for packages to be applied)
+    AC --> |Wait for deployments| AD(Get deployment resources)
+    AD --> AF(Wait for deployments)
 ```

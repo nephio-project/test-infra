@@ -51,17 +51,27 @@
       ansible.builtin.include_role:
         name: kpt
       loop:
-        - {pkg: repository, version: repository/v3, namespaces: [], dest: /tmp/repository/mgmt}
-        - {pkg: rootsync, version: rootsync/v3, namespaces: [], dest: /tmp/rootsync/mgmt}
-        - {pkg: repository, version: repository/v3, namespaces: [], dest: /tmp/repository/mgmt-staging}
+        - {pkg: repository, version: repository/v3, dest: /tmp/repository/mgmt}
+        - {pkg: rootsync, version: rootsync/v3, dest: /tmp/rootsync/mgmt}
+        - {pkg: repository, version: repository/v3, dest: /tmp/repository/mgmt-staging}
       vars:
         repo_uri: https://github.com/nephio-project/nephio-example-packages
         local_dest_directory: "{{ item.dest }}"
         pkg: "{{ item.pkg }}"
         version: "{{ item.version }}"
-        namespaces: "{{ item.namespaces }}"
         for_deployment: true
         context: kind-kind
+        kpt_async: 900
+        kpt_poll: 0
+    - name: Wait for packages to be applied
+      ansible.builtin.async_status:
+        jid: "{{ item.ansible_job_id }}"
+      register: job_result
+      with_items: "{{ all_kpt_apply }}"
+      when: all_kpt_apply is defined
+      until: job_result.finished
+      retries: 90
+      delay: 10
     - name: Install container lab tool
       become: true
       ansible.builtin.apt:
