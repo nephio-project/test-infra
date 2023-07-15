@@ -12,41 +12,77 @@
   hosts: vm
   vars:
     container_engine: docker
-    clab_version: 0.42.0
+    clab:
+      version: 0.42.0
+      download_url: "https://github.com/srl-labs/containerlab/releases/download"
   pre_tasks:
     - name: Install kubernetes python package
       become: true
       ansible.builtin.pip:
         name: kubernetes==26.1.0
-  roles:
-    - role: andrewrothstein.docker_engine
+    - name: Install Docker Engine
       become: true
-      when: ( container_engine is not defined ) or ( container_engine == "docker" )
-    - role: andrewrothstein.podman
+      when: (container_engine is not defined) or (container_engine == "docker")
+      block:
+        - name: Install docker binaries
+          ansible.builtin.include_role:
+            name: andrewrothstein.docker_engine
+        - name: Grant Docker permissions to user
+          ansible.builtin.user:
+            name: "{{ ansible_user_id }}"
+            groups: docker
+            append: true
+    - name: Install podman binaries
+      ansible.builtin.include_role:
+        name: andrewrothstein.podman
       when: container_engine == "podman"
-    - andrewrothstein.kind
-    - andrewrothstein.kubectl
-    - role: andrewrothstein.kpt
-      kpt_ver: '1.0.0-beta.38'
-      kpt_checksums:
-        '1.0.0-beta.38':
-          linux_amd64: sha256:e58b13b6069c70a5f0c4154aa2a548b09a9d21b9e9e7c2d935807f9943d92db4
-          linux_arm64: sha256:168fd10c69e446e8e9d408a338e937b51ba4d7bd3bf986691c1e97c52a1e3d7d
-          darwin_amd64: sha256:488943eca09e2a994a2a57d85729e49af241eac69bd0e3e6c1ad76507bcb6357
-          darwin_arm64: sha256:8673953ad01ae806d93b5fffcaf42482ddbace7d0cd81424391b57d6c7ad6665
-    - role: darkwizard242.cni
+    - name: Install KinD command-line
+      ansible.builtin.include_role:
+        name: andrewrothstein.kind
+    - name: Install kubectl command-line
+      ansible.builtin.include_role:
+        name: andrewrothstein.kubectl
+    - name: Install kpt command-line
+      ansible.builtin.include_role:
+        name: andrewrothstein.kpt
+      vars:
+        kpt_ver: '1.0.0-beta.38'
+        kpt_checksums:
+          '1.0.0-beta.38':
+            linux_amd64: sha256:e58b13b6069c70a5f0c4154aa2a548b09a9d21b9e9e7c2d935807f9943d92db4
+            linux_arm64: sha256:168fd10c69e446e8e9d408a338e937b51ba4d7bd3bf986691c1e97c52a1e3d7d
+            darwin_amd64: sha256:488943eca09e2a994a2a57d85729e49af241eac69bd0e3e6c1ad76507bcb6357
+            darwin_arm64: sha256:8673953ad01ae806d93b5fffcaf42482ddbace7d0cd81424391b57d6c7ad6665
+    - name: Download CNI plugins
+      ansible.builtin.include_role:
+        name: darkwizard242.cni
+      vars:
+        ansible_become: true
+        cni_plugins_dir: /opt/cni/bin
+    - name: Install container lab tool
       become: true
-      cni_plugins_dir: /opt/cni/bin
+      when: ansible_architecture in ('arm64', 'x86_64')
+      block:
+        - name: Install container lab on Ubuntu family OS
+          ansible.builtin.apt:
+            deb: "{{ clab.download_url }}/v{{ clab.version }}/containerlab_{{ clab.version }}_linux_{{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}.deb"
+          when: ansible_os_family == 'Debian'
+        - name: Install container lab on RedHat family OS
+          ansible.builtin.yum:
+            name: "{{ clab.download_url }}/v{{ clab.version }}/containerlab_{{ clab.version }}_linux_{{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}.rpm"
+            state: present
+            disable_gpg_check: true
+          when: ansible_os_family == 'RedHat'
+        - name: Configure SELinux for clab
+          ansible.posix.seboolean:
+            name: selinuxuser_execmod
+            state: true
+            persistent: true
+          when: ansible_os_family == 'RedHat'
+  roles:
     - bootstrap
     - install
   tasks:
-    - name: Grant Docker permissions to user
-      ansible.builtin.user:
-        name: "{{ ansible_user_id }}"
-        groups: docker
-        append: true
-      become: true
-      when: ( container_engine is not defined ) or ( container_engine == "docker" )
     - name: Deploy repositories
       ansible.builtin.include_role:
         name: kpt
@@ -72,25 +108,6 @@
       until: job_result.finished
       retries: 90
       delay: 10
-    - name: Install container lab tool
-      become: true
-      ansible.builtin.apt:
-        deb: "https://github.com/srl-labs/containerlab/releases/download/v{{ clab_version }}/containerlab_{{ clab_version }}_linux_{{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}.deb"
-      when: ansible_os_family == 'Debian' and ansible_architecture in ('arm64', 'x86_64')
-    - name: Install container lab on RedHat family OS
-      block:
-        - name: Install container lab
-          ansible.builtin.yum:
-            name: "https://github.com/srl-labs/containerlab/releases/download/v{{ clab_version }}/containerlab_{{ clab_version }}_linux_{{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}.rpm"
-            state: present
-            disable_gpg_check: true
-        - name: Configure SELinux for clab
-          ansible.posix.seboolean:
-            name: selinuxuser_execmod
-            state: true
-            persistent: true
-      become: true
-      when: ansible_os_family == 'RedHat' and ansible_architecture in ('arm64', 'x86_64')
     - name: Wait for repositories
       kubernetes.core.k8s:
         context: kind-kind
