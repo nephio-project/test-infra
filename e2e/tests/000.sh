@@ -27,3 +27,7 @@ source "${LIBDIR}/k8s.sh"
 cd /tmp/kpt-pkg/nephio-stock-repos
 kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- by-path='spec.git.repo' by-file-path='repo-nephio-example-packages.yaml' put-value='https://github.com/johnbelamaric/nephio-example-packages.git'
 kpt live apply
+
+cd /tmp/kpt-pkg/nephio-controllers
+kpt fn eval --image gcr.io/kpt-fn/set-image:unstable -- name=docker.io/nephio/nephio-operator newTag=jbelamaric
+kpt live apply
