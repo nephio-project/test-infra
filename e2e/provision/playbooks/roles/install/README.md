@@ -1,6 +1,6 @@
 # Install
 
-This ansible installs Nephio services on a target cluster.
+This role installs Nephio services on a target cluster.
 
 ## Requirements
 
@@ -48,6 +48,13 @@ None
         src: https://github.com/GoogleContainerTools/kpt/releases/download/v1.0.0-beta.38/kpt_linux_amd64-1.0.0-beta.38.tar.gz
         dest: /usr/local/bin/
         creates: /usr/local/bin/kpt
+    - name: Install Docker Engine
+      become: true
+      ansible.builtin.include_role:
+        name: andrewrothstein.docker_engine
+    - name: Install KinD command-line
+      ansible.builtin.include_role:
+        name: andrewrothstein.kind
     - name: Get k8s clusters
       become: true
       ansible.builtin.command: kind get clusters
@@ -58,10 +65,6 @@ None
       ansible.builtin.command: kind create cluster --image kindest/node:v1.27.1
       when: not 'kind' in kind_get_cluster.stdout
   roles:
-    - andrewrothstein.kind
-    - andrewrothstein.kubectl
-    - role: andrewrothstein.docker_engine
-      become: true
     - install
 ```
 
