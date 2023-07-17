@@ -109,7 +109,8 @@ options:
         type: str
     output:
         description:
-           - If specified, the output resources are written to provided location, if not specified, resources are modified in-place.
+           - If specified, the output resources are written to provided
+             location, if not specified, resources are modified in-place.
         required: false
         type: str
     results_dir:
@@ -119,7 +120,8 @@ options:
         type: str
     force:
         description:
-           - Forces the inventory values to be updated, even if they are already set.
+           - Forces the inventory values to be updated, even if they are
+             already set.
         required: false
         type: bool
     inventory_id:
@@ -129,12 +131,14 @@ options:
         type: str
     name:
         description:
-           - The name for the ResourceGroup resource that contains the inventory for the package.
+           - The name for the ResourceGroup resource that contains the
+             inventory for the package.
         required: false
         type: str
     namespace:
         description:
-           - The namespace for the ResourceGroup resource that contains the inventory for the package.
+           - The namespace for the ResourceGroup resource that contains the
+             inventory for the package.
         required: false
         type: str
     rg_file:
@@ -144,7 +148,9 @@ options:
         type: str
     dry_run:
         description:
-           - It true, kpt will validate the resources in the package and print which resources will be applied and which resources will be pruned, but no resources will be changed.
+           - It true, kpt will validate the resources in the package and print
+             which resources will be applied and which resources will be
+             pruned, but no resources will be changed.
         required: false
         type: bool
     field_manager:
@@ -155,17 +161,20 @@ options:
         default: kubectl
     force_conflicts:
         description:
-          - Force overwrite of field conflicts during apply due to different field managers.
+          - Force overwrite of field conflicts during apply due to different
+            field managers.
         required: false
         type: bool
     install_resource_group:
         description:
-          - Install the ResourceGroup CRD into the cluster if it isn't already available.
+          - Install the ResourceGroup CRD into the cluster if it isn't already
+            available.
         required: false
         type: bool
     inventory_policy:
         description:
-          - Determines how to handle overlaps between the package being currently applied and existing resources in the cluster.
+          - Determines how to handle overlaps between the package being
+            currently applied and existing resources in the cluster.
         required: false
         type: str
         choices:
@@ -182,12 +191,14 @@ options:
           - Orphan
     prune_timeout:
         description:
-          - The threshold for how long to wait for all pruned resources to be deleted before giving up.
+          - The threshold for how long to wait for all pruned resources to be
+            deleted before giving up.
         required: false
         type: str
     reconcile_timeout:
         description:
-          - The threshold for how long to wait for all resources to reconcile before giving up.
+          - The threshold for how long to wait for all resources to reconcile
+            before giving up.
         required: false
         type: str
     server_side:
@@ -197,7 +208,8 @@ options:
         type: bool
     show_status_events:
         description:
-          - The output will include the details on the reconciliation status for all resources.
+          - The output will include the details on the reconciliation status
+            for all resources.
         required: false
         type: bool
     context:
@@ -253,7 +265,8 @@ stdout:
     returned: changed
     type: str
 stdout_lines:
-    description: A list of strings, each containing one item per line from the original output.
+    description: A list of strings, each containing one item per line from the
+                 original output.
     returned: changed
     type: str
 stderr:
@@ -261,7 +274,8 @@ stderr:
     returned: changed
     type: str
 stderr_lines:
-    description: A list of strings, each containing one item per line from the original error.
+    description: A list of strings, each containing one item per line from the
+                 original error.
     returned: changed
     type: str
 """  # noqa: F841
@@ -288,7 +302,7 @@ class KptClient:
         self._module.exit_json(**result)
 
     # Show resources in the current directory.
-    def pkg_tree(self, directory, **kargs):
+    def pkg_tree(self, directory, **kwargs):
         cmd = [self._kpt_cmd_path, "pkg", "tree"]
         if directory:
             cmd.append(directory)
@@ -303,7 +317,7 @@ class KptClient:
         version,
         strategy,
         for_deployment,
-        **kargs
+        **kwargs
     ):
         cmd = [self._kpt_cmd_path, "pkg", "get"]
         cmd.append(
@@ -337,7 +351,7 @@ class KptClient:
 
     # Show differences between a local package and upstream.
     def pkg_diff(
-        self, pkg_path, version, diff_type, diff_tool, diff_tool_opts, **kargs
+        self, pkg_path, version, diff_type, diff_tool, diff_tool_opts, **kwargs
     ):
         cmd = [self._kpt_cmd_path, "pkg", "diff"]
         if pkg_path:
@@ -358,7 +372,7 @@ class KptClient:
 
     # Render a package.
     def fn_render(
-        self, pkg_path, allow_exec, image_pull_policy, output, results_dir, **kargs
+        self, pkg_path, allow_exec, image_pull_policy, output, results_dir, **kwargs
     ):
         cmd = [self._kpt_cmd_path, "fn", "render"]
         if pkg_path:
@@ -375,7 +389,7 @@ class KptClient:
 
     # Initialize a package with the information needed for inventory tracking.
     def live_init(
-        self, pkg_path, force, inventory_id, name, namespace, rg_file, context, **kargs
+        self, pkg_path, force, inventory_id, name, namespace, rg_file, context, **kwargs
     ):
         cmd = [self._kpt_cmd_path, "live", "init"]
         if pkg_path:
@@ -410,7 +424,7 @@ class KptClient:
         server_side,
         show_status_events,
         context,
-        **kargs
+        **kwargs
     ):
         cmd = [self._kpt_cmd_path, "live", "apply"]
         if pkg_path:
