@@ -1,0 +1,59 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- name: Init job ids array
+  ansible.builtin.set_fact:
+    all_kpt_apply: []
+
+- name: Create list of packages
+  ansible.builtin.set_fact:
+    cert_manager_pkgs: "{{ cert_manager.enabled | ternary(cert_manager.kpt.packages, []) }}"
+    gitea_pkgs: "{{ gitea.enabled | ternary(gitea.kpt.packages, []) }}"
+    resource_backend_pkgs: "{{ resource_backend.enabled | ternary(resource_backend.kpt.packages, []) }}"
+    metallb_pkgs: "{{ metallb.enabled | ternary(metallb.kpt.packages, []) }}"
+    cluster_api_pkgs: "{{ cluster_api.enabled | ternary(cluster_api.kpt.packages, []) }}"
+
+- name: Deploy base packages
+  ansible.builtin.include_role:
+    name: kpt
+  loop: "{{ cert_manager_pkgs + gitea_pkgs + resource_backend_pkgs + metallb_pkgs + cluster_api_pkgs }}"
+  vars:
+    repo_uri: "{{ item.repo_uri }}"
+    pkg: "{{ item.pkg }}"
+    version: "{{ item.version }}"
+    context: "{{ k8s.context }}"
+    kpt_async: "{{ item.async }}"
+    kpt_poll: "{{ item.poll }}"
+
+- name: Wait for packages to be applied
+  ansible.builtin.async_status:
+    jid: "{{ item.ansible_job_id }}"
+  register: job_result
+  with_items: "{{ all_kpt_apply }}"
+  when: all_kpt_apply is defined
+  until: job_result.finished
+  retries: 100
+  delay: 15
+
+- name: Create list of namespaces
+  ansible.builtin.set_fact:
+    cert_manager_namespaces: "{{ cert_manager.enabled | ternary(cert_manager.k8s.namespaces, []) }}"
+    gitea_namespaces: "{{ gitea.enabled | ternary(gitea.k8s.namespaces, []) }}"
+    resource_backend_namespaces: "{{ resource_backend.enabled | ternary(resource_backend.k8s.namespaces, []) }}"
+    metallb_namespaces: "{{ metallb.enabled | ternary(metallb.k8s.namespaces, []) }}"
+    cluster_api_namespaces: "{{ cluster_api.enabled | ternary(cluster_api.k8s.namespaces, []) }}"
+
+- name: Wait for deployments
+  ansible.builtin.include_tasks: wait-deployments.yml
+  loop: "{{ cert_manager_namespaces + gitea_namespaces + resource_backend_namespaces + metallb_namespaces + cluster_api_namespaces }}"
+  loop_control:
+    loop_var: namespace
+  vars:
+    context: "{{ k8s.context }}"

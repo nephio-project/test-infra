@@ -1,0 +1,65 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- name: Get k8s clusters
+  become: true
+  ansible.builtin.command: kind get clusters
+  register: bootstrap_kind_get_cluster
+  failed_when: (bootstrap_kind_get_cluster.rc not in [0, 1])
+  changed_when: false
+
+- name: Print kind_get_cluster value
+  ansible.builtin.debug:
+    var: bootstrap_kind_get_cluster
+
+- name: Create management cluster
+  become: true
+  ansible.builtin.command: kind create cluster --kubeconfig /tmp/kubeconfig --config=-
+  args:
+    stdin: |
+      kind: Cluster
+      apiVersion: kind.x-k8s.io/v1alpha4
+      nodes:
+        - role: control-plane
+          image: kindest/node:{{ k8s.version }}
+          extraMounts:
+            - hostPath: /var/run/{{ container_engine }}.sock
+              containerPath: /var/run/{{ container_engine }}.sock
+  when: not 'kind' in bootstrap_kind_get_cluster.stdout
+  changed_when: true
+
+- name: Create .kube directory
+  ansible.builtin.file:
+    path: "{{ ansible_user_dir }}/.kube"
+    state: directory
+    mode: '0755'
+
+- name: Copy root kubeconfig file
+  become: true
+  ansible.builtin.copy:
+    remote_src: true
+    src: /tmp/kubeconfig
+    dest: "{{ ansible_user_dir }}/.kube/config"
+    owner: "{{ ansible_user_uid }}"
+    group: "{{ ansible_user_gid }}"
+    mode: '0644'
+
+- name: Wait for Kind Nodes to become ready
+  kubernetes.core.k8s:
+    context: "{{ k8s.context }}"
+    definition:
+      apiVersion: v1
+      kind: Node
+      metadata:
+        name: kind-control-plane
+    wait: true
+    wait_condition:
+      type: Ready
+      status: true
