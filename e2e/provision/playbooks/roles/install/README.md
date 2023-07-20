@@ -12,10 +12,16 @@ This role installs Nephio services on a target cluster.
 
 Available variables are listed below, along with default values (see defaults/main.yml):
 
-| Variable                 | Required | Default    | Choices                   | Comments                                                      |
-|--------------------------|----------|------------|---------------------------|---------------------------------------------------------------|
-| gitea_username           | no       | nephio     |                           | Gitea admin user name                                         |
-| gitea_password           | no       | secret     |                           | Gitea admin password                                          |
+| Variable                   | Required | Default       | Choices | Comments                                                                |
+|----------------------------|----------|---------------|---------|-------------------------------------------------------------------------|
+| k8s.context                | no       | kind-kind     |         | Kubernetes context to create resources                                  |
+| gitea.k8s.username         | no       | nephio        |         | Gitea admin user name                                                   |
+| gitea.k8s.password         | no       | secret        |         | Gitea admin password                                                    |
+| nephio_pkg_version         | no       | v1.0.1-beta.1 |         | Default version for all kpt packages                                    |
+| nephio.k8s.namespaces      | no       |               |         | List of Kubernetes namespaces to watch for  Nephio deployment resources |
+| nephio.kpt.packages        | no       |               |         | List of Nephio kpt packages                                             |
+| nephio_webui.k8s.namespace | no       | nephio-webui  |         | Kubernetes namespace for Nephio WebUI resources                         |
+| nephio_webui.kpt.package   | no       |               |         | Nephio WebUI kpt package details                                        |
 
 ## Dependencies
 
