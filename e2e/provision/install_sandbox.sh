@@ -89,9 +89,9 @@ if [ "${DEPLOYMENT_TYPE:-r1}" == "one-summit" ]; then
 else
     # Management cluster creation
     if [[ ${DEBUG:-false} != "true" ]]; then
-        ansible-playbook -i ./nephio.yaml playbooks/cluster.yml
+        ansible-playbook -i 127.0.0.1, playbooks/cluster.yml
     else
-        ansible-playbook -vvv -i ./nephio.yaml playbooks/cluster.yml
+        ansible-playbook -vvv -i 127.0.0.1, playbooks/cluster.yml
     fi
 fi
 

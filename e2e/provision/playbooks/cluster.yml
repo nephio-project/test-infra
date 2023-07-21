@@ -9,7 +9,7 @@
 ##############################################################################
 
 - name: Bootstrap Management cluster
-  hosts: vm
+  hosts: all
   vars:
     container_engine: docker
     clab:
