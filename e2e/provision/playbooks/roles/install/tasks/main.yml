@@ -16,7 +16,7 @@
   ansible.builtin.include_role:
     name: kpt
   loop:
-    - {pkg: porch-dev, version: v1.0.0-beta.1, async: 480, poll: 5}
+    - {pkg: porch-dev, version: v1.0.1-beta.1, async: 480, poll: 5}
     - {pkg: nephio-controllers, version: v1.0.1-beta.1, async: 480, poll: 5}
     - {pkg: configsync, version: v1.0.1-beta.1, async: 240, poll: 5}
     - {pkg: network-config, version: v1.0.1-beta.1, async: 480, poll: 0}
