@@ -126,14 +126,14 @@
   ansible.builtin.include_role:
     name: kpt
   loop:
-    - {pkg: cert-manager, version: cert-manager/v2, async: 660, poll: 0}
-    - {pkg: gitea, version: gitea/v3, async: 780, poll: 0}
-    - {pkg: resource-backend, version: resource-backend/v2, async: 780, poll: 0}
-    - {pkg: metallb, version: metallb/v1, async: 1020, poll: 5}
-    - {pkg: metallb-sandbox-config, version: metallb-sandbox-config/v1, async: 660, poll: 0}
-    - {pkg: cluster-capi, version: cluster-capi/v4, async: 900, poll: 5}
-    - {pkg: cluster-capi-infrastructure-docker, version: cluster-capi-infrastructure-docker/v1, async: 780, poll: 5}
-    - {pkg: cluster-capi-kind-docker-templates, version: cluster-capi-kind-docker-templates/v1, async: 1500, poll: 0}
+    - {pkg: cert-manager, version: v1.0.1-beta.1, async: 660, poll: 0}
+    - {pkg: gitea, version: v1.0.1-beta.1, async: 780, poll: 0}
+    - {pkg: resource-backend, version: v1.0.1-beta.1, async: 780, poll: 0}
+    - {pkg: metallb, version: v1.0.1-beta.1, async: 1020, poll: 5}
+    - {pkg: metallb-sandbox-config, version: v1.0.1-beta.1, async: 660, poll: 0}
+    - {pkg: cluster-capi, version: v1.0.1-beta.1, async: 900, poll: 5}
+    - {pkg: cluster-capi-infrastructure-docker, version: v1.0.1-beta.1, async: 780, poll: 5}
+    - {pkg: cluster-capi-kind-docker-templates, version: v1.0.1-beta.1, async: 1500, poll: 0}
   vars:
     repo_uri: https://github.com/nephio-project/nephio-example-packages
     pkg: "{{ item.pkg }}"

@@ -16,11 +16,11 @@
   ansible.builtin.include_role:
     name: kpt
   loop:
-    - {pkg: porch-dev, version: porch-dev/v3, async: 480, poll: 5}
-    - {pkg: nephio-controllers, version: nephio-controllers/v5, async: 480, poll: 5}
-    - {pkg: configsync, version: configsync/v1, async: 240, poll: 5}
-    - {pkg: network-config, version: network-config/v1, async: 480, poll: 0}
-    - {pkg: nephio-stock-repos, version: nephio-stock-repos/v1, async: 60, poll: 0}
+    - {pkg: porch-dev, version: v1.0.1-beta.1, async: 480, poll: 5}
+    - {pkg: nephio-controllers, version: v1.0.1-beta.1, async: 480, poll: 5}
+    - {pkg: configsync, version: v1.0.1-beta.1, async: 240, poll: 5}
+    - {pkg: network-config, version: v1.0.1-beta.1, async: 480, poll: 0}
+    - {pkg: nephio-stock-repos, version: v1.0.1-beta.1, async: 60, poll: 0}
   vars:
     repo_uri: https://github.com/nephio-project/nephio-example-packages.git
     pkg: "{{ item.pkg }}"
@@ -76,7 +76,7 @@
   vars:
     repo_uri: https://github.com/nephio-project/nephio-packages.git
     pkg: nephio-webui
-    version: v7
+    version: v1.0.1-beta.1
     context: kind-kind
     reconcile_timeout: 10m
     kpt_async: 600

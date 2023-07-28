@@ -26,7 +26,7 @@ source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
-workload_cluster_pkg_rev=$(kpt alpha rpkg get --name nephio-workload-cluster --revision v8 -o jsonpath='{.metadata.name}')
+workload_cluster_pkg_rev=$(kpt alpha rpkg get --name nephio-workload-cluster --revision v9 -o jsonpath='{.metadata.name}')
 regional_pkg_rev=$(kpt alpha rpkg clone -n default "$workload_cluster_pkg_rev" --repository mgmt regional | cut -f 1 -d ' ')
 
 kpt alpha rpkg pull -n default "$regional_pkg_rev" regional

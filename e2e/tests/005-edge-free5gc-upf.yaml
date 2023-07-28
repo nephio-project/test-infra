@@ -6,7 +6,7 @@ spec:
   upstream:
     repo: free5gc-packages
     package: pkg-example-upf-bp
-    revision: v3
+    revision: v4
   targets:
   - objectSelector:
       apiVersion: infra.nephio.org/v1alpha1
