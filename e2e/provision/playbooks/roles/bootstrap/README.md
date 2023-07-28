@@ -12,20 +12,39 @@ This role installs and configures the tool set required to deploy a Nephio Manag
 
 Available variables are listed below, along with default values (see defaults/main.yml):
 
-| Variable                 | Required | Default    | Choices                   | Comments                                                      |
-|--------------------------|----------|------------|---------------------------|---------------------------------------------------------------|
-| host_min_vcpu            | no       | 8          |                           | Minimum vCPUs required                                        |
-| host_min_cpu_ram         | no       | 16         |                           | Minimum RAM required (GB)                                     |
-| host_min_root_disk_space | no       | 50         |                           | Minimum disk space required (GB)                              |
-| container_engine         | no       | docker     | docker                    | Container engine utilized for the management cluster creation |
-| kubernetes_version       | no       | v1.27.1    |                           | Kubernetes version used for the management cluster            |
-| gitea_postgres_password  | no       | c2VjcmV0   |                           | `postgres-password` secret value for gitea database service   |
-| gitea_db_password        | no       | c2VjcmV0   |                           | `password` secret value for gitea service                     |
-| gitea_username           | no       | nephio     |                           | Gitea admin user name                                         |
-| gitea_password           | no       | secret     |                           | Gitea admin password                                          |
-| gtp5g_dest               | no       | /opt/gtp5g |                           | Destination path for GTP5G source code                        |
-| gtp5g_version            | no       | v0.6.8     |                           | GTP5G source code version                                     |
-| gtp5g_tarball_url        | no       |            |                           | GTP5G tarball URI                                             |
+| Variable                        | Required | Default       | Choices                   | Comments                                                                          |
+|---------------------------------|----------|---------------|---------------------------|-----------------------------------------------------------------------------------|
+| host_min_vcpu                   | no       | 8             |                           | Minimum vCPUs required                                                            |
+| host_min_cpu_ram                | no       | 16            |                           | Minimum RAM required (GB)                                                         |
+| host_min_root_disk_space        | no       | 50            |                           | Minimum disk space required (GB)                                                  |
+| container_engine                | no       | docker        | docker                    | Container engine utilized for the management cluster creation                     |
+| gtp5g_dest                      | no       | /opt/gtp5g    |                           | Destination path for GTP5G source code                                            |
+| gtp5g_version                   | no       | v0.6.8        |                           | GTP5G source code version                                                         |
+| gtp5g_tarball_url               | no       |               |                           | GTP5G tarball URI                                                                 |
+| k8s.context                     | no       | kind-kind     |                           | Kubernetes context to create gitea resources                                      |
+| k8s.version                     | no       | v1.27.1       |                           | Kubernetes version used for the management cluster                                |
+| kind.enabled                    | no       | true          | true, false               | Enable/Disable Kubernetes Cluster creation                                        |
+| nephio_pkg_version              | no       | v1.0.1-beta.1 |                           | Default version for all kpt packages                                              |
+| gitea.enabled                   | no       | true          | true, false               | Enable/Disable gitea services                                                     |
+| gitea.k8s.namespace             | no       | gitea         |                           | Kubernetes namespace for gitea resources                                          |
+| gitea.k8s.postgres_password     | no       | c2VjcmV0      |                           | `postgres-password` secret value for gitea database service                       |
+| gitea.k8s.db_password           | no       | c2VjcmV0      |                           | `password` secret value for gitea service                                         |
+| gitea.k8s.username              | no       | nephio        |                           | Gitea admin user name                                                             |
+| gitea.k8s.password              | no       | secret        |                           | Gitea admin password                                                              |
+| gitea.k8s.namespaces            | no       |               |                           | List of Kubernetes namespaces to watch for gitea deployment rersources            |
+| gitea.kpt.packages              | no       |               |                           | List of gitea kpt packages                                                        |
+| resource_backend.enabled        | no       | true          | true, false               | Enable/Disable resource-backend services                                          |
+| resource_backend.k8s.namespaces | no       |               |                           | List of Kubernetes namespaces to watch for resource-backend deployment rersources |
+| resource_backend.kpt.packages   | no       |               |                           | List of resource-backend kpt packages                                             |
+| cert_manager.enabled            | no       | true          | true, false               | Enable/Disable cert-manager services                                              |
+| cert_manager.k8s.namespaces     | no       |               |                           | List of Kubernetes namespaces to watch for cert-manager deployment rersources     |
+| cert_manager.kpt.packages       | no       |               |                           | List of cert-manager kpt packages                                                 |
+| cluster_api.enabled             | no       | true          | true, false               | Enable/Disable cluster-api services                                               |
+| cluster_api.k8s.namespaces      | no       |               |                           | List of Kubernetes namespaces to watch for cluster-api deployment rersources      |
+| cluster_api.kpt.packages        | no       |               |                           | List of cluster-api kpt packages                                                  |
+| metallb.enabled                 | no       | true          | true, false               | Enable/Disable MetalLB services                                                   |
+| metallb.k8s.namespaces          | no       |               |                           | List of Kubernetes namespaces to watch for MetalLB deployment rersources          |
+| metallb.kpt.packages            | no       |               |                           | List of MetalLB kpt packages                                                      |
 
 ## Dependencies
 
@@ -58,11 +77,14 @@ The `install` Ansible role depends on the outcome generated by this role.
         src: https://github.com/GoogleContainerTools/kpt/releases/download/v1.0.0-beta.38/kpt_linux_amd64-1.0.0-beta.38.tar.gz
         dest: /usr/local/bin/
         creates: /usr/local/bin/kpt
-  roles:
-    - andrewrothstein.kind
-    - andrewrothstein.kubectl
-    - role: andrewrothstein.docker_engine
+    - name: Install KinD command-line
+      ansible.builtin.include_role:
+        name: andrewrothstein.kind
+    - name: Install Docker Engine
       become: true
+      ansible.builtin.include_role:
+        name: andrewrothstein.docker_engine
+  roles:
     - bootstrap
 ```
 
@@ -87,18 +109,20 @@ flowchart TD
     M -- false --> P
     O -->|Set Kernel Parameters| P(Set kernel parameters)
     P --> Q(Force all notified handlers to run at this point)
-    Q --> R(Get k8s clusters)
+    Q -->|Create Management KinD Cluster| R(Get k8s clusters)
     R --> S{not 'kind' in bootstrap_kind_get_cluster.stdout?}
     S -- true --> T(Create management cluster)
     T --> U(Create .kube directory)
     S -- false --> U
     U --> V(Copy root kubeconfig file)
     V --> W(Wait for Kind Nodes to become ready)
-    W --> Y(Create gitea namespace)
+    W -->|Create Gitea K8s resources| Y(Create gitea namespace)
     Y --> Z(Create gitea postgresql user password)
-    Z --> AA(Init job ids array)
-    AA --> AB(Deploy base packages)
-    AB --> AC(Wait for packages to be applied)
-    AC --> |Wait for deployments| AD(Get deployment resources)
-    AD --> AF(Wait for deployments)
+    Z -->|Apply kpt packages| AA(Init job ids array)
+    AA --> AB(Create list of packages)
+    AB --> AC(Deploy base packages)
+    AC --> AD(Wait for packages to be applied)
+    AD --> AF(Create list of namespaces)
+    AF --> |Wait for deployments| AE(Get deployment resources)
+    AE --> AG(Wait for deployments)
 ```

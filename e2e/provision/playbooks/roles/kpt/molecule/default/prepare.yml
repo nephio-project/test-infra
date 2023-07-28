@@ -45,10 +45,12 @@
       ansible.builtin.command: kind get clusters
       register: kind_get_cluster
       failed_when: (kind_get_cluster.rc not in [0, 1])
+      changed_when: false
     - name: Create k8s cluster
       become: true
       ansible.builtin.command: kind create cluster --image kindest/node:v1.27.1 --kubeconfig=/tmp/kubeconfig
       when: not 'kind' in kind_get_cluster.stdout
+      changed_when: false
     - name: Create .kube directory
       ansible.builtin.file:
         path: "{{ ansible_user_dir }}/.kube"

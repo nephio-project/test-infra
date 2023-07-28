@@ -15,18 +15,12 @@
 - name: Deploy Nephio packages
   ansible.builtin.include_role:
     name: kpt
-  loop:
-    - {pkg: porch-dev, version: v1.0.1-beta.1, async: 480, poll: 5}
-    - {pkg: nephio-controllers, version: v1.0.1-beta.1, async: 480, poll: 5}
-    - {pkg: configsync, version: v1.0.1-beta.1, async: 240, poll: 5}
-    - {pkg: network-config, version: v1.0.1-beta.1, async: 480, poll: 0}
-    - {pkg: nephio-stock-repos, version: v1.0.1-beta.1, async: 60, poll: 0}
+  loop: "{{ nephio.kpt.packages }}"
   vars:
-    repo_uri: https://github.com/nephio-project/nephio-example-packages.git
+    repo_uri: "{{ item.repo_uri }}"
     pkg: "{{ item.pkg }}"
     version: "{{ item.version }}"
-    context: kind-kind
-    reconcile_async: 10m
+    context: "{{ k8s.context }}"
     kpt_async: "{{ item.async }}"
     kpt_poll: "{{ item.poll }}"
 
@@ -42,21 +36,15 @@
 
 - name: Wait for deployments
   ansible.builtin.include_tasks: wait_deployments.yml
-  loop:
-    - porch-fn-system
-    - porch-system
-    - nephio-system
-    - config-management-monitoring
-    - config-management-system
-    - resource-group-system
+  loop: "{{ nephio.k8s.namespaces }}"
   loop_control:
     loop_var: namespace
   vars:
-    context: kind-kind
+    context: "{{ k8s.context }}"
 
 - name: Create gitea user password in nephio-system namespace
   kubernetes.core.k8s:
-    context: kind-kind
+    context: "{{ k8s.context }}"
     state: present
     definition:
       apiVersion: v1
@@ -66,24 +54,23 @@
         namespace: nephio-system
       type: kubernetes.io/basic-auth
       stringData:
-        username: "{{ gitea_username }}"
-        password: "{{ gitea_password }}"
+        username: "{{ gitea.k8s.username }}"
+        password: "{{ gitea.k8s.password }}"
   no_log: true
 
 - name: Deploy Nephio webui
   ansible.builtin.include_role:
     name: kpt
   vars:
-    repo_uri: https://github.com/nephio-project/nephio-packages.git
-    pkg: nephio-webui
-    version: v1.0.1-beta.1
-    context: kind-kind
-    reconcile_timeout: 10m
+    repo_uri: "{{ nephio_webui.kpt.package.repo_uri }}"
+    pkg: "{{ nephio_webui.kpt.package.pkg }}"
+    version: "{{ nephio_webui.kpt.package.version }}"
+    context: "{{ k8s.context }}"
     kpt_async: 600
     kpt_poll: 5
 
 - name: Wait for Nephio webui deployment
   ansible.builtin.include_tasks: wait_deployments.yml
   vars:
-    context: kind-kind
-    namespace: nephio-webui
+    context: "{{ k8s.context }}"
+    namespace: "{{ nephio_webui.k8s.namespace }}"

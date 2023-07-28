@@ -12,6 +12,7 @@ warn_list:
   - yaml
 skip_list:
   - experimental
+  - var-naming
 exclude_paths:
   - roles/deploy_mk8s/
 mock_modules:

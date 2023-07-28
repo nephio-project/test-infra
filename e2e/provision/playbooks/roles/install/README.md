@@ -1,6 +1,6 @@
 # Install
 
-This ansible installs Nephio services on a target cluster.
+This role installs Nephio services on a target cluster.
 
 ## Requirements
 
@@ -12,10 +12,16 @@ This ansible installs Nephio services on a target cluster.
 
 Available variables are listed below, along with default values (see defaults/main.yml):
 
-| Variable                 | Required | Default    | Choices                   | Comments                                                      |
-|--------------------------|----------|------------|---------------------------|---------------------------------------------------------------|
-| gitea_username           | no       | nephio     |                           | Gitea admin user name                                         |
-| gitea_password           | no       | secret     |                           | Gitea admin password                                          |
+| Variable                   | Required | Default       | Choices | Comments                                                                |
+|----------------------------|----------|---------------|---------|-------------------------------------------------------------------------|
+| k8s.context                | no       | kind-kind     |         | Kubernetes context to create resources                                  |
+| gitea.k8s.username         | no       | nephio        |         | Gitea admin user name                                                   |
+| gitea.k8s.password         | no       | secret        |         | Gitea admin password                                                    |
+| nephio_pkg_version         | no       | v1.0.1-beta.1 |         | Default version for all kpt packages                                    |
+| nephio.k8s.namespaces      | no       |               |         | List of Kubernetes namespaces to watch for  Nephio deployment resources |
+| nephio.kpt.packages        | no       |               |         | List of Nephio kpt packages                                             |
+| nephio_webui.k8s.namespace | no       | nephio-webui  |         | Kubernetes namespace for Nephio WebUI resources                         |
+| nephio_webui.kpt.package   | no       |               |         | Nephio WebUI kpt package details                                        |
 
 ## Dependencies
 
@@ -48,6 +54,13 @@ None
         src: https://github.com/GoogleContainerTools/kpt/releases/download/v1.0.0-beta.38/kpt_linux_amd64-1.0.0-beta.38.tar.gz
         dest: /usr/local/bin/
         creates: /usr/local/bin/kpt
+    - name: Install Docker Engine
+      become: true
+      ansible.builtin.include_role:
+        name: andrewrothstein.docker_engine
+    - name: Install KinD command-line
+      ansible.builtin.include_role:
+        name: andrewrothstein.kind
     - name: Get k8s clusters
       become: true
       ansible.builtin.command: kind get clusters
@@ -58,10 +71,6 @@ None
       ansible.builtin.command: kind create cluster --image kindest/node:v1.27.1
       when: not 'kind' in kind_get_cluster.stdout
   roles:
-    - andrewrothstein.kind
-    - andrewrothstein.kubectl
-    - role: andrewrothstein.docker_engine
-      become: true
     - install
 ```
 

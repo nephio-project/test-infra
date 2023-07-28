@@ -14,6 +14,7 @@
 
 - name: Create base directory if it does not exist
   ansible.builtin.file:
+    mode: '0755'
     path: "{{ workdir | dirname }}"
     state: directory
 
@@ -96,7 +97,7 @@
 
 - name: Export job ids array
   ansible.builtin.set_fact:
-    all_kpt_apply: "{{ all_kpt_apply | default([]) + [ kpt_apply ] }}"
+    all_kpt_apply: "{{ all_kpt_apply | default([]) + [kpt_apply] }}"
   when: kpt_poll == 0
 
 - name: Print job ids

@@ -64,9 +64,7 @@ def test_resource_group_system_deployments_creation(host):
 
 
 def test_network_config_deployments_creation(host):
-    _check_k8s_deployment(
-        host, "network-config-controller", "network-config"
-    )
+    _check_k8s_deployment(host, "network-config-controller", "network-config")
 
 
 def test_repositories_creation(host):

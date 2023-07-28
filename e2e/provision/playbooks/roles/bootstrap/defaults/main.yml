@@ -13,14 +13,104 @@ host_min_cpu_ram: 16  # minimum required CPU RAM before install; value in GB
 host_min_root_disk_space: 50  # minimum required disk space before install; value in GB
 
 container_engine: docker
-kubernetes_version: v1.27.1
-
-gitea_postgres_password: c2VjcmV0  # echo -n "secret" | base64
-gitea_db_password: c2VjcmV0
-
-gitea_username: nephio
-gitea_password: secret
 
 gtp5g_dest: /opt/gtp5g
 gtp5g_version: v0.6.8
 gtp5g_tarball_url: "https://github.com/free5gc/gtp5g/archive/refs/tags/{{ gtp5g_version }}.tar.gz"
+
+k8s:
+  context: kind-kind
+  version: v1.27.1
+
+kind:
+  enabled: true
+
+nephio_pkg_version: v1.0.1-beta.1
+
+gitea:
+  enabled: true
+  k8s:
+    namespace: gitea
+    postgres_password: c2VjcmV0  # echo "secret" | base64
+    db_password: c2VjcmV0
+    username: nephio
+    password: secret
+    namespaces:
+      - gitea
+  kpt:
+    packages:
+      - repo_uri: https://github.com/nephio-project/nephio-example-packages
+        pkg: gitea
+        version: "{{ nephio_pkg_version }}"
+        async: 780
+        poll: 0
+
+resource_backend:
+  enabled: true
+  k8s:
+    namespaces:
+      - backend-system
+  kpt:
+    packages:
+      - repo_uri: https://github.com/nephio-project/nephio-example-packages
+        pkg: resource-backend
+        version: "{{ nephio_pkg_version }}"
+        async: 780
+        poll: 0
+
+cert_manager:
+  enabled: true
+  k8s:
+    namespaces:
+      - cert-manager
+  kpt:
+    packages:
+      - repo_uri: https://github.com/nephio-project/nephio-example-packages
+        pkg: cert-manager
+        version: "{{ nephio_pkg_version }}"
+        async: 660
+        poll: 0
+
+cluster_api:
+  enabled: true
+  k8s:
+    namespaces:
+      - capi-system
+      - capi-kubeadm-control-plane-system
+      - capi-kubeadm-bootstrap-system
+      - capd-system
+  kpt:
+    packages:
+      - repo_uri: https://github.com/nephio-project/nephio-example-packages
+        pkg: cluster-capi
+        version: "{{ nephio_pkg_version }}"
+        async: 900
+        poll: 5
+      - repo_uri: https://github.com/nephio-project/nephio-example-packages
+        pkg: cluster-capi-infrastructure-docker
+        version: "{{ nephio_pkg_version }}"
+        async: 780
+        poll: 5
+      - repo_uri: https://github.com/nephio-project/nephio-example-packages
+        pkg: cluster-capi-kind-docker-templates
+        version: "{{ nephio_pkg_version }}"
+        async: 1500
+        poll: 0
+
+metallb:
+  enabled: true
+  k8s:
+    namespaces:
+      - metallb-system
+  kpt:
+    packages:
+      - repo_uri: https://github.com/nephio-project/nephio-example-packages
+        pkg: metallb
+        version: "{{ nephio_pkg_version }}"
+        async: 1020
+        poll: 5
+      - repo_uri: https://github.com/nephio-project/nephio-example-packages
+        pkg: metallb-sandbox-config
+        version: "{{ nephio_pkg_version }}"
+        async: 660
+        poll: 0
