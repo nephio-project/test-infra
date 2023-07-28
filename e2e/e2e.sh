@@ -19,6 +19,12 @@ export TESTDIR=${TESTDIR:-$E2EDIR/tests}
 
 source "$E2EDIR/lib/testing.sh"
 
+test_summary=""
 for t in $TESTDIR/*.sh; do
     testing_run_test "$t"
 done
+echo "TEST SUMMARY"
+echo "------------"
+echo $test_summary
+echo "------------"
+echo
