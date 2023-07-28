@@ -87,12 +87,18 @@
     context: "{{ context }}"
     command: live-apply
     reconcile_timeout: "{{ reconcile_timeout }}"
+  async: "{{ kpt_async | int }}"
+  poll: "{{ kpt_poll | int }}"
+  changed_when: false
   register: kpt_apply
   until: kpt_apply is not failed
   retries: 5
 
-- name: Wait for deployments
-  ansible.builtin.include_tasks: wait_deployments.yml
-  loop: "{{ namespaces }}"
-  loop_control:
-    loop_var: namespace
+- name: Export job ids array
+  ansible.builtin.set_fact:
+    all_kpt_apply: "{{ all_kpt_apply | default([]) + [ kpt_apply ] }}"
+  when: kpt_poll == 0
+
+- name: Print job ids
+  ansible.builtin.debug:
+    var: all_kpt_apply

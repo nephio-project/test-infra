@@ -19,7 +19,7 @@ lint: |
   PATH=${PATH}
   yamllint -c ../../../.yaml-lint.yml .
 platforms:
-  - name: bionic
+  - name: focal
     box: generic/ubuntu2004
     provider_options:
       gui: false
@@ -35,7 +35,7 @@ provisioner:
         repo_uri: https://github.com/GoogleContainerTools/kpt
         version: v0.9
         context: kind-kind
-        namespaces:
-          - default
+        kpt_async: 600
+        kpt_poll: 5
 verifier:
   name: testinfra

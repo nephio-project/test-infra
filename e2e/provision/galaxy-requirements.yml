@@ -20,12 +20,12 @@ roles:
   - name: andrewrothstein.kpt
     version: 0.0.3
   - name: darkwizard242.cni
-    version: 2.2.0
+    version: 2.3.0
 
 collections:
   - name: community.general
-    version: 6.6.0
+    version: 7.1.0
   - name: kubernetes.core
     version: 2.4.0
   - name: community.docker
-    version: 3.4.4
+    version: 3.4.8

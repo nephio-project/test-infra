@@ -19,20 +19,31 @@ lint: |
   PATH=${PATH}
   yamllint -c ../../../.yaml-lint.yml .
   ansible-lint -v -c ../../../.ansible-lint
-  flake8
 platforms:
   - name: focal
     box: generic/ubuntu2004
+    memory: 8192
+    cpus: 4
     provider_options:
       gui: false
+    groups:
+      - ubuntu
   - name: jammy
     box: generic/ubuntu2204
+    memory: 8192
+    cpus: 4
     provider_options:
       gui: false
+    groups:
+      - ubuntu
   - name: fedora34
     box: generic/fedora34
+    memory: 8192
+    cpus: 4
     provider_options:
       gui: false
+    groups:
+      - fedora
 provisioner:
   name: ansible
   env:

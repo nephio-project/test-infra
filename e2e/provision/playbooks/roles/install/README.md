@@ -45,7 +45,7 @@ None
       become_user: root
       ansible.builtin.unarchive:
         remote_src: true
-        src: https://github.com/GoogleContainerTools/kpt/releases/download/v1.0.0-beta.32/kpt_linux_amd64-1.0.0-beta.32.tar.gz
+        src: https://github.com/GoogleContainerTools/kpt/releases/download/v1.0.0-beta.38/kpt_linux_amd64-1.0.0-beta.38.tar.gz
         dest: /usr/local/bin/
         creates: /usr/local/bin/kpt
     - name: Get k8s clusters
@@ -69,7 +69,13 @@ None
 
 ```mermaid
 flowchart TD
-    A[main.yml] --> B(Deploy Nephio packages)
-    B --> C(Create gitea user password in nephio-system namespace)
-    C --> D(Deploy Nephio webui)
+    A[main.yml] --> B(Init job ids array)
+    B --> C(Deploy Nephio packages)
+    C --> D(Wait for packages to be applied)
+    D --> |Wait for deployments| E(Get deployment resources)
+    E --> F(Wait for deployments)
+    F --> G(Create gitea user password in nephio-system namespace)
+    G --> H(Deploy Nephio webui)
+    H --> |Wait for Nephio webui deployment| I(Get deployment resources)
+    I --> J(Wait for deployments)
 ```
