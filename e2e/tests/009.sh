@@ -53,7 +53,7 @@ echo "Current Memory $current_memory"
 smf_deployment_pkg=$(kubectl --kubeconfig $kubeconfig get packagevariant regional-free5gc-smf-regional-free5gc-smf -o jsonpath='{.status.downstreamTargets[0].name}')
 
 #if it's already a Draft, we will edit it directly, otherwise we will create a copy
-lifecycle=$(kubectl --kubeconfig $kubeconfig get packagerevision $smf_deployment_pkg -o jsonpath'{.spec.lifecycle}')
+lifecycle=$(kubectl --kubeconfig $kubeconfig get packagerevision $smf_deployment_pkg -o jsonpath='{.spec.lifecycle}')
 ws="regional-smf-scaling"
 
 smf_pkg_rev=$smf_deployment_pkg

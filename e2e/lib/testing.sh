@@ -33,7 +33,7 @@ function testing_run_test {
     echo "+++++ $(date): finished $testfile $testname (result: $result)"
     local seconds="$(($(date +%s) - int_start))"
     printf "TIME $(basename $testfile): %s secs\n" $seconds
-    test_summary="${test_summary-}\n$(basename $testfile): $result in $seconds seconds"
+    test_summary="${test_summary-}$(echo && echo $(basename $testfile): $result in $seconds seconds)"
 
     if [[ ${DEBUG:-false} == "true" ]]; then
         echo "Porch Controller logs"
