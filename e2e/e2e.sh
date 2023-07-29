@@ -25,6 +25,6 @@ for t in $TESTDIR/*.sh; do
 done
 echo "TEST SUMMARY"
 echo "------------"
-echo $test_summary
+echo "$test_summary"
 echo "------------"
 echo
