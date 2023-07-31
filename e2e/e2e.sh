@@ -19,6 +19,19 @@ export TESTDIR=${TESTDIR:-$E2EDIR/tests}
 
 source "$E2EDIR/lib/testing.sh"
 
+failed=$((0))
+test_summary=""
 for t in $TESTDIR/*.sh; do
-    testing_run_test "$t"
+    if ! testing_run_test "$t"; then
+        failed=$((failed + 1))
+    fi
 done
+echo "TEST SUMMARY"
+echo "------------"
+echo -e "$test_summary"
+echo "------------"
+echo
+if [[ $failed -gt 0 ]]; then
+    echo "FAILED $failed tests"
+    exit 1
+fi

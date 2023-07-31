@@ -23,10 +23,22 @@ function testing_run_test {
     local testname=$(testing_get_test_metadata "$testfile" "TEST-NAME")
     int_start=$(date +%s)
     echo "+++++ $(date): starting $testfile $testname"
-    /bin/bash "$testfile"
-    echo "+++++ $(date): finished $testfile $testname"
-    printf "TIME $(basename $testfile): %s secs\n" "$(($(date +%s) - int_start))"
+    local rc=0
+    /bin/bash "$testfile" || rc=$?
+    local result="PASS"
+    if [[ $rc != 0 ]]; then
+        result="FAIL ($rc)"
+    fi
 
-    echo "Porch Controller logs"
-    kubectl logs deployment/porch-controllers -n porch-system --since "$(($(date +%s) - int_start))s" | sed -e '/PackageVariant/!d;/resources changed/!d'
+    echo "+++++ $(date): finished $testfile $testname (result: $result)"
+    local seconds="$(($(date +%s) - int_start))"
+    printf "TIME $(basename $testfile): %s secs\n" $seconds
+    test_summary+="$(basename $testfile): $result in $seconds seconds\n"
+
+    if [[ ${DEBUG:-false} == "true" ]]; then
+        echo "Porch Controller logs"
+        kubectl logs deployment/porch-controllers -n porch-system --since "$(($(date +%s) - int_start))s" | sed -e '/PackageVariant/!d;/resources changed/!d'
+    fi
+
+    return $rc
 }

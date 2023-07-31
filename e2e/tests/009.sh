@@ -51,33 +51,72 @@ echo "Current Memory $current_memory"
 
 #Scale the POD
 smf_deployment_pkg=$(kubectl --kubeconfig $kubeconfig get packagevariant regional-free5gc-smf-regional-free5gc-smf -o jsonpath='{.status.downstreamTargets[0].name}')
-echo "Copying $smf_deployment_pkg"
+
+#if it's already a Draft, we will edit it directly, otherwise we will create a copy
+lifecycle=$(kubectl --kubeconfig $kubeconfig get packagerevision $smf_deployment_pkg -o jsonpath='{.spec.lifecycle}')
 ws="regional-smf-scaling"
-smf_pkg_rev=$(kpt alpha rpkg copy -n default $smf_deployment_pkg --workspace $ws | cut -d ' ' -f 1)
-echo "Copied to $smf_pkg_rev, pulling"
 
-rm -rf $ws
-kpt alpha rpkg pull -n default "$smf_pkg_rev" $ws
+smf_pkg_rev=$smf_deployment_pkg
 
-rm -rf /tmp/$ws
-cp -r $ws /tmp
+if [[ $lifecycle == "Published" ]]; then
+    echo "Copying $smf_deployment_pkg"
+    smf_pkg_rev=$(kpt alpha rpkg copy -n default $smf_deployment_pkg --workspace $ws | cut -d ' ' -f 1)
+    echo "Copied to $smf_pkg_rev, pulling"
+fi
 
-echo "Updating the capacity"
+# We need to put this entire section in a retry loop, because it is possible
+# for a controller to come in and change the package after we pull it. This
+# in general is something we should not be seeing, but is not really a failure
+# state, so we will work around it in here. A separate issues has been filed to
+# debug why a controller is unexpectedly changing the package.
 
-kpt fn eval --image gcr.io/kpt-fn/search-replace:v0.2.0 $ws -- by-path='spec.maxSessions' by-file-path='**/capacity.yaml' put-value=10000
-kpt fn eval --image gcr.io/kpt-fn/search-replace:v0.2.0 $ws -- by-path='spec.maxNFConnections' by-file-path='**/capacity.yaml' put-value=50
+retries=5
+while [[ $retries -gt 0 ]]; do
+    rm -rf $ws
+    kpt alpha rpkg pull -n default "$smf_pkg_rev" $ws
 
-diff -r /tmp/$ws $ws || echo
+    rm -rf /tmp/$ws
+    cp -r $ws /tmp
 
-echo "Pushing update"
-kpt alpha rpkg push -n default "$smf_pkg_rev" $ws
+    echo "Updating the capacity"
 
-echo "Proposing update"
-kpt alpha rpkg propose -n default "$smf_pkg_rev"
-k8s_wait_exists "$kubeconfig" 600 "default" "packagerev" "$smf_pkg_rev"
+    kpt fn eval --image gcr.io/kpt-fn/search-replace:v0.2.0 $ws -- by-path='spec.maxSessions' by-file-path='**/capacity.yaml' put-value=10000
+    kpt fn eval --image gcr.io/kpt-fn/search-replace:v0.2.0 $ws -- by-path='spec.maxNFConnections' by-file-path='**/capacity.yaml' put-value=50
 
-echo "Approving update"
-kpt alpha rpkg approve -n default "$smf_pkg_rev"
+    diff -r /tmp/$ws $ws || echo
+
+    modified=false
+    echo "Pushing update"
+    output=$(kpt alpha rpkg push -n default "$smf_pkg_rev" $ws 2>&1)
+    if [[ $output =~ "modified" ]]; then
+        modified=true
+    fi
+
+    if [[ $modified == false ]]; then
+        echo "Proposing update"
+        output=$(kpt alpha rpkg propose -n default "$smf_pkg_rev" 2>&1)
+        if [[ $output =~ "modified" ]]; then
+            modified=true
+        else
+            k8s_wait_exists "$kubeconfig" 600 "default" "packagerev" "$smf_pkg_rev"
+        fi
+    fi
+
+    if [[ $modified == false ]]; then
+        echo "Approving update"
+        output=$(kpt alpha rpkg approve -n default "$smf_pkg_rev" 2>&1)
+        if [[ $output =~ "modified" ]]; then
+            modified=true
+        fi
+    fi
+
+    if [[ $modified == false ]]; then
+        retries=0
+    else
+        echo Capacity update failed due to concurrent change, retrying
+        retries=$(expr $retries - 1)
+    fi
+done
 
 # Wait for the deployment to start with a new pod
 timeout=600
