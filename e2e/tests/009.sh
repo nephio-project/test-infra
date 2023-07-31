@@ -65,7 +65,7 @@ if [[ $lifecycle == "Published" ]]; then
 fi
 
 # We need to put this entire section in a retry loop, because it is possible
-# for a controller to come in and chnage the package after we pull it. This
+# for a controller to come in and change the package after we pull it. This
 # in general is something we should not be seeing, but is not really a failure
 # state, so we will work around it in here. A separate issues has been filed to
 # debug why a controller is unexpectedly changing the package.
