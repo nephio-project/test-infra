@@ -12,6 +12,7 @@ dependency:
   name: galaxy
   options:
     role-file: ../../../galaxy-requirements.yml
+    requirements-file: ../../../galaxy-requirements.yml
 driver:
   name: vagrant
 lint: |
