@@ -39,4 +39,6 @@ function testing_run_test {
         echo "Porch Controller logs"
         kubectl logs deployment/porch-controllers -n porch-system --since "$(($(date +%s) - int_start))s" | sed -e '/PackageVariant/!d;/resources changed/!d'
     fi
+
+    return $rc
 }
