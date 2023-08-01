@@ -107,22 +107,24 @@ flowchart TD
     M -- true --> N(Configure gtp5g module)
     N --> O(Install gtp5g module)
     M -- false --> P
-    O -->|Set Kernel Parameters| P(Set kernel parameters)
-    P --> Q(Force all notified handlers to run at this point)
-    Q -->|Create Management KinD Cluster| R(Get k8s clusters)
+    O --> P(Force all notified handlers to run at this point)
+    P -->|Create Management KinD Cluster| Q{kind.enbled?}
+    Q -- true --> R(Get k8s clusters)
     R --> S{not 'kind' in bootstrap_kind_get_cluster.stdout?}
     S -- true --> T(Create management cluster)
-    T --> U(Create .kube directory)
     S -- false --> U
+    T --> U(Create .kube directory)
     U --> V(Copy root kubeconfig file)
     V --> W(Wait for Kind Nodes to become ready)
+    Q -- false --> Y
     W -->|Create Gitea K8s resources| Y(Create gitea namespace)
     Y --> Z(Create gitea postgresql user password)
-    Z -->|Apply kpt packages| AA(Init job ids array)
-    AA --> AB(Create list of packages)
-    AB --> AC(Deploy base packages)
-    AC --> AD(Wait for packages to be applied)
-    AD --> AF(Create list of namespaces)
-    AF --> |Wait for deployments| AE(Get deployment resources)
-    AE --> AG(Wait for deployments)
+    Z --> AA(Create gitea user password)
+    AA -->|Apply kpt packages| AB(Init job ids array)
+    AB --> AC(Create list of packages)
+    AC --> AD(Deploy base packages)
+    AD --> AE(Wait for packages to be applied)
+    AE --> AF(Create list of namespaces)
+    AF --> |Wait for deployments| AG(Get deployment resources)
+    AG --> AH(Wait for deployments)
 ```

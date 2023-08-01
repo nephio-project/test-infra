@@ -27,7 +27,14 @@
       ansible.builtin.pip:
         name: kubernetes==26.1.0
   roles:
-    - andrewrothstein.kind
+    - role: andrewrothstein.kind
+      vars:
+        kind_config:
+          sysctl:
+            fs.inotify.max_user_watches: 524288
+            fs.inotify.max_user_instances: 512
+            kernel.keys.maxkeys: 500000
+            kernel.keys.maxbytes: 1000000
     - andrewrothstein.kubectl
     - role: andrewrothstein.docker_engine
       become: true
