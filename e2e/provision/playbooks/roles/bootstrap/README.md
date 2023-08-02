@@ -24,7 +24,7 @@ Available variables are listed below, along with default values (see defaults/ma
 | k8s.context                     | no       | kind-kind     |                           | Kubernetes context to create gitea resources                                      |
 | k8s.version                     | no       | v1.27.1       |                           | Kubernetes version used for the management cluster                                |
 | kind.enabled                    | no       | true          | true, false               | Enable/Disable Kubernetes Cluster creation                                        |
-| nephio_pkg_version              | no       | v1.0.1-beta.1 |                           | Default version for all kpt packages                                              |
+| nephio_pkg_version              | no       | v1.0.1        |                           | Default version for all kpt packages                                              |
 | gitea.enabled                   | no       | true          | true, false               | Enable/Disable gitea services                                                     |
 | gitea.k8s.namespace             | no       | gitea         |                           | Kubernetes namespace for gitea resources                                          |
 | gitea.k8s.postgres_password     | no       | c2VjcmV0      |                           | `postgres-password` secret value for gitea database service                       |
