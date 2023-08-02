@@ -6,9 +6,9 @@
 #
 ansible==6.7.0
     # via -r requirements.in
-ansible-core==2.13.10
+ansible-core==2.13.11
     # via ansible
-certifi==2023.5.7
+certifi==2023.7.22
     # via requests
 cffi==1.15.1
     # via
@@ -38,17 +38,17 @@ pycparser==2.21
     # via cffi
 pygithub==1.59.0
     # via -r requirements.in
-pyjwt[crypto]==2.7.0
+pyjwt[crypto]==2.8.0
     # via pygithub
 pynacl==1.5.0
     # via pygithub
-pyyaml==6.0
+pyyaml==6.0.1
     # via ansible-core
 requests==2.31.0
     # via pygithub
 resolvelib==0.8.1
     # via ansible-core
-urllib3==2.0.3
+urllib3==2.0.4
     # via requests
 wrapt==1.15.0
     # via deprecated

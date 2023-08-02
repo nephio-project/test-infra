@@ -22,6 +22,11 @@ function testing_run_test {
 
     local testname=$(testing_get_test_metadata "$testfile" "TEST-NAME")
     int_start=$(date +%s)
+    mgmt_nic="$(ip route get 1.1.1.1 | awk 'NR==1 { print $5 }')"
+    ratio=$((1024 * 1024)) # MB
+    if [ -f "/sys/class/net/$mgmt_nic/statistics/rx_bytes" ]; then
+        int_rx_bytes_before=$(cat "/sys/class/net/$mgmt_nic/statistics/rx_bytes")
+    fi
     echo "+++++ $(date): starting $testfile $testname"
     local rc=0
     /bin/bash "$testfile" || rc=$?
@@ -33,6 +38,10 @@ function testing_run_test {
     echo "+++++ $(date): finished $testfile $testname (result: $result)"
     local seconds="$(($(date +%s) - int_start))"
     printf "TIME $(basename $testfile): %s secs\n" $seconds
+    if [ -f "/sys/class/net/$mgmt_nic/statistics/rx_bytes" ]; then
+        int_rx_bytes_after=$(cat "/sys/class/net/$mgmt_nic/statistics/rx_bytes")
+        printf "%'.f MB total downloaded\n" "$(((int_rx_bytes_after - int_rx_bytes_before) / ratio))"
+    fi
     test_summary+="$(basename $testfile): $result in $seconds seconds\n"
 
     if [[ ${DEBUG:-false} == "true" ]]; then
