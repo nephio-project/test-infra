@@ -6,7 +6,7 @@ spec:
   upstream:
     repo: free5gc-packages
     package: pkg-example-smf-bp
-    revision: v4
+    revision: v5
   targets:
   - objectSelector:
       apiVersion: infra.nephio.org/v1alpha1

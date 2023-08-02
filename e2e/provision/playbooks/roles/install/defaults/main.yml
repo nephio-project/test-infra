@@ -16,7 +16,7 @@ gitea:
     username: nephio
     password: secret
 
-nephio_pkg_version: v1.0.1-beta.1
+nephio_pkg_version: v1.0.1
 
 nephio:
   k8s:

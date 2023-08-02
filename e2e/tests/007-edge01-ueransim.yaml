@@ -6,7 +6,7 @@ spec:
   upstream:
     repo: nephio-example-packages
     package: ueransim
-    revision: v2
+    revision: v3
   downstream:
     repo: edge01
     package: ueransim
