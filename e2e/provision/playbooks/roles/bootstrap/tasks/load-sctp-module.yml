@@ -1,0 +1,21 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- name: install sctp on {{ ansible_os_family }}
+  become: yes
+  ansible.builtin.package:
+    name: "kernel-modules-extra-{{ ansible_kernel }}"
+  when: ansible_os_family == 'RedHat'
+
+- name: load the sctp kernel module
+  become: yes
+  community.general.modprobe:
+    name: sctp
+    state: present

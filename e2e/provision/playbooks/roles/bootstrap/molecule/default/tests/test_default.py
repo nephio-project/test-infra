@@ -19,6 +19,11 @@ def test_gtp5g_load(host):
     assert cmd.succeeded
 
 
+def test_sctp_load(host):
+    cmd = host.run("modinfo sctp")
+    assert cmd.succeeded
+
+
 def test_kernel_parameters_validation(host):
     params = {
         "fs.inotify.max_user_watches": "524288",

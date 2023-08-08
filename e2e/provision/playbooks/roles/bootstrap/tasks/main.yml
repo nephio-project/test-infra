@@ -14,6 +14,9 @@
 - name: Load gtp5g kernel module
   ansible.builtin.include_tasks: load-gtp5g-module.yml
 
+- name: Load sctp kernel module
+  ansible.builtin.include_tasks: load-sctp-module.yml
+
 - name: Force all notified handlers to run at this point
   ansible.builtin.meta: flush_handlers
 
