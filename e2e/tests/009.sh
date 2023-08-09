@@ -87,14 +87,14 @@ while [[ $retries -gt 0 ]]; do
 
     modified=false
     echo "Pushing update"
-    output=$(kpt alpha rpkg push -n default "$smf_pkg_rev" $ws 2>&1)
+    output=$(kpt alpha rpkg push -n default "$smf_pkg_rev" $ws 2>&1 || rc=$?)
     if [[ $output =~ "modified" ]]; then
         modified=true
     fi
 
     if [[ $modified == false ]]; then
         echo "Proposing update"
-        output=$(kpt alpha rpkg propose -n default "$smf_pkg_rev" 2>&1)
+        output=$(kpt alpha rpkg propose -n default "$smf_pkg_rev" 2>&1 || rc=$?)
         if [[ $output =~ "modified" ]]; then
             modified=true
         else
@@ -104,7 +104,7 @@ while [[ $retries -gt 0 ]]; do
 
     if [[ $modified == false ]]; then
         echo "Approving update"
-        output=$(kpt alpha rpkg approve -n default "$smf_pkg_rev" 2>&1)
+        output=$(kpt alpha rpkg approve -n default "$smf_pkg_rev" 2>&1 || rc=$?)
         if [[ $output =~ "modified" ]]; then
             modified=true
         fi
