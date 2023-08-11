@@ -106,8 +106,10 @@ flowchart TD
     L --> M{"ERROR: Module gtp5g not found." in bootstrap_modinfo_gtp5g.stderr?}
     M -- true --> N(Configure gtp5g module)
     N --> O(Install gtp5g module)
-    M -- false --> P
-    O --> P(Force all notified handlers to run at this point)
+    M -- false --> P1
+    O -->|Load sctp kernel module| P1(install kernel-modules-extra)
+    P1 --> P2(load the sctp module)
+    P2 --> P(Force all notified handlers to run at this point)
     P -->|Create Management KinD Cluster| Q{kind.enbled?}
     Q -- true --> R(Get k8s clusters)
     R --> S{not 'kind' in bootstrap_kind_get_cluster.stdout?}
