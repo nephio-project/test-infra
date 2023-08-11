@@ -1,0 +1,40 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+dependency:
+  name: galaxy
+  options:
+    role-file: ../../../galaxy-requirements.yml
+    requirements-file: ../../../galaxy-requirements.yml
+driver:
+  name: vagrant
+lint: |
+  set -e
+  PATH=${PATH}
+  yamllint -c ../../../.yaml-lint.yml .
+  ansible-lint -v -c ../../../.ansible-lint
+platforms:
+  - name: focal
+    box: generic/ubuntu2004
+    memory: 8192
+    cpus: 4
+    provider_options:
+      gui: false
+provisioner:
+  name: ansible
+  options:
+    vvv: true
+  config_options:
+    defaults:
+      callbacks_enabled: timer, profile_tasks, profile_roles
+  env:
+    ANSIBLE_LIBRARY: ${MOLECULE_PROJECT_DIRECTORY}/../../../playbooks/library
+verifier:
+  name: testinfra
