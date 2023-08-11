@@ -29,9 +29,9 @@ nephio:
       - resource-group-system
   kpt:
     packages:
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages.git
+      - repo_uri: https://github.com/johnbelamaric/nephio-example-packages.git
         pkg: porch-dev
-        version: "{{ nephio_pkg_version }}"
+        version: "jbelamaric"
         async: 480
         poll: 5
       - repo_uri: https://github.com/nephio-project/nephio-example-packages.git
