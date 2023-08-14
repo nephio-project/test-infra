@@ -1,0 +1,51 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+k8s:
+  context: kind-kind
+
+nephio_pkg_version: v1.0.1
+
+nephio:
+  k8s:
+    namespaces:
+      - porch-fn-system
+      - porch-system
+      - nephio-system
+      - config-management-monitoring
+      - config-management-system
+      - resource-group-system
+      - nephio-webui
+  kpt:
+    packages:
+      - pkg: porch-dev
+        version: "{{ nephio_pkg_version }}"
+        async: 90
+        poll: 0
+      - pkg: nephio-controllers
+        version: "{{ nephio_pkg_version }}"
+        async: 90
+        poll: 0
+      - pkg: configsync
+        version: "{{ nephio_pkg_version }}"
+        async: 90
+        poll: 0
+      - pkg: network-config
+        version: "{{ nephio_pkg_version }}"
+        async: 90
+        poll: 0
+      - pkg: nephio-stock-repos
+        version: "{{ nephio_pkg_version }}"
+        async: 90
+        poll: 0
+      - pkg: nephio-webui
+        version: "{{ nephio_pkg_version }}"
+        async: 90
+        poll: 0

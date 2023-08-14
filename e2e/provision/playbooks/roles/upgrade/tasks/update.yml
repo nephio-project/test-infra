@@ -1,0 +1,49 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- name: Define working directory
+  ansible.builtin.set_fact:
+    workdir: "{{ local_dest_directory | default('/tmp/kpt-pkg/' + pkg) }}"
+
+- name: Create base directory if it does not exist
+  ansible.builtin.file:
+    mode: '0755'
+    path: "{{ workdir | dirname }}"
+    state: directory
+
+- name: Print working directory
+  ansible.builtin.debug:
+    var: workdir
+
+- name: Init job ids array
+  ansible.builtin.set_fact:
+    all_kpt_update: []
+
+- name: Update package
+  kpt:
+    command: pkg-update
+    pkg_path: "{{ workdir }}"
+    version: "{{ version }}"
+    context: "{{ k8s.context }}"
+  async: "{{ kpt_async | int }}"
+  poll: "{{ kpt_poll | int }}"
+  changed_when: false
+  register: kpt_update
+  until: kpt_update is not failed
+  retries: 5
+
+- name: Export job ids array
+  ansible.builtin.set_fact:
+    all_kpt_update: "{{ all_kpt_update | default([]) + [kpt_update] }}"
+  when: kpt_poll == 0
+
+- name: Print job ids
+  ansible.builtin.debug:
+    var: all_kpt_update
