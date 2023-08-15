@@ -8,14 +8,20 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-- name: install sctp on {{ ansible_os_family }}
-  become: yes
+- name: Install sctp on {{ ansible_os_family }}
+  become: true
   ansible.builtin.package:
-    name: "kernel-modules-extra-{{ ansible_kernel }}"
+    name: "{{ item }}"
   when: ansible_os_family == 'RedHat'
+  ignore_errors: true
+  register: kernel_modules_install
+  until: kernel_modules_install is not failed
+  loop:
+    - "kernel-modules-extra-{{ ansible_kernel }}"
+    - kernel-modules-extra
 
-- name: load the sctp kernel module
-  become: yes
+- name: Load the sctp kernel module
+  become: true
   community.general.modprobe:
     name: sctp
     state: present
