@@ -53,33 +53,37 @@ function k8s_wait_exists {
     info "Found $resource_type $resource_namespace/$resource_name"
 }
 
+# k8s_wait_ready() - Waits for the readiness of a given kubernetes resource
 function k8s_wait_ready {
-    local kubeconfig=$1
-    local timeout=$2
-    local resource_namespace=$3
-    local resource_type=$4
-    local resource_name=$5
+    local resource_type=$1
+    local resource_name=$2
+    local kubeconfig=${3:-"$HOME/.kube/config"}
+    local resource_namespace=${4:-default}
+    local timeout=${5:-600}
 
     # should validate the params...
+    [ -f $kubeconfig ] || error "Kubeconfig file doesn't exist"
 
+    k8s_wait_exists "$@"
+
+    info "checking readiness of $resource_type $resource_namespace/$resource_name using $kubeconfig"
     local ready=""
     while [[ $ready != "True" && $timeout -gt 0 ]]; do
-        echo "$timeout: checking readiness of $resource_type $resource_namespace/$resource_name using $kubeconfig"
+        debug "timeout: $timeout"
         ready=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' || echo)
         timeout=$((timeout - 5))
         if [[ $ready != "True" && $timeout -gt 0 ]]; then
-            echo "status: $ready"
+            debug "status: $ready"
             sleep 5
         fi
     done
 
     if [[ $ready != "True" ]]; then
-        echo "Timed out waiting for $resource_type $resource_namespace/$resource_name to be ready"
-        return 1
+        kubectl --kubeconfig $kubeconfig -n $resource_namespace describe $resource_type $resource_name
+        error "Timed out waiting for $resource_type $resource_namespace/$resource_name to be ready"
     fi
 
-    echo "$resource_type $resource_namespace/$resource_name is ready"
-    return 0
+    info "$resource_type $resource_namespace/$resource_name is ready"
 }
 
 function k8s_wait_ready_replicas {

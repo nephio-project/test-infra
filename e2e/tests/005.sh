@@ -25,16 +25,10 @@ export LIBDIR=${LIBDIR:-$E2EDIR/lib}
 
 source "${LIBDIR}/k8s.sh"
 
-kubeconfig="$HOME/.kube/config"
-
 k8s_apply "$TESTDIR/005-edge-free5gc-upf.yaml"
 
 for cluster in "edge01" "edge02"; do
-    k8s_wait_exists "packagevariant" "edge-free5gc-upf-${cluster}-free5gc-upf"
-done
-
-for cluster in "edge01" "edge02"; do
-    k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "edge-free5gc-upf-${cluster}-free5gc-upf"
+    k8s_wait_ready "packagevariant" "edge-free5gc-upf-${cluster}-free5gc-upf"
 done
 
 for cluster in "edge01" "edge02"; do

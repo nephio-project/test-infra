@@ -25,8 +25,6 @@ export LIBDIR=${LIBDIR:-$E2EDIR/lib}
 
 source "${LIBDIR}/k8s.sh"
 
-kubeconfig="$HOME/.kube/config"
-
 k8s_apply "$TESTDIR/002-edge-clusters.yaml"
 
 # Wait for cluster resources creation
@@ -36,10 +34,11 @@ for cluster in edge01 edge02; do
 done
 
 # Wait for cluster readiness
+kubeconfig="$HOME/.kube/config"
 for cluster in $(kubectl get cl -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --kubeconfig "$kubeconfig"); do
-    k8s_wait_ready "$kubeconfig" 600 "default" "cl" "$cluster"
+    k8s_wait_ready "cl" "$cluster"
     for machineset in $(kubectl get machineset -l cluster.x-k8s.io/cluster-name="$cluster" -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --kubeconfig "$kubeconfig"); do
-        k8s_wait_ready "$kubeconfig" 600 "default" "machineset" "$machineset"
+        k8s_wait_ready "machineset" "$machineset"
     done
 done
 

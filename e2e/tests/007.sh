@@ -25,8 +25,6 @@ export LIBDIR=${LIBDIR:-$E2EDIR/lib}
 
 source "${LIBDIR}/k8s.sh"
 
-kubeconfig="$HOME/.kube/config"
-
 # Register a subscriber with free5gc
 
 regional_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
@@ -39,7 +37,7 @@ curl -d "@${TESTDIR}/007-subscriber.json" -H 'Token: admin' -H 'Content-Type: ap
 
 k8s_apply "$TESTDIR/007-edge01-ueransim.yaml"
 
-k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "edge01-ueransim"
+k8s_wait_ready "packagevariant" "edge01-ueransim"
 
 edge01_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "edge01")
 k8s_wait_exists "deployment" "ueransimgnb-edge01" "$edge01_kubeconfig" "ueransim"

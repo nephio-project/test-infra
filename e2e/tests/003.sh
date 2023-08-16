@@ -25,11 +25,9 @@ export LIBDIR=${LIBDIR:-$E2EDIR/lib}
 
 source "${LIBDIR}/k8s.sh"
 
-kubeconfig="$HOME/.kube/config"
-
 k8s_apply "$TESTDIR/003-network.yaml"
 
-k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "network"
+k8s_wait_ready "packagevariant" "network"
 
 ## Apply the network topology
 k8s_apply "$TESTDIR/003-secret.yaml"
