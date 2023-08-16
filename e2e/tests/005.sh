@@ -27,7 +27,7 @@ source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
-k8s_apply "$kubeconfig" "$TESTDIR/005-edge-free5gc-upf.yaml"
+k8s_apply "$TESTDIR/005-edge-free5gc-upf.yaml"
 
 for cluster in "edge01" "edge02"; do
     k8s_wait_exists "$kubeconfig" 600 "default" "packagevariant" "edge-free5gc-upf-${cluster}-free5gc-upf"

@@ -37,7 +37,7 @@ curl -d "@${TESTDIR}/007-subscriber.json" -H 'Token: admin' -H 'Content-Type: ap
 
 # Deploy UERANSIM to edge01
 
-k8s_apply "$kubeconfig" "$TESTDIR/007-edge01-ueransim.yaml"
+k8s_apply "$TESTDIR/007-edge01-ueransim.yaml"
 
 k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "edge01-ueransim"
 

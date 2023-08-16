@@ -28,8 +28,8 @@ source "${LIBDIR}/k8s.sh"
 kubeconfig="$HOME/.kube/config"
 
 # apply both AMF and SMF so they both start processing
-k8s_apply "$kubeconfig" "$TESTDIR/006-regional-free5gc-amf.yaml"
-k8s_apply "$kubeconfig" "$TESTDIR/006-regional-free5gc-smf.yaml"
+k8s_apply "$TESTDIR/006-regional-free5gc-amf.yaml"
+k8s_apply "$TESTDIR/006-regional-free5gc-smf.yaml"
 
 cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
 

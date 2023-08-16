@@ -9,11 +9,16 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-function k8s_apply {
-    local kubeconfig=$1
-    local file=$2
+# shellcheck source=e2e/lib/_utils.sh
+source _utils.sh
 
-    # should validate the params...
+# k8s_apply() - Creates the resources in a given kubernetes cluster
+function k8s_apply {
+    local file=$1
+    local kubeconfig=${2:-"$HOME/.kube/config"}
+
+    [ -f $kubeconfig ] || error "Kubeconfig file doesn't exist"
+    [ -f $file ] || error "Resources file doesn't exist"
 
     kubectl --kubeconfig $kubeconfig apply -f $file
 }

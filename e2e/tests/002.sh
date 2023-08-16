@@ -27,7 +27,7 @@ source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
-k8s_apply "$kubeconfig" "$TESTDIR/002-edge-clusters.yaml"
+k8s_apply "$TESTDIR/002-edge-clusters.yaml"
 
 # Wait for cluster resources creation
 for cluster in edge01 edge02; do
