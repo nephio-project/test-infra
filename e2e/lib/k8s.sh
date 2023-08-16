@@ -86,34 +86,38 @@ function k8s_wait_ready {
     info "$resource_type $resource_namespace/$resource_name is ready"
 }
 
+# k8s_wait_ready_replicas() - Waits for the readiness of a minimun number of replicas
 function k8s_wait_ready_replicas {
-    local kubeconfig=$1
-    local timeout=$2
-    local resource_namespace=$3
-    local resource_type=$4
-    local resource_name=$5
+    local resource_type=$1
+    local resource_name=$2
+    local kubeconfig=${3:-"$HOME/.kube/config"}
+    local resource_namespace=${4:-default}
+    local timeout=${5:-600}
     local min_ready=${6:-1}
 
     # should validate the params...
+    [ -f $kubeconfig ] || error "Kubeconfig file doesn't exist"
 
+    k8s_wait_exists "$resource_type" "$resource_name" "$kubeconfig" "$resource_namespace" "$timeout"
+
+    info "checking readiness of $resource_type $resource_namespace/$resource_name using $kubeconfig"
     local ready=""
     while [[ $ready -lt $min_ready && $timeout -gt 0 ]]; do
-        echo "$timeout: checking readiness of $resource_type $resource_namespace/$resource_name using $kubeconfig"
+        debug "timeout: $timeout"
         ready=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath='{.status.readyReplicas}' || echo)
         timeout=$((timeout - 5))
         if [[ $ready -lt $min_ready && $timeout -gt 0 ]]; then
-            echo "status: $ready (want $min_ready)"
+            debug "status: $ready (want $min_ready)"
             sleep 5
         fi
     done
 
     if [[ $ready -lt $min_ready ]]; then
-        echo "Timed out waiting for $resource_type $resource_namespace/$resource_name to be ready"
-        return 1
+        kubectl --kubeconfig $kubeconfig -n $resource_namespace describe $resource_type $resource_name
+        error "Timed out waiting for $resource_type $resource_namespace/$resource_name to be ready"
     fi
 
-    echo "$resource_type $resource_namespace/$resource_name is ready"
-    return 0
+    info "$resource_type $resource_namespace/$resource_name is ready"
 }
 
 function k8s_get_capi_kubeconfig {

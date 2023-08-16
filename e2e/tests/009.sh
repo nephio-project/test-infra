@@ -139,7 +139,7 @@ if [[ -z $found ]]; then
 fi
 
 # Verify pod actually reaches ready state
-k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc-cp" "deployment" "smf-regional"
+k8s_wait_ready_replicas "deployment" "smf-regional" "$cluster_kubeconfig" "free5gc-cp"
 
 echo "Getting CPU for $smf_pod_id_scale"
 after_scaling_cpu=$(k8s_get_first_container_requests $cluster_kubeconfig free5gc-cp $smf_pod_id_scale "cpu")

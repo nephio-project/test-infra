@@ -33,10 +33,8 @@ cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
 
 # check the AMF
 k8s_wait_ready "packagevariant" "regional-free5gc-amf-regional-free5gc-amf"
-k8s_wait_exists "deployment" "amf-regional" "$cluster_kubeconfig" "free5gc-cp"
-k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc-cp" "deployment" "amf-regional"
+k8s_wait_ready_replicas "deployment" "amf-regional" "$cluster_kubeconfig" "free5gc-cp"
 
 # check the SMF
 k8s_wait_ready "packagevariant" "regional-free5gc-smf-regional-free5gc-smf"
-k8s_wait_exists "deployment" "smf-regional" "$cluster_kubeconfig" "free5gc-cp"
-k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc-cp" "deployment" "smf-regional"
+k8s_wait_ready_replicas "deployment" "smf-regional" "$cluster_kubeconfig" "free5gc-cp"

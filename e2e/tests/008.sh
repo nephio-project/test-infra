@@ -105,7 +105,7 @@ for cluster in "edge01"; do
     fi
 
     # Verify pod actually reaches ready state
-    k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc-upf" "deployment" "upf-${cluster}"
+    k8s_wait_ready_replicas "deployment" "upf-${cluster}" "$cluster_kubeconfig" "free5gc-upf"
 
     echo "Getting CPU for $upf_pod_id_scale"
     after_scaling_cpu=$(k8s_get_first_container_requests $cluster_kubeconfig free5gc-upf $upf_pod_id_scale "cpu")
