@@ -22,7 +22,7 @@ source "$E2EDIR/lib/testing.sh"
 failed=$((0))
 test_summary=""
 for t in $TESTDIR/*.sh; do
-    if ! testing_run_test "$t"; then
+    if ! run_test "$t"; then
         failed=$((failed + 1))
     fi
 done
