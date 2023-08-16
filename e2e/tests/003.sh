@@ -43,5 +43,4 @@ kpt alpha rpkg propose -n default "$pkg_rev"
 k8s_wait_exists "packagerev" "$pkg_rev"
 kpt alpha rpkg approve -n default "$pkg_rev"
 
-regional_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
-k8s_wait_ready_replicas "statefulset" "mongodb" "$regional_kubeconfig" "free5gc-cp"
+k8s_wait_ready_replicas "statefulset" "mongodb" "$(k8s_get_capi_kubeconfig "regional")" "free5gc-cp"

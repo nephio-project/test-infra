@@ -28,7 +28,7 @@ kubeconfig="$HOME/.kube/config"
 
 #Get the cluster kubeconfig
 echo "Getting kubeconfig for regional"
-cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
+cluster_kubeconfig=$(k8s_get_capi_kubeconfig "regional")
 
 #Before scaling test get the running SMF POD ID
 echo "Getting pod for SMF in cluster regional"

@@ -33,7 +33,7 @@ for cluster in "edge01"; do
 
     #Get the cluster kubeconfig
     echo "Getting kubeconfig for $cluster"
-    cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "$cluster")
+    cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$cluster")
 
     #Before scaling test get the running UPF POD ID
     echo "Getting pod for UPF in cluster $cluster"

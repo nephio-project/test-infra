@@ -29,7 +29,7 @@ source "${LIBDIR}/k8s.sh"
 k8s_apply "$TESTDIR/006-regional-free5gc-amf.yaml"
 k8s_apply "$TESTDIR/006-regional-free5gc-smf.yaml"
 
-cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
+cluster_kubeconfig=$(k8s_get_capi_kubeconfig "regional")
 
 # check the AMF
 k8s_wait_ready "packagevariant" "regional-free5gc-amf-regional-free5gc-amf"

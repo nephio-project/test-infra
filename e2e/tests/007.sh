@@ -27,7 +27,7 @@ source "${LIBDIR}/k8s.sh"
 
 # Register a subscriber with free5gc
 
-regional_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
+regional_kubeconfig=$(k8s_get_capi_kubeconfig "regional")
 ip=$(kubectl --kubeconfig $regional_kubeconfig get node -o jsonpath='{.items[0].status.addresses[?(.type=="InternalIP")].address}')
 port=$(kubectl --kubeconfig $regional_kubeconfig -n free5gc-cp get svc webui-service -o jsonpath='{.spec.ports[0].nodePort}')
 
@@ -39,7 +39,7 @@ k8s_apply "$TESTDIR/007-edge01-ueransim.yaml"
 
 k8s_wait_ready "packagevariant" "edge01-ueransim"
 
-edge01_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "edge01")
+edge01_kubeconfig=$(k8s_get_capi_kubeconfig "edge01")
 k8s_wait_ready_replicas "deployment" "ueransimgnb-edge01" "$edge01_kubeconfig" "ueransim"
 k8s_wait_ready_replicas "deployment" "ueransimue-edge01" "$edge01_kubeconfig" "ueransim"
 ue_pod_name=$(kubectl --kubeconfig $edge01_kubeconfig get pods -n ueransim -l app=ueransim -l component=ue -o jsonpath='{.items[0].metadata.name}')
