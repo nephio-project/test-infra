@@ -10,7 +10,7 @@
 ##############################################################################
 
 # shellcheck source=e2e/lib/_utils.sh
-source _utils.sh
+source "${E2EDIR:-$HOME/test-infra/e2e}/lib/_utils.sh"
 
 # k8s_apply() - Creates the resources in a given kubernetes cluster
 function k8s_apply {
@@ -23,19 +23,22 @@ function k8s_apply {
     kubectl --kubeconfig $kubeconfig apply -f $file
 }
 
+# k8s_wait_exists() - Waits for the creation of a given kubernetes resource
 function k8s_wait_exists {
-    local kubeconfig=$1
-    local timeout=$2
-    local resource_namespace=$3
-    local resource_type=$4
-    local resource_name=$5
+    local resource_type=$1
+    local resource_name=$2
+    local kubeconfig=${3:-"$HOME/.kube/config"}
+    local resource_namespace=${4:-default}
+    local timeout=${5:-600}
 
     # should validate the params...
+    [ -f $kubeconfig ] || error "Kubeconfig file doesn't exist"
 
+    info "looking for $resource_type $resource_namespace/$resource_name using $kubeconfig"
     local found=""
     while [[ -z $found && $timeout -gt 0 ]]; do
-        echo "$timeout: looking for $resource_type $resource_namespace/$resource_name using $kubeconfig"
-        found=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath='{.metadata.name}' || echo)
+        debug "timeout: $timeout"
+        found=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath='{.metadata.name}' --ignore-not-found)
         timeout=$((timeout - 5))
         if [[ -z $found && $timeout -gt 0 ]]; then
             sleep 5
@@ -43,12 +46,11 @@ function k8s_wait_exists {
     done
 
     if [[ $found != "$resource_name" ]]; then
-        echo "Timed out waiting for $resource_type $resource_namespace/$resource_name"
-        return 1
+        kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type
+        error "Timed out waiting for $resource_type $resource_namespace/$resource_name"
     fi
 
-    echo "Found $resource_type $resource_namespace/$resource_name"
-    return 0
+    info "Found $resource_type $resource_namespace/$resource_name"
 }
 
 function k8s_wait_ready {
@@ -117,7 +119,7 @@ function k8s_get_capi_kubeconfig {
 
     # mktemp is supported on both ubuntu and fedora
     local file=$(mktemp --suffix "_kubeconfig-$cluster")
-    k8s_wait_exists "$kubeconfig" 600 "$namespace" "secret" "${cluster}-kubeconfig" >/dev/null 2>&1
+    k8s_wait_exists "secret" "${cluster}-kubeconfig" "$kubeconfig" "$namespace" >/dev/null 2>&1
     kubectl --kubeconfig "$kubeconfig" -n "$namespace" get secret "${cluster}-kubeconfig" -o jsonpath='{.data.value}' | base64 -d >"$file"
     echo "$file"
 }

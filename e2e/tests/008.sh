@@ -79,7 +79,7 @@ for cluster in "edge01"; do
 
     echo "Proposing update"
     kpt alpha rpkg propose -n default "$upf_pkg_rev"
-    k8s_wait_exists "$kubeconfig" 600 "default" "packagerev" "$upf_pkg_rev"
+    k8s_wait_exists "packagerev" "$upf_pkg_rev"
 
     echo "Approving update"
     kpt alpha rpkg approve -n default "$upf_pkg_rev"

@@ -31,8 +31,8 @@ k8s_apply "$TESTDIR/002-edge-clusters.yaml"
 
 # Wait for cluster resources creation
 for cluster in edge01 edge02; do
-    k8s_wait_exists "$kubeconfig" 600 "default" "workloadcluster" "$cluster"
-    k8s_wait_exists "$kubeconfig" 600 "default" "cl" "$cluster"
+    k8s_wait_exists "workloadcluster" "$cluster"
+    k8s_wait_exists "cl" "$cluster"
 done
 
 # Wait for cluster readiness

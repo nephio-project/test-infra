@@ -42,8 +42,8 @@ k8s_apply "$TESTDIR/007-edge01-ueransim.yaml"
 k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "edge01-ueransim"
 
 edge01_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "edge01")
-k8s_wait_exists "$edge01_kubeconfig" 600 "ueransim" "deployment" "ueransimgnb-edge01"
-k8s_wait_exists "$edge01_kubeconfig" 600 "ueransim" "deployment" "ueransimue-edge01"
+k8s_wait_exists "deployment" "ueransimgnb-edge01" "$edge01_kubeconfig" "ueransim"
+k8s_wait_exists "deployment" "ueransimue-edge01" "$edge01_kubeconfig" "ueransim"
 k8s_wait_ready_replicas "$edge01_kubeconfig" 600 "ueransim" "deployment" "ueransimgnb-edge01"
 k8s_wait_ready_replicas "$edge01_kubeconfig" 600 "ueransim" "deployment" "ueransimue-edge01"
 ue_pod_name=$(kubectl --kubeconfig $edge01_kubeconfig get pods -n ueransim -l app=ueransim -l component=ue -o jsonpath='{.items[0].metadata.name}')

@@ -30,7 +30,7 @@ kubeconfig="$HOME/.kube/config"
 k8s_apply "$TESTDIR/005-edge-free5gc-upf.yaml"
 
 for cluster in "edge01" "edge02"; do
-    k8s_wait_exists "$kubeconfig" 600 "default" "packagevariant" "edge-free5gc-upf-${cluster}-free5gc-upf"
+    k8s_wait_exists "packagevariant" "edge-free5gc-upf-${cluster}-free5gc-upf"
 done
 
 for cluster in "edge01" "edge02"; do
@@ -39,6 +39,6 @@ done
 
 for cluster in "edge01" "edge02"; do
     cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "$cluster")
-    k8s_wait_exists "$cluster_kubeconfig" 600 "free5gc-upf" "deployment" "upf-${cluster}"
+    k8s_wait_exists "deployment" "upf-${cluster}" "$cluster_kubeconfig" "free5gc-upf"
     k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc-upf" "deployment" "upf-${cluster}"
 done

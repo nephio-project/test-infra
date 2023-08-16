@@ -98,7 +98,7 @@ while [[ $retries -gt 0 ]]; do
         if [[ $output =~ "modified" ]]; then
             modified=true
         else
-            k8s_wait_exists "$kubeconfig" 600 "default" "packagerev" "$smf_pkg_rev"
+            k8s_wait_exists "packagerev" "$smf_pkg_rev"
         fi
     fi
 
