@@ -131,13 +131,14 @@ function k8s_get_capi_kubeconfig {
     echo "$file"
 }
 
+# k8s_exec() - Execute a command into a pod container
 function k8s_exec {
     local kubeconfig=$1
     local resource_namespace=$2
     local resource_name=$3
     local command=$4
 
-    echo "executing command $command on $resource_name in namespace $resource_namespace using $kubeconfig"
+    info "executing command $command on $resource_name in namespace $resource_namespace using $kubeconfig"
     kubectl --kubeconfig $kubeconfig -n $resource_namespace exec $resource_name -- /bin/bash -c "$command"
     return $?
 }
@@ -153,6 +154,7 @@ function _k8s_absolute_unit {
     fi
 }
 
+# k8s_check_scale() - Validate scaling pod resources
 function k8s_check_scale {
     local NF=$1
     local metric=$2
@@ -163,15 +165,15 @@ function k8s_check_scale {
     local previous_scaled=$(_k8s_absolute_unit $3)
     local success=$(echo "$previous_scaled < $current_scaled" | bc)
 
-    echo "Current : $current_raw ($current_scaled), Previous: $previous_raw ($previous_scaled)"
-    echo "$NF - Comparing the new $metric after scaling"
+    info "Current : $current_raw ($current_scaled), Previous: $previous_raw ($previous_scaled)"
+    info "$NF - Comparing the new $metric after scaling"
     if [ "$success" == "0" ]; then
-        echo "$NF $metric scaling Failed"
-        exit 1
+        error "$NF $metric scaling Failed"
     fi
-    echo "$NF - $metric Pod Scaling Successful"
+    info "$NF - $metric Pod Scaling Successful"
 }
 
+# k8s_get_first_container_requests() - Get request value from the first container found in the pod
 function k8s_get_first_container_requests {
     local kubeconfig=$1
     local namespace=$2
