@@ -23,13 +23,16 @@ export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
 export TESTDIR=${TESTDIR:-$E2EDIR/tests}
 export LIBDIR=${LIBDIR:-$E2EDIR/lib}
 
+# shellcheck source=e2e/lib/_utils.sh
+source "${LIBDIR}/_utils.sh"
+# shellcheck source=e2e/lib/k8s.sh
 source "${LIBDIR}/k8s.sh"
 
 # Register a subscriber with free5gc
 
 regional_kubeconfig=$(k8s_get_capi_kubeconfig "regional")
-ip=$(kubectl --kubeconfig $regional_kubeconfig get node -o jsonpath='{.items[0].status.addresses[?(.type=="InternalIP")].address}')
-port=$(kubectl --kubeconfig $regional_kubeconfig -n free5gc-cp get svc webui-service -o jsonpath='{.spec.ports[0].nodePort}')
+ip=$(kubectl --kubeconfig "$regional_kubeconfig" get node -o jsonpath='{.items[0].status.addresses[?(.type=="InternalIP")].address}')
+port=$(kubectl --kubeconfig "$regional_kubeconfig" -n free5gc-cp get svc webui-service -o jsonpath='{.spec.ports[0].nodePort}')
 
 curl -d "@${TESTDIR}/007-subscriber.json" -H 'Token: admin' -H 'Content-Type: application/json' "http://${ip}:${port}/api/subscriber/imsi-208930000000003/20893"
 
@@ -42,13 +45,14 @@ k8s_wait_ready "packagevariant" "edge01-ueransim"
 edge01_kubeconfig=$(k8s_get_capi_kubeconfig "edge01")
 k8s_wait_ready_replicas "deployment" "ueransimgnb-edge01" "$edge01_kubeconfig" "ueransim"
 k8s_wait_ready_replicas "deployment" "ueransimue-edge01" "$edge01_kubeconfig" "ueransim"
-ue_pod_name=$(kubectl --kubeconfig $edge01_kubeconfig get pods -n ueransim -l app=ueransim -l component=ue -o jsonpath='{.items[0].metadata.name}')
+ue_pod_name=$(kubectl --kubeconfig "$edge01_kubeconfig" get pods -n ueransim -l app=ueransim -l component=ue -o jsonpath='{.items[0].metadata.name}')
 
+info "waiting for tunnel to be established"
 timeout=600
 found=""
 while [[ -z $found && $timeout -gt 0 ]]; do
-    echo "$timeout: waiting for tunnel to be established"
-    ip_a=$(k8s_exec $edge01_kubeconfig "ueransim" $ue_pod_name "ip address show")
+    debug "timeout: $timeout"
+    ip_a=$(k8s_exec "$edge01_kubeconfig" "ueransim" "$ue_pod_name" "ip address show")
     if [[ $ip_a == *"uesimtun0"* ]]; then
         found="yes"
     fi
@@ -59,8 +63,7 @@ while [[ -z $found && $timeout -gt 0 ]]; do
 done
 
 if [[ -z $found ]]; then
-    echo "Timed out waiting for tunnel"
-    exit 1
+    error "Timed out waiting for tunnel"
 fi
 
-k8s_exec $edge01_kubeconfig "ueransim" $ue_pod_name "ping -I uesimtun0 -c 3 172.0.0.1"
+k8s_exec "$edge01_kubeconfig" "ueransim" "$ue_pod_name" "ping -I uesimtun0 -c 3 172.0.0.1"

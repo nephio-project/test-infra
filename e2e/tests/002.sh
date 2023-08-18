@@ -23,6 +23,7 @@ export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
 export TESTDIR=${TESTDIR:-$E2EDIR/tests}
 export LIBDIR=${LIBDIR:-$E2EDIR/lib}
 
+# shellcheck source=e2e/lib/k8s.sh
 source "${LIBDIR}/k8s.sh"
 
 k8s_apply "$TESTDIR/002-edge-clusters.yaml"
@@ -43,7 +44,7 @@ for cluster in $(kubectl get cl -o jsonpath='{range .items[*]}{.metadata.name}{"
 done
 
 # Inter-connect worker nodes
-$E2EDIR/provision/hacks/inter-connect_workers.sh
+"$E2EDIR/provision/hacks/inter-connect_workers.sh"
 
 # Configure VLAN interfaces
-$E2EDIR/provision/hacks/vlan-interfaces.sh
+"$E2EDIR/provision/hacks/vlan-interfaces.sh"
