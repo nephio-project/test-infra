@@ -1,0 +1,57 @@
+- name: "Create gitea repo: {{ item.name }}"
+  kubernetes.core.k8s:
+    context: kind-kind
+    state: present
+    definition:
+      apiVersion: infra.nephio.org/v1alpha1
+      kind: Repository
+      metadata:
+        name: "{{ item.name }}"
+        namespace: default
+      spec:
+        description: "{{ item.name }} repository"
+        defaultBranch: main
+
+- name: "Pull GitHub repo {{ item.name }}"
+  ansible.builtin.git:
+    repo: "{{ item.repo_uri }}"
+    dest: "/tmp/repository/{{ item.name }}.git"
+    bare: yes
+
+- name: "Add gitea remote to local git repo"
+  ansible.builtin.shell: |
+    cd /tmp/repository/{{ item.name }}.git ; git remote add gitea http://nephio:secret@172.18.0.200:3000/nephio/{{ item.name }}.git
+
+- name: "Push tags to gitea: {{ item.name }}"
+  ansible.builtin.shell: |
+    cd /tmp/repository/{{ item.name }}.git ; no_proxy="$no_proxy,172.18.0.200" NO_PROXY="$NO_PROXY,172.18.0.200"  git push gitea --tags --force
+  register: push_result
+  until: push_result is not failed
+  retries: 60
+  delay: 10
+
+- name: "Push branches to gitea: {{ item.name }}"
+  ansible.builtin.shell: |
+    cd /tmp/repository/{{ item.name }}.git ; no_proxy="$no_proxy,172.18.0.200" NO_PROXY="$NO_PROXY,172.18.0.200"  git push gitea --all --force
+
+- name: "Create porch repository object: {{ item.name }}"
+  kubernetes.core.k8s:
+    context: kind-kind
+    state: present
+    definition:
+      apiVersion: config.porch.kpt.dev/v1alpha1
+      kind: Repository
+      metadata:
+        name: "{{ item.name }}"
+        namespace: default
+        labels:
+          kpt.dev/repository-access: read-only
+          kpt.dev/repository-content: external-blueprints
+      spec:
+        content: Package
+        deployment: false
+        git:
+          branch: main
+          directory: /
+          repo: "http://172.18.0.200:3000/nephio/{{ item.name }}.git"
+        type: git   
