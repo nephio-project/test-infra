@@ -22,46 +22,47 @@ export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
 export TESTDIR=${TESTDIR:-$E2EDIR/tests}
 export LIBDIR=${LIBDIR:-$E2EDIR/lib}
 
+# shellcheck source=e2e/lib/_utils.sh
+source "${LIBDIR}/_utils.sh"
+# shellcheck source=e2e/lib/k8s.sh
 source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
 
 #Get the cluster kubeconfig
-echo "Getting kubeconfig for regional"
-cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
+info "Getting kubeconfig for regional"
+cluster_kubeconfig=$(k8s_get_capi_kubeconfig "regional")
 
 #Before scaling test get the running SMF POD ID
-echo "Getting pod for SMF in cluster regional"
-smf_pod_id=$(kubectl --kubeconfig $cluster_kubeconfig get pods -l name=smf-regional -n free5gc-cp | grep smf | head -1 | cut -d ' ' -f 1)
+info "Getting pod for SMF in cluster regional"
+smf_pod_id=$(kubectl --kubeconfig "$cluster_kubeconfig" get pods -l name=smf-regional -n free5gc-cp | grep smf | head -1 | cut -d ' ' -f 1)
 
 if [ -z "$smf_pod_id" ]; then
-    echo "SMF Pod Not Found"
-    exit 1
+    error "SMF Pod Not Found"
 fi
 
-echo "Getting CPU for $smf_pod_id"
+info "Getting CPU for $smf_pod_id"
 #If the pod exists, Get the current CPU and Memory limit
-current_cpu=$(k8s_get_first_container_requests $cluster_kubeconfig free5gc-cp $smf_pod_id "cpu")
+current_cpu=$(k8s_get_first_container_requests "$cluster_kubeconfig" free5gc-cp "$smf_pod_id" "cpu")
+debug "current_cpu: $current_cpu"
 
-echo "Getting memory for $smf_pod_id"
-current_memory=$(k8s_get_first_container_requests $cluster_kubeconfig free5gc-cp $smf_pod_id "memory")
-
-echo "Current CPU $current_cpu"
-echo "Current Memory $current_memory"
+info "Getting memory for $smf_pod_id"
+current_memory=$(k8s_get_first_container_requests "$cluster_kubeconfig" free5gc-cp "$smf_pod_id" "memory")
+debug "current_memory: $current_memory"
 
 #Scale the POD
-smf_deployment_pkg=$(kubectl --kubeconfig $kubeconfig get packagevariant regional-free5gc-smf-regional-free5gc-smf -o jsonpath='{.status.downstreamTargets[0].name}')
+smf_deployment_pkg=$(kubectl --kubeconfig "$kubeconfig" get packagevariant regional-free5gc-smf-regional-free5gc-smf -o jsonpath='{.status.downstreamTargets[0].name}')
 
 #if it's already a Draft, we will edit it directly, otherwise we will create a copy
-lifecycle=$(kubectl --kubeconfig $kubeconfig get packagerevision $smf_deployment_pkg -o jsonpath='{.spec.lifecycle}')
+lifecycle=$(kubectl --kubeconfig "$kubeconfig" get packagerevision "$smf_deployment_pkg" -o jsonpath='{.spec.lifecycle}')
 ws="regional-smf-scaling"
 
 smf_pkg_rev=$smf_deployment_pkg
 
 if [[ $lifecycle == "Published" ]]; then
-    echo "Copying $smf_deployment_pkg"
-    smf_pkg_rev=$(kpt alpha rpkg copy -n default $smf_deployment_pkg --workspace $ws | cut -d ' ' -f 1)
-    echo "Copied to $smf_pkg_rev, pulling"
+    info "Copying $smf_deployment_pkg"
+    smf_pkg_rev=$(kpt alpha rpkg copy -n default "$smf_deployment_pkg" --workspace "$ws" | cut -d ' ' -f 1)
+    info "Copied to $smf_pkg_rev, pulling"
 fi
 
 # We need to put this entire section in a retry loop, because it is possible
@@ -78,7 +79,7 @@ while [[ $retries -gt 0 ]]; do
     rm -rf /tmp/$ws
     cp -r $ws /tmp
 
-    echo "Updating the capacity"
+    info "Updating the capacity"
 
     kpt fn eval --image gcr.io/kpt-fn/search-replace:v0.2.0 $ws -- by-path='spec.maxSessions' by-file-path='**/capacity.yaml' put-value=10000
     kpt fn eval --image gcr.io/kpt-fn/search-replace:v0.2.0 $ws -- by-path='spec.maxNFConnections' by-file-path='**/capacity.yaml' put-value=50
@@ -86,25 +87,25 @@ while [[ $retries -gt 0 ]]; do
     diff -r /tmp/$ws $ws || echo
 
     modified=false
-    echo "Pushing update"
-    output=$(kpt alpha rpkg push -n default "$smf_pkg_rev" $ws 2>&1 || rc=$?)
+    info "Pushing update"
+    output=$(kpt alpha rpkg push -n default "$smf_pkg_rev" $ws >/dev/null 2>&1)
     if [[ $output =~ "modified" ]]; then
         modified=true
     fi
 
     if [[ $modified == false ]]; then
-        echo "Proposing update"
-        output=$(kpt alpha rpkg propose -n default "$smf_pkg_rev" 2>&1 || rc=$?)
+        info "Proposing update"
+        output=$(kpt alpha rpkg propose -n default "$smf_pkg_rev" >/dev/null 2>&1)
         if [[ $output =~ "modified" ]]; then
             modified=true
         else
-            k8s_wait_exists "$kubeconfig" 600 "default" "packagerev" "$smf_pkg_rev"
+            k8s_wait_exists "packagerev" "$smf_pkg_rev"
         fi
     fi
 
     if [[ $modified == false ]]; then
-        echo "Approving update"
-        output=$(kpt alpha rpkg approve -n default "$smf_pkg_rev" 2>&1 || rc=$?)
+        info "Approving update"
+        output=$(kpt alpha rpkg approve -n default "$smf_pkg_rev" >/dev/null 2>&1)
         if [[ $output =~ "modified" ]]; then
             modified=true
         fi
@@ -113,18 +114,19 @@ while [[ $retries -gt 0 ]]; do
     if [[ $modified == false ]]; then
         retries=0
     else
-        echo Capacity update failed due to concurrent change, retrying
-        retries=$(expr $retries - 1)
+        info "Capacity update failed due to concurrent change, retrying"
+        retries=$((retries - 1))
     fi
 done
 
 # Wait for the deployment to start with a new pod
+info "checking if new pod has deployed"
 timeout=600
 found=""
 while [[ -z $found && $timeout -gt 0 ]]; do
-    echo "$timeout: checking if new pod has deployed"
-    smf_pod_id_scale=$(kubectl --kubeconfig $cluster_kubeconfig get pods -l name=smf-regional -n free5gc-cp | grep smf | head -1 | cut -d ' ' -f 1)
-    if [[ ! -z $smf_pod_id_scale && $smf_pod_id_scale != $smf_pod_id ]]; then
+    debug "timeout: $timeout"
+    smf_pod_id_scale=$(kubectl --kubeconfig "$cluster_kubeconfig" get pods -l name=smf-regional -n free5gc-cp | grep smf | head -1 | cut -d ' ' -f 1)
+    if [[ -n $smf_pod_id_scale && $smf_pod_id_scale != "$smf_pod_id" ]]; then
         found=$smf_pod_id_scale
     fi
     timeout=$((timeout - 5))
@@ -134,20 +136,19 @@ while [[ -z $found && $timeout -gt 0 ]]; do
 done
 
 if [[ -z $found ]]; then
-    echo "Timed out waiting for new pod to deploy"
-    exit 1
+    error "Timed out waiting for new pod to deploy"
 fi
 
 # Verify pod actually reaches ready state
-k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc-cp" "deployment" "smf-regional"
+k8s_wait_ready_replicas "deployment" "smf-regional" "$cluster_kubeconfig" "free5gc-cp"
 
-echo "Getting CPU for $smf_pod_id_scale"
-after_scaling_cpu=$(k8s_get_first_container_requests $cluster_kubeconfig free5gc-cp $smf_pod_id_scale "cpu")
+info "Getting CPU for $smf_pod_id_scale"
+after_scaling_cpu=$(k8s_get_first_container_requests "$cluster_kubeconfig" free5gc-cp "$smf_pod_id_scale" "cpu")
 
-echo "Getting Memory for $smf_pod_id_scale"
-after_scaling_memory=$(k8s_get_first_container_requests $cluster_kubeconfig free5gc-cp $smf_pod_id_scale "memory")
+info "Getting Memory for $smf_pod_id_scale"
+after_scaling_memory=$(k8s_get_first_container_requests "$cluster_kubeconfig" free5gc-cp "$smf_pod_id_scale" "memory")
 
-echo "After Scaling  $after_scaling_cpu $after_scaling_memory"
+info "After Scaling  $after_scaling_cpu $after_scaling_memory"
 
-k8s_check_scale "SMF" "CPU" $current_cpu $after_scaling_cpu
-k8s_check_scale "SMF" "Memory" $current_memory $after_scaling_memory
+k8s_check_scale "SMF" "CPU" "$current_cpu" "$after_scaling_cpu"
+k8s_check_scale "SMF" "Memory" "$current_memory" "$after_scaling_memory"

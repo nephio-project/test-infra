@@ -22,9 +22,8 @@ export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
 export TESTDIR=${TESTDIR:-$E2EDIR/tests}
 export LIBDIR=${LIBDIR:-$E2EDIR/lib}
 
+# shellcheck source=e2e/lib/k8s.sh
 source "${LIBDIR}/k8s.sh"
-
-kubeconfig="$HOME/.kube/config"
 
 workload_cluster_pkg_rev=$(kpt alpha rpkg get --name nephio-workload-cluster --revision v9 -o jsonpath='{.metadata.name}')
 regional_pkg_rev=$(kpt alpha rpkg clone -n default "$workload_cluster_pkg_rev" --repository mgmt regional | cut -f 1 -d ' ')
@@ -34,9 +33,8 @@ kpt fn eval --image "gcr.io/kpt-fn/set-labels:v0.2.0" regional -- "nephio.org/si
 kpt alpha rpkg push -n default "$regional_pkg_rev" regional
 
 kpt alpha rpkg propose -n default "$regional_pkg_rev"
-k8s_wait_exists "$kubeconfig" 600 "default" "packagerev" "$regional_pkg_rev"
+k8s_wait_exists "packagerev" "$regional_pkg_rev"
 kpt alpha rpkg approve -n default "$regional_pkg_rev"
 
-k8s_wait_exists "$kubeconfig" 600 "default" "workloadcluster" "regional"
-k8s_wait_exists "$kubeconfig" 600 "default" "cl" "regional"
-k8s_wait_ready "$kubeconfig" 600 "default" "cl" "regional"
+k8s_wait_exists "workloadcluster" "regional"
+k8s_wait_ready "cl" "regional"

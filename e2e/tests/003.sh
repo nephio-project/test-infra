@@ -23,29 +23,25 @@ export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
 export TESTDIR=${TESTDIR:-$E2EDIR/tests}
 export LIBDIR=${LIBDIR:-$E2EDIR/lib}
 
+# shellcheck source=e2e/lib/k8s.sh
 source "${LIBDIR}/k8s.sh"
 
-kubeconfig="$HOME/.kube/config"
+k8s_apply "$TESTDIR/003-network.yaml"
 
-k8s_apply "$kubeconfig" "$TESTDIR/003-network.yaml"
-
-k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "network"
+k8s_wait_ready "packagevariant" "network"
 
 ## Apply the network topology
-k8s_apply "$kubeconfig" "$TESTDIR/003-secret.yaml"
+k8s_apply "$TESTDIR/003-secret.yaml"
 
-$E2EDIR/provision/hacks/network-topo.sh
+"$E2EDIR/provision/hacks/network-topo.sh"
 
-k8s_apply "$kubeconfig" "$TESTDIR/003-network-topo.yaml"
-regional_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
+k8s_apply "$TESTDIR/003-network-topo.yaml"
 
 upstream_pkg_rev=$(kpt alpha rpkg get --name free5gc-cp --revision v1 -o jsonpath='{.metadata.name}')
 pkg_rev=$(kpt alpha rpkg clone -n default "$upstream_pkg_rev" --repository regional free5gc-cp | cut -f 1 -d ' ')
 
 kpt alpha rpkg propose -n default "$pkg_rev"
-k8s_wait_exists "$kubeconfig" 600 "default" "packagerev" "$pkg_rev"
+k8s_wait_exists "packagerev" "$pkg_rev"
 kpt alpha rpkg approve -n default "$pkg_rev"
 
-k8s_wait_exists "$regional_kubeconfig" 600 "free5gc-cp" "statefulset" "mongodb"
-
-k8s_wait_ready_replicas "$regional_kubeconfig" 600 "free5gc-cp" "statefulset" "mongodb"
+k8s_wait_ready_replicas "statefulset" "mongodb" "$(k8s_get_capi_kubeconfig "regional")" "free5gc-cp"

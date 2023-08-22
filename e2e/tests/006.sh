@@ -23,24 +23,19 @@ export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
 export TESTDIR=${TESTDIR:-$E2EDIR/tests}
 export LIBDIR=${LIBDIR:-$E2EDIR/lib}
 
+# shellcheck source=e2e/lib/k8s.sh
 source "${LIBDIR}/k8s.sh"
 
-kubeconfig="$HOME/.kube/config"
-
 # apply both AMF and SMF so they both start processing
-k8s_apply "$kubeconfig" "$TESTDIR/006-regional-free5gc-amf.yaml"
-k8s_apply "$kubeconfig" "$TESTDIR/006-regional-free5gc-smf.yaml"
+k8s_apply "$TESTDIR/006-regional-free5gc-amf.yaml"
+k8s_apply "$TESTDIR/006-regional-free5gc-smf.yaml"
 
-cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "regional")
+cluster_kubeconfig=$(k8s_get_capi_kubeconfig "regional")
 
 # check the AMF
-k8s_wait_exists "$kubeconfig" 600 "default" "packagevariant" "regional-free5gc-amf-regional-free5gc-amf"
-k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "regional-free5gc-amf-regional-free5gc-amf"
-k8s_wait_exists "$cluster_kubeconfig" 600 "free5gc-cp" "deployment" "amf-regional"
-k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc-cp" "deployment" "amf-regional"
+k8s_wait_ready "packagevariant" "regional-free5gc-amf-regional-free5gc-amf"
+k8s_wait_ready_replicas "deployment" "amf-regional" "$cluster_kubeconfig" "free5gc-cp"
 
 # check the SMF
-k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "regional-free5gc-smf-regional-free5gc-smf"
-k8s_wait_exists "$kubeconfig" 600 "default" "packagevariant" "regional-free5gc-smf-regional-free5gc-smf"
-k8s_wait_exists "$cluster_kubeconfig" 600 "free5gc-cp" "deployment" "smf-regional"
-k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc-cp" "deployment" "smf-regional"
+k8s_wait_ready "packagevariant" "regional-free5gc-smf-regional-free5gc-smf"
+k8s_wait_ready_replicas "deployment" "smf-regional" "$cluster_kubeconfig" "free5gc-cp"

@@ -23,22 +23,15 @@ export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
 export TESTDIR=${TESTDIR:-$E2EDIR/tests}
 export LIBDIR=${LIBDIR:-$E2EDIR/lib}
 
+# shellcheck source=e2e/lib/k8s.sh
 source "${LIBDIR}/k8s.sh"
 
-kubeconfig="$HOME/.kube/config"
-
-k8s_apply "$kubeconfig" "$TESTDIR/005-edge-free5gc-upf.yaml"
+k8s_apply "$TESTDIR/005-edge-free5gc-upf.yaml"
 
 for cluster in "edge01" "edge02"; do
-    k8s_wait_exists "$kubeconfig" 600 "default" "packagevariant" "edge-free5gc-upf-${cluster}-free5gc-upf"
+    k8s_wait_ready "packagevariant" "edge-free5gc-upf-${cluster}-free5gc-upf"
 done
 
 for cluster in "edge01" "edge02"; do
-    k8s_wait_ready "$kubeconfig" 600 "default" "packagevariant" "edge-free5gc-upf-${cluster}-free5gc-upf"
-done
-
-for cluster in "edge01" "edge02"; do
-    cluster_kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "$cluster")
-    k8s_wait_exists "$cluster_kubeconfig" 600 "free5gc-upf" "deployment" "upf-${cluster}"
-    k8s_wait_ready_replicas "$cluster_kubeconfig" 600 "free5gc-upf" "deployment" "upf-${cluster}"
+    k8s_wait_ready_replicas "deployment" "upf-${cluster}" "$(k8s_get_capi_kubeconfig "$cluster")" "free5gc-upf"
 done

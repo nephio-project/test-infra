@@ -22,7 +22,7 @@ kubeconfig="$HOME/.kube/config"
 
 workers=""
 for cluster in $(kubectl get cl -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --sort-by=.metadata.name --kubeconfig "$kubeconfig"); do
-    _kubeconfig=$(k8s_get_capi_kubeconfig "$kubeconfig" "default" "$cluster")
+    _kubeconfig=$(k8s_get_capi_kubeconfig "$cluster")
     workers+=$(kubectl get nodes -l node-role.kubernetes.io/control-plane!= -o jsonpath='{range .items[*]}"{.metadata.name}",{"\n"}{end}' --kubeconfig "$_kubeconfig")
 done
 echo "{\"workers\":[${workers::-1}]}" | tee /tmp/vars.json
