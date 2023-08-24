@@ -1,10 +1,3 @@
-provider "google" {
-  project     = var.project
-  region      = var.region
-  zone        = var.zone
-  credentials = file(var.credentials)
-}
-
 resource "random_string" "vm-name" {
   length  = 6
   upper   = false
@@ -15,6 +8,7 @@ resource "random_string" "vm-name" {
 
 locals {
   vm-name = "e2e-vm-${random_string.vm-name.result}"
+  nephioyaml = "/home/${var.home_user}/nephio.yaml"
 }
 
 resource "google_compute_instance" "lab_instances" {
@@ -24,12 +18,12 @@ resource "google_compute_instance" "lab_instances" {
   allow_stopping_for_update = true
   metadata = {
     ssh-keys                = "${var.ansible_user}:${file(var.ssh_pub_key)}"
-    metadata_startup_script = file("${path.module}/../provision/init.sh")
+    metadata_startup_script = file("${path.module}/../../../provision/init.sh")
     nephio-run-e2e          = false
   }
   boot_disk {
     initialize_params {
-      image = "ubuntu-os-cloud/ubuntu-2004-lts"
+      image = var.vmimage
       size  = 200
     }
   }
@@ -50,7 +44,7 @@ resource "google_compute_instance" "e2e_instances" {
   }
   boot_disk {
     initialize_params {
-      image = "ubuntu-os-cloud/ubuntu-2004-lts"
+      image = var.vmimage
       size  = 200
     }
   }
@@ -60,8 +54,8 @@ resource "google_compute_instance" "e2e_instances" {
     }
   }
   provisioner "file" {
-    source      = "../../../test-infra"
-    destination = "/home/ubuntu/test-infra"
+    source      = "../../../../test-infra"
+    destination = "/home/${var.home_user}/test-infra"
     connection {
       host        = self.network_interface[0].access_config[0].nat_ip
       type        = "ssh"
@@ -72,7 +66,7 @@ resource "google_compute_instance" "e2e_instances" {
   }
   provisioner "file" {
     source      = "/etc/nephio/nephio.yaml"
-    destination = "/home/ubuntu/nephio.yaml"
+    destination = local.nephioyaml
     connection {
       host        = self.network_interface[0].access_config[0].nat_ip
       type        = "ssh"
@@ -90,9 +84,21 @@ resource "google_compute_instance" "e2e_instances" {
       agent       = false
     }
     inline = [
-      "cd /home/ubuntu/test-infra/e2e/provision/",
-      "chmod +x init.sh",
-      "sudo -E NEPHIO_REPO_DIR=/home/ubuntu/test-infra NEPHIO_DEBUG=true NEPHIO_RUN_E2E=true ./init.sh"
+      "if [[ $(hostnamectl | grep Fedora) == *Fedora* ]]; then sudo dnf update -y && sudo shutdown -r +1; fi"
     ]
   }
+  provisioner "remote-exec" {
+      connection {
+        host        = self.network_interface[0].access_config[0].nat_ip
+        type        = "ssh"
+        private_key = file(var.ssh_prv_key)
+        user        = var.ansible_user
+        agent       = false
+      }
+      inline = [
+        "cd /home/${var.home_user}/test-infra/e2e/provision/",
+        "chmod +x init.sh",
+        "sudo -E NEPHIO_REPO_DIR=/home/${var.home_user}/test-infra NEPHIO_DEBUG=true NEPHIO_RUN_E2E=true NEPHIO_USER=${var.home_user} ./init.sh"
+      ]
+    }
 }
