@@ -1,3 +1,17 @@
+terraform {
+  required_providers {
+    random = "~> 3.5"
+    google = "~> 4.80"
+  }
+}
+
+provider "google" {
+  credentials = file(var.credentials)
+  project     = var.project
+  region      = var.region
+  zone        = var.zone
+}
+
 resource "random_string" "vm-name" {
   length  = 6
   upper   = false
@@ -7,8 +21,8 @@ resource "random_string" "vm-name" {
 }
 
 locals {
-  vm-name = "e2e-vm-${random_string.vm-name.result}"
-  nephioyaml = "/home/${var.home_user}/nephio.yaml"
+  vm-name    = "e2e-vm-${random_string.vm-name.result}"
+  nephioyaml = "/home/${var.ansible_user}/nephio.yaml"
 }
 
 resource "google_compute_instance" "lab_instances" {
@@ -54,8 +68,8 @@ resource "google_compute_instance" "e2e_instances" {
     }
   }
   provisioner "file" {
-    source      = "../../../../test-infra"
-    destination = "/home/${var.home_user}/test-infra"
+    source      = "../../../test-infra"
+    destination = "/home/${var.ansible_user}/test-infra"
     connection {
       host        = self.network_interface[0].access_config[0].nat_ip
       type        = "ssh"
@@ -88,17 +102,17 @@ resource "google_compute_instance" "e2e_instances" {
     ]
   }
   provisioner "remote-exec" {
-      connection {
-        host        = self.network_interface[0].access_config[0].nat_ip
-        type        = "ssh"
-        private_key = file(var.ssh_prv_key)
-        user        = var.ansible_user
-        agent       = false
-      }
-      inline = [
-        "cd /home/${var.home_user}/test-infra/e2e/provision/",
-        "chmod +x init.sh",
-        "sudo -E NEPHIO_REPO_DIR=/home/${var.home_user}/test-infra NEPHIO_DEBUG=true NEPHIO_RUN_E2E=true NEPHIO_USER=${var.home_user} ./init.sh"
-      ]
+    connection {
+      host        = self.network_interface[0].access_config[0].nat_ip
+      type        = "ssh"
+      private_key = file(var.ssh_prv_key)
+      user        = var.ansible_user
+      agent       = false
     }
+    inline = [
+      "cd /home/${var.ansible_user}/test-infra/e2e/provision/",
+      "chmod +x init.sh",
+      "sudo -E NEPHIO_REPO_DIR=/home/${var.ansible_user}/test-infra NEPHIO_DEBUG=true NEPHIO_RUN_E2E=true NEPHIO_USER=${var.ansible_user} ./init.sh"
+    ]
+  }
 }
