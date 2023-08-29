@@ -14,6 +14,10 @@ variable "instance" {
   default = "e2-standard-16"
 }
 
+variable "vmimage" {
+  default = "ubuntu-os-cloud/ubuntu-2004-lts"
+}
+
 variable "credentials" {
   default = "/etc/satoken/satoken"
 }
@@ -40,4 +44,8 @@ variable "nephio_e2e_nodes" {
   default     = 1
   type        = number
   description = "The number of End-to-End instances running per PR."
+}
+
+variable "home_user" {
+  default = "ubuntu"
 }
