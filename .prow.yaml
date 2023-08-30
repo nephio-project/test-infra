@@ -14,7 +14,7 @@ presubmits:
           args:
             - "--plugin-config=prow/config/plugins.yaml"
             - "--config-path=prow/config/config.yaml"
-  - name: e2e-ubuntu
+  - name: e2e-ubuntu-focal
     annotations:
     labels:
     run_if_changed: '^e2e/'
@@ -29,8 +29,8 @@ presubmits:
           args:
             - "-c"
             - |
-              set -eE; cd e2e/terraform/ubuntu; trap 'terraform destroy -auto-approve' EXIT;
-              terraform init && timeout 75m terraform apply -auto-approve
+              set -eE; cd e2e/terraform; trap 'terraform destroy -target module.gcp-ubuntu-focal -auto-approve' EXIT;
+              terraform init && timeout 75m terraform apply -target module.gcp-ubuntu-focal -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -64,7 +64,7 @@ presubmits:
             items:
               - key: nephio.yaml
                 path: nephio.yaml
-  - name: e2e-fedora
+  - name: e2e-fedora-34
     annotations:
     labels:
     run_if_changed: '^e2e/'
@@ -79,8 +79,8 @@ presubmits:
           args:
             - "-c"
             - |
-              set -eE; cd e2e/terraform/fedora; trap 'terraform destroy -auto-approve' EXIT;
-              terraform init && timeout 75m terraform apply -auto-approve
+              set -eE; cd e2e/terraform; trap 'terraform destroy -target module.gcp-fedora-34 -auto-approve' EXIT;
+              terraform init && timeout 75m terraform apply -target module.gcp-fedora-34 -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -298,7 +298,7 @@ postsubmits:
                 path: config.json
 
 periodics:
-  - name: e2e-daily
+  - name: e2e-ubuntu-focal-daily
     annotations:
     labels:
     cron: "0 15 * * 1-5"
@@ -313,8 +313,58 @@ periodics:
           args:
             - "-c"
             - |
-              set -eE; cd e2e/terraform; trap 'terraform destroy -auto-approve' EXIT;
-              terraform init && timeout 75m terraform apply -auto-approve
+              set -eE; cd e2e/terraform; trap 'terraform destroy -target module.gcp-ubuntu-focal -auto-approve' EXIT;
+              terraform init && timeout 75m terraform apply -target module.gcp-ubuntu-focal -auto-approve
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+            - name: ssh-key-vol
+              mountPath: "/etc/ssh-key"
+            - name: nephio-e2e-yaml
+              mountPath: "/etc/nephio"
+          resources:
+            requests:
+              cpu: 2
+              memory: 2Gi
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+        - name: ssh-key-vol
+          secret:
+            secretName: ssh-key-e2e
+            defaultMode: 256
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: id_rsa.pub
+                path: id_rsa.pub
+        - name: nephio-e2e-yaml
+          secret:
+            secretName: nephio-e2e-yaml
+            items:
+              - key: nephio.yaml
+                path: nephio.yaml
+  - name: e2e-fedora-34-daily
+    annotations:
+    labels:
+    cron: "0 15 * * 1-5"
+    skip_report: false
+    decorate: true
+    cluster: default
+    spec:
+      containers:
+        - image: "nephio/e2e:1"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - |
+              set -eE; cd e2e/terraform; trap 'terraform destroy -target module.gcp-fedora-34 -auto-approve' EXIT;
+              terraform init && timeout 75m terraform apply -target module.gcp-fedora-34 -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
