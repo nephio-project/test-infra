@@ -37,13 +37,13 @@ function k8s_wait_exists {
     info "looking for $resource_type $resource_namespace/$resource_name using $kubeconfig"
     local found=""
     while [[ -z $found && $timeout -gt 0 ]]; do
-        debug "timeout: $timeout"
         found=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath='{.metadata.name}' --ignore-not-found)
         timeout=$((timeout - 5))
         if [[ -z $found && $timeout -gt 0 ]]; then
             sleep 5
         fi
     done
+    debug "timeout: $timeout"
 
     if [[ $found != "$resource_name" ]]; then
         kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type
@@ -69,14 +69,14 @@ function k8s_wait_ready {
     info "checking readiness of $resource_type $resource_namespace/$resource_name using $kubeconfig"
     local ready=""
     while [[ $ready != "True" && $timeout -gt 0 ]]; do
-        debug "timeout: $timeout"
         ready=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' || echo)
         timeout=$((timeout - 5))
         if [[ $ready != "True" && $timeout -gt 0 ]]; then
-            debug "status: $ready"
             sleep 5
         fi
     done
+    debug "status: $ready"
+    debug "timeout: $timeout"
 
     if [[ $ready != "True" ]]; then
         kubectl --kubeconfig $kubeconfig -n $resource_namespace describe $resource_type $resource_name
@@ -103,14 +103,14 @@ function k8s_wait_ready_replicas {
     info "checking readiness of $resource_type $resource_namespace/$resource_name using $kubeconfig"
     local ready=""
     while [[ $ready -lt $min_ready && $timeout -gt 0 ]]; do
-        debug "timeout: $timeout"
         ready=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath='{.status.readyReplicas}' || echo)
         timeout=$((timeout - 5))
         if [[ $ready -lt $min_ready && $timeout -gt 0 ]]; then
-            debug "status: $ready (want $min_ready)"
             sleep 5
         fi
     done
+    debug "status: $ready (want $min_ready)"
+    debug "timeout: $timeout"
 
     if [[ $ready -lt $min_ready ]]; then
         kubectl --kubeconfig $kubeconfig -n $resource_namespace describe $resource_type $resource_name

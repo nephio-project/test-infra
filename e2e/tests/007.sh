@@ -36,7 +36,6 @@ function _wait_for_uesimtun0 {
     timeout=600
     found=""
     while [[ -z $found && $timeout -gt 0 ]]; do
-        debug "timeout: $timeout"
         ip_a=$(k8s_exec "$kubeconfig" "ueransim" "$pod_name" "ip address show")
         if [[ $ip_a == *"uesimtun0"* ]]; then
             found="yes"
@@ -46,6 +45,7 @@ function _wait_for_uesimtun0 {
             sleep 5
         fi
     done
+    debug "timeout: $timeout"
 
     if [[ -z $found ]]; then
         k8s_exec "$kubeconfig" "ueransim" "$pod_name" "ip address show"
