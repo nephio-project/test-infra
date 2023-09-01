@@ -182,3 +182,27 @@ function k8s_get_first_container_requests {
 
     kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath="{.spec.containers[0].resources.requests.$resource_type}"
 }
+
+# k8s_get_newest_pod_name() - Get most recent pod name
+function k8s_get_newest_pod_name {
+    local kubeconfig="$1"
+    local label="$2"
+    local namespace="$3"
+    local previous_podname="${4:-}"
+
+    # Wait for the deployment to start with a new pod
+    timeout=600
+    while [[ $timeout -gt 0 ]]; do
+        podname=$(kubectl --kubeconfig "$kubeconfig" get pods -l "$label" -n "$namespace" --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}')
+        if [[ $podname != "$previous_podname" ]]; then
+            echo "$podname"
+            return
+        fi
+        timeout=$((timeout - 5))
+        sleep 5
+    done
+
+    kubectl --kubeconfig "$kubeconfig" get pods -n "$namespace" --show-labels
+    kubectl --kubeconfig "$kubeconfig" get events -n "$namespace"
+    error "Timed out waiting for new pod to deploy"
+}

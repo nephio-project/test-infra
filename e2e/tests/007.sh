@@ -28,42 +28,56 @@ source "${LIBDIR}/_utils.sh"
 # shellcheck source=e2e/lib/k8s.sh
 source "${LIBDIR}/k8s.sh"
 
-# Register a subscriber with free5gc
+function _wait_for_uesimtun0 {
+    kubeconfig="$1"
+    pod_name="$2"
 
+    info "waiting for tunnel to be established"
+    timeout=600
+    found=""
+    while [[ -z $found && $timeout -gt 0 ]]; do
+        debug "timeout: $timeout"
+        ip_a=$(k8s_exec "$kubeconfig" "ueransim" "$pod_name" "ip address show")
+        if [[ $ip_a == *"uesimtun0"* ]]; then
+            found="yes"
+        fi
+        timeout=$((timeout - 5))
+        if [[ -z $found && $timeout -gt 0 ]]; then
+            sleep 5
+        fi
+    done
+
+    if [[ -z $found ]]; then
+        k8s_exec "$kubeconfig" "ueransim" "$pod_name" "ip address show"
+        for worker in $(sudo docker ps --filter "name=edge01-md*" --format "{{.Names}}"); do
+            sudo docker exec "$worker" dmesg
+        done
+        error "Timed out waiting for tunnel"
+    fi
+}
+
+# Get free5GC WebUI details
 regional_kubeconfig=$(k8s_get_capi_kubeconfig "regional")
+debug "regional_kubeconfig: $regional_kubeconfig"
 ip=$(kubectl --kubeconfig "$regional_kubeconfig" get node -o jsonpath='{.items[0].status.addresses[?(.type=="InternalIP")].address}')
+debug "ip: $ip"
 port=$(kubectl --kubeconfig "$regional_kubeconfig" -n free5gc-cp get svc webui-service -o jsonpath='{.spec.ports[0].nodePort}')
+debug "port: $port"
 
+# Register a subscriber with free5gc
 curl -d "@${TESTDIR}/007-subscriber.json" -H 'Token: admin' -H 'Content-Type: application/json' "http://${ip}:${port}/api/subscriber/imsi-208930000000003/20893"
 
 # Deploy UERANSIM to edge01
-
 k8s_apply "$TESTDIR/007-edge01-ueransim.yaml"
-
 k8s_wait_ready "packagevariant" "edge01-ueransim"
-
 edge01_kubeconfig=$(k8s_get_capi_kubeconfig "edge01")
 k8s_wait_ready_replicas "deployment" "ueransimgnb-edge01" "$edge01_kubeconfig" "ueransim"
 k8s_wait_ready_replicas "deployment" "ueransimue-edge01" "$edge01_kubeconfig" "ueransim"
 ue_pod_name=$(kubectl --kubeconfig "$edge01_kubeconfig" get pods -n ueransim -l app=ueransim -l component=ue -o jsonpath='{.items[0].metadata.name}')
+debug "ue_pod_name: $ue_pod_name"
 
-info "waiting for tunnel to be established"
-timeout=600
-found=""
-while [[ -z $found && $timeout -gt 0 ]]; do
-    debug "timeout: $timeout"
-    ip_a=$(k8s_exec "$edge01_kubeconfig" "ueransim" "$ue_pod_name" "ip address show")
-    if [[ $ip_a == *"uesimtun0"* ]]; then
-        found="yes"
-    fi
-    timeout=$((timeout - 5))
-    if [[ -z $found && $timeout -gt 0 ]]; then
-        sleep 5
-    fi
-done
+# Wait for uesimtun0 interface
+_wait_for_uesimtun0 "$edge01_kubeconfig" "$ue_pod_name"
 
-if [[ -z $found ]]; then
-    error "Timed out waiting for tunnel"
-fi
-
+# Validate uesimtun0 connectivity
 k8s_exec "$edge01_kubeconfig" "ueransim" "$ue_pod_name" "ping -I uesimtun0 -c 3 172.0.0.1"
