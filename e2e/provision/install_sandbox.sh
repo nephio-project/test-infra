@@ -89,9 +89,17 @@ if [ "${DEPLOYMENT_TYPE:-r1}" == "one-summit" ]; then
 else
     # Management cluster creation
     if [[ ${DEBUG:-false} != "true" ]]; then
-        ansible-playbook -i 127.0.0.1, playbooks/cluster.yml
+        if [ ${#DOCKERHUB_USERNAME} != 0 ] && [ ${#DOCKERHUB_TOKEN} != 0 ]; then
+            ansible-playbook -i 127.0.0.1, playbooks/cluster.yml -e "DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME DOCKERHUB_TOKEN=$DOCKERHUB_TOKEN"
+        else
+            ansible-playbook -i 127.0.0.1, playbooks/cluster.yml
+        fi
     else
-        ansible-playbook -vvv -i 127.0.0.1, playbooks/cluster.yml
+        if [ ${#DOCKERHUB_USERNAME} != 0 ] && [ ${#DOCKERHUB_TOKEN} != 0 ]; then
+            ansible-playbook -vvv -i 127.0.0.1, playbooks/cluster.yml -e "DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME DOCKERHUB_TOKEN=$DOCKERHUB_TOKEN"
+        else
+            ansible-playbook -vvv -i 127.0.0.1, playbooks/cluster.yml
+        fi
     fi
 fi
 

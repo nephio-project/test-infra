@@ -60,8 +60,10 @@ BRANCH=${NEPHIO_BRANCH:-$(get_metadata nephio-test-infra-branch "main")}
 NEPHIO_USER=${NEPHIO_USER:-$(get_metadata nephio-user "ubuntu")}
 HOME=${NEPHIO_HOME:-/home/$NEPHIO_USER}
 REPO_DIR=${NEPHIO_REPO_DIR:-$HOME/test-infra}
+DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME:-""}
+DOCKERHUB_TOKEN=${DOCKERHUB_TOKEN:-""}
 
-echo "$DEBUG, $DEPLOYMENT_TYPE, $RUN_E2E, $REPO, $BRANCH, $NEPHIO_USER, $HOME, $REPO_DIR"
+echo "$DEBUG, $DEPLOYMENT_TYPE, $RUN_E2E, $REPO, $BRANCH, $NEPHIO_USER, $HOME, $REPO_DIR, $DOCKERHUB_USERNAME, $DOCKERHUB_TOKEN"
 trap get_status ERR
 
 if ! command -v git >/dev/null; then
@@ -105,7 +107,7 @@ sed -e "s/vagrant/$NEPHIO_USER/" <"$REPO_DIR/e2e/provision/nephio.yaml" >"$HOME/
 # Sandbox Creation
 int_start=$(date +%s)
 cd "$REPO_DIR/e2e/provision"
-export DEBUG DEPLOYMENT_TYPE
+export DEBUG DEPLOYMENT_TYPE DOCKERHUB_USERNAME DOCKERHUB_TOKEN
 runuser -u "$NEPHIO_USER" ./install_sandbox.sh
 printf "%s secs\n" "$(($(date +%s) - int_start))"
 
