@@ -89,9 +89,9 @@ if [ "${DEPLOYMENT_TYPE:-r1}" == "one-summit" ]; then
 else
     # Management cluster creation
     if [[ ${DEBUG:-false} != "true" ]]; then
-        ansible-playbook -i 127.0.0.1, playbooks/cluster.yml
+        ansible-playbook -i 127.0.0.1, playbooks/cluster.yml --extra-vars="nephio_pkg_version={{ lookup('env', 'PKG_VERSION') }}"
     else
-        ansible-playbook -vvv -i 127.0.0.1, playbooks/cluster.yml
+        ansible-playbook -vvv -i 127.0.0.1, playbooks/cluster.yml --extra-vars="nephio_pkg_version={{ lookup('env', 'PKG_VERSION') }}"
     fi
 fi
 

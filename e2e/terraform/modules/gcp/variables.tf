@@ -63,3 +63,9 @@ variable "nephio_e2e_nodes" {
   default     = 1
   type        = number
 }
+
+variable "nephio_pkg_version" {
+  description = "The version used for all the nephio packages"
+  default     = "main"
+  type        = string
+}

@@ -112,7 +112,7 @@ resource "google_compute_instance" "e2e_instances" {
     inline = [
       "cd /home/${var.ansible_user}/test-infra/e2e/provision/",
       "chmod +x init.sh",
-      "sudo -E NEPHIO_REPO_DIR=/home/${var.ansible_user}/test-infra NEPHIO_DEBUG=true NEPHIO_RUN_E2E=true NEPHIO_USER=${var.ansible_user} ./init.sh"
+      "sudo -E NEPHIO_PKG_VERSION=${var.nephio_pkg_version} NEPHIO_REPO_DIR=/home/${var.ansible_user}/test-infra NEPHIO_DEBUG=true NEPHIO_RUN_E2E=true NEPHIO_USER=${var.ansible_user} ./init.sh"
     ]
   }
 }
