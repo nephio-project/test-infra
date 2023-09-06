@@ -98,7 +98,7 @@ resource "google_compute_instance" "e2e_instances" {
       agent       = false
     }
     inline = [
-      "if [[ $(hostnamectl | grep Fedora) == *Fedora* ]]; then sudo dnf update -y && sudo shutdown -r +1; fi"
+      "! command -v dnf > /dev/null || sudo -- sh -c 'dnf update kernel-core -y; shutdown -r +1'"
     ]
   }
   provisioner "remote-exec" {

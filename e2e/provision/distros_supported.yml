@@ -8,10 +8,12 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-build_pkgs:
-  - gcc
-  - make
-  - kernel-devel
-  - kernel-headers
-  - elfutils-libelf
-  - elfutils-libelf-devel
+ubuntu_focal:
+  name: generic/ubuntu2004
+  project_id: ubuntu-os-cloud
+  family: ubuntu-2004-lts
+fedora_34:
+  name: fedora/34-cloud-base
+  reload: true
+  project_id: fedora-cloud
+  family: fedora-cloud-34

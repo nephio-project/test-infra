@@ -10,6 +10,13 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
+require 'yaml'
+
+vagrant_root = File.dirname(__FILE__)
+vagrant_boxes = YAML.load_file("#{vagrant_root}/distros_supported.yml")
+os_distro = ENV['OS_DISTRO'] || 'ubuntu_focal'
+box = vagrant_boxes[os_distro]
+
 # rubocop:disable Metrics/BlockLength
 Vagrant.configure('2') do |config|
   # rubocop:enable Metrics/BlockLength
@@ -17,13 +24,18 @@ Vagrant.configure('2') do |config|
   config.vm.provider :virtualbox
   config.vm.provider :google
 
-  config.vm.box = 'generic/ubuntu2004'
+  config.vm.box = box['name']
   config.vm.box_check_update = false
-  vagrant_root = File.dirname(__FILE__)
   config.vm.synced_folder "#{vagrant_root}/../../", '/opt/test-infra'
 
   config.vm.network 'forwarded_port', guest: 7007, guest_ip: '127.0.0.1', host: 7007
   config.vm.network 'forwarded_port', guest: 3000, guest_ip: '172.18.0.200', host: 3000
+
+  # Upgrade Kernel version
+  config.vm.provision 'shell', inline: <<-SHELL
+    ! command -v dnf > /dev/null || sudo dnf update kernel-core -y
+  SHELL
+  config.vm.provision :reload if box.fetch('reload', false)
 
   # Initial setup
   config.vm.provision 'shell', privileged: false, inline: <<-SHELL
@@ -71,7 +83,8 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.provider :libvirt do |v, override|
-    override.vm.synced_folder "#{vagrant_root}/../../", '/opt/test-infra', type: 'virtiofs'
+    override.vm.synced_folder "#{vagrant_root}/../../", '/opt/test-infra', type: 'nfs',
+                                                                           nfs_version: ENV.fetch('VAGRANT_NFS_VERSION', 3)
     v.memorybacking :access, mode: 'shared'
     v.random_hostname = true
     v.management_network_address = '10.0.2.0/24'
@@ -83,8 +96,8 @@ Vagrant.configure('2') do |config|
     v.google_project_id = ENV['GOOGLE_PROJECT_ID']
     v.google_json_key_location = ENV.fetch('GOOGLE_JSON_KEY_LOCATION',
                                            '~/.config/gcloud/application_default_credentials.json')
-    v.image_project_id = 'ubuntu-os-cloud'
-    v.image_family = 'ubuntu-2004-lts'
+    v.image_project_id = box['project_id']
+    v.image_family = box['family']
     v.machine_type = 'e2-standard-16'
     v.disk_size = 200
     v.name = "sandbox-vm-#{[*('a'..'z')].sample(6).join}"
