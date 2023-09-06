@@ -31,7 +31,7 @@ gitea:
   enabled: true
   k8s:
     namespace: gitea
-    postgres_password: c2VjcmV0  # echo "secret" | base64
+    postgres_password: c2VjcmV0  # echo -n "secret" | base64
     db_password: c2VjcmV0
     username: nephio
     password: secret
