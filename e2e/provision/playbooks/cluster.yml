@@ -24,6 +24,12 @@
       become: true
       when: (container_engine is not defined) or (container_engine == "docker")
       block:
+        - name: Add registry mirrors to docker configuration
+          ansible.builtin.set_fact:
+            docker_engine_daemon_json: 
+              registry-mirrors: "{{ lookup('ansible.builtin.env', 'DOCKER_REGISTRY_MIRRORS') }}"
+          when: lookup('ansible.builtin.env', 'DOCKER_REGISTRY_MIRRORS')
+
         - name: Install docker binaries
           ansible.builtin.include_role:
             name: andrewrothstein.docker_engine
