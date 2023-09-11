@@ -8,7 +8,7 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-- name: Get deployment resources
+- name: "Get deployment resources in '{{ namespace }}' namespace"
   kubernetes.core.k8s_info:
     context: "{{ context }}"
     api_version: v1
@@ -16,11 +16,11 @@
     namespace: "{{ namespace }}"
   register: deployment_list
 
-- name: Print deployment resources
+- name: "Print deployment resources in '{{ namespace }}' namespace"
   ansible.builtin.debug:
     var: deployment_list.resources
 
-- name: Wait for deployments
+- name: "Wait for deployments in '{{ namespace }}' namespace"
   kubernetes.core.k8s:
     context: "{{ context }}"
     definition:
