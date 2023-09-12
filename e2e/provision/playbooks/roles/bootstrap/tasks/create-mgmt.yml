@@ -36,7 +36,7 @@
       containerdConfigPatches:
         - |-
           [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
-            endpoint = {{ lookup('ansible.builtin.env', 'DOCKER_REGISTRY_MIRRORS') | from_json }}              
+            endpoint = {{ lookup('ansible.builtin.env', 'DOCKER_REGISTRY_MIRRORS') | from_json }}
       {% endif %}
   when: not 'kind' in bootstrap_kind_get_cluster.stdout
   changed_when: true
