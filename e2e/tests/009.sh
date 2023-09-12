@@ -32,25 +32,19 @@ kubeconfig="$HOME/.kube/config"
 #Get the cluster kubeconfig
 info "Getting kubeconfig for regional"
 cluster_kubeconfig=$(k8s_get_capi_kubeconfig "regional")
+debug "cluster_kubeconfig: $cluster_kubeconfig"
 
-#Before scaling test get the running SMF POD ID
+# Get current SMF pod state before scaling
+k8s_wait_ready_replicas "deployment" "smf-regional" "$cluster_kubeconfig" "free5gc-cp"
 info "Getting pod for SMF in cluster regional"
-smf_pod_id=$(kubectl --kubeconfig "$cluster_kubeconfig" get pods -l name=smf-regional -n free5gc-cp | grep smf | head -1 | cut -d ' ' -f 1)
-
-if [ -z "$smf_pod_id" ]; then
-    error "SMF Pod Not Found"
-fi
-
-info "Getting CPU for $smf_pod_id"
-#If the pod exists, Get the current CPU and Memory limit
+smf_pod_id=$(k8s_get_newest_pod_name "$cluster_kubeconfig" "name=smf-regional" "free5gc-cp")
+debug "smf_pod_id: $smf_pod_id"
 current_cpu=$(k8s_get_first_container_requests "$cluster_kubeconfig" free5gc-cp "$smf_pod_id" "cpu")
 debug "current_cpu: $current_cpu"
-
-info "Getting memory for $smf_pod_id"
 current_memory=$(k8s_get_first_container_requests "$cluster_kubeconfig" free5gc-cp "$smf_pod_id" "memory")
 debug "current_memory: $current_memory"
 
-#Scale the POD
+# Scale the SMF pod
 smf_deployment_pkg=$(kubectl --kubeconfig "$kubeconfig" get packagevariant regional-free5gc-smf-regional-free5gc-smf -o jsonpath='{.status.downstreamTargets[0].name}')
 
 #if it's already a Draft, we will edit it directly, otherwise we will create a copy
@@ -88,14 +82,14 @@ while [[ $retries -gt 0 ]]; do
 
     modified=false
     info "Pushing update"
-    output=$(kpt alpha rpkg push -n default "$smf_pkg_rev" $ws >/dev/null 2>&1)
+    output=$(kpt alpha rpkg push -n default "$smf_pkg_rev" $ws 2>&1)
     if [[ $output =~ "modified" ]]; then
         modified=true
     fi
 
     if [[ $modified == false ]]; then
         info "Proposing update"
-        output=$(kpt alpha rpkg propose -n default "$smf_pkg_rev" >/dev/null 2>&1)
+        output=$(kpt alpha rpkg propose -n default "$smf_pkg_rev" 2>&1)
         if [[ $output =~ "modified" ]]; then
             modified=true
         else
@@ -105,7 +99,7 @@ while [[ $retries -gt 0 ]]; do
 
     if [[ $modified == false ]]; then
         info "Approving update"
-        output=$(kpt alpha rpkg approve -n default "$smf_pkg_rev" >/dev/null 2>&1)
+        output=$(kpt alpha rpkg approve -n default "$smf_pkg_rev" 2>&1)
         if [[ $output =~ "modified" ]]; then
             modified=true
         fi
@@ -119,36 +113,17 @@ while [[ $retries -gt 0 ]]; do
     fi
 done
 
-# Wait for the deployment to start with a new pod
-info "checking if new pod has deployed"
-timeout=600
-found=""
-while [[ -z $found && $timeout -gt 0 ]]; do
-    debug "timeout: $timeout"
-    smf_pod_id_scale=$(kubectl --kubeconfig "$cluster_kubeconfig" get pods -l name=smf-regional -n free5gc-cp | grep smf | head -1 | cut -d ' ' -f 1)
-    if [[ -n $smf_pod_id_scale && $smf_pod_id_scale != "$smf_pod_id" ]]; then
-        found=$smf_pod_id_scale
-    fi
-    timeout=$((timeout - 5))
-    if [[ -z $found && $timeout -gt 0 ]]; then
-        sleep 5
-    fi
-done
-
-if [[ -z $found ]]; then
-    error "Timed out waiting for new pod to deploy"
-fi
-
-# Verify pod actually reaches ready state
+# Get current SMF pod state after scaling
 k8s_wait_ready_replicas "deployment" "smf-regional" "$cluster_kubeconfig" "free5gc-cp"
-
-info "Getting CPU for $smf_pod_id_scale"
+info "Get newest SMF pod"
+smf_pod_id_scale=$(k8s_get_newest_pod_name "$cluster_kubeconfig" "name=smf-regional" "free5gc-cp" "$smf_pod_id")
+debug "smf_pod_id_scale: $smf_pod_id_scale"
 after_scaling_cpu=$(k8s_get_first_container_requests "$cluster_kubeconfig" free5gc-cp "$smf_pod_id_scale" "cpu")
-
-info "Getting Memory for $smf_pod_id_scale"
+debug "after_scaling_cpu: $after_scaling_cpu"
 after_scaling_memory=$(k8s_get_first_container_requests "$cluster_kubeconfig" free5gc-cp "$smf_pod_id_scale" "memory")
+debug "after_scaling_memory: $after_scaling_memory"
 
-info "After Scaling  $after_scaling_cpu $after_scaling_memory"
-
+# Validate scale CPU and memory resources
+info "Validate scale CPU and memory SMF resources"
 k8s_check_scale "SMF" "CPU" "$current_cpu" "$after_scaling_cpu"
 k8s_check_scale "SMF" "Memory" "$current_memory" "$after_scaling_memory"

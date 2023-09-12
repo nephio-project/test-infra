@@ -37,13 +37,13 @@ function k8s_wait_exists {
     info "looking for $resource_type $resource_namespace/$resource_name using $kubeconfig"
     local found=""
     while [[ -z $found && $timeout -gt 0 ]]; do
-        debug "timeout: $timeout"
         found=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath='{.metadata.name}' --ignore-not-found)
         timeout=$((timeout - 5))
         if [[ -z $found && $timeout -gt 0 ]]; then
             sleep 5
         fi
     done
+    debug "timeout: $timeout"
 
     if [[ $found != "$resource_name" ]]; then
         kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type
@@ -69,14 +69,14 @@ function k8s_wait_ready {
     info "checking readiness of $resource_type $resource_namespace/$resource_name using $kubeconfig"
     local ready=""
     while [[ $ready != "True" && $timeout -gt 0 ]]; do
-        debug "timeout: $timeout"
         ready=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' || echo)
         timeout=$((timeout - 5))
         if [[ $ready != "True" && $timeout -gt 0 ]]; then
-            debug "status: $ready"
             sleep 5
         fi
     done
+    debug "status: $ready"
+    debug "timeout: $timeout"
 
     if [[ $ready != "True" ]]; then
         kubectl --kubeconfig $kubeconfig -n $resource_namespace describe $resource_type $resource_name
@@ -103,14 +103,14 @@ function k8s_wait_ready_replicas {
     info "checking readiness of $resource_type $resource_namespace/$resource_name using $kubeconfig"
     local ready=""
     while [[ $ready -lt $min_ready && $timeout -gt 0 ]]; do
-        debug "timeout: $timeout"
         ready=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath='{.status.readyReplicas}' || echo)
         timeout=$((timeout - 5))
         if [[ $ready -lt $min_ready && $timeout -gt 0 ]]; then
-            debug "status: $ready (want $min_ready)"
             sleep 5
         fi
     done
+    debug "status: $ready (want $min_ready)"
+    debug "timeout: $timeout"
 
     if [[ $ready -lt $min_ready ]]; then
         kubectl --kubeconfig $kubeconfig -n $resource_namespace describe $resource_type $resource_name
@@ -181,4 +181,28 @@ function k8s_get_first_container_requests {
     local resource_type=$4
 
     kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath="{.spec.containers[0].resources.requests.$resource_type}"
+}
+
+# k8s_get_newest_pod_name() - Get most recent pod name
+function k8s_get_newest_pod_name {
+    local kubeconfig="$1"
+    local label="$2"
+    local namespace="$3"
+    local previous_podname="${4:-}"
+
+    # Wait for the deployment to start with a new pod
+    timeout=600
+    while [[ $timeout -gt 0 ]]; do
+        podname=$(kubectl --kubeconfig "$kubeconfig" get pods -l "$label" -n "$namespace" --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}')
+        if [[ $podname != "$previous_podname" ]]; then
+            echo "$podname"
+            return
+        fi
+        timeout=$((timeout - 5))
+        sleep 5
+    done
+
+    kubectl --kubeconfig "$kubeconfig" get pods -n "$namespace" --show-labels
+    kubectl --kubeconfig "$kubeconfig" get events -n "$namespace"
+    error "Timed out waiting for new pod to deploy"
 }
