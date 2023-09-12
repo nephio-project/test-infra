@@ -27,13 +27,13 @@
     for_deployment: "{{ for_deployment | default(false) | bool }}"
     command: pkg-get
 
-- name: "Get '{{pkg}}' package content information"
+- name: "Get package content information for {{ pkg }}"
   kpt:
     directory: "{{ workdir }}"
     command: pkg-tree
   register: kpt_pkg_tree
 
-- name: "Print '{{ pkg }}' package content information"
+- name: "Print package content information for {{ pkg }}"
   ansible.builtin.debug:
     var: kpt_pkg_tree.stdout_lines
 
@@ -52,7 +52,7 @@
     group: "{{ ansible_user_gid }}"
     recurse: true
 
-- name: "Get '{{pkg}}' package differences between local and upstream"
+- name: "Get package differences between local and upstream: {{ pkg }}"
   kpt:
     pkg_path: "{{ workdir }}"
     version: "{{ version }}"
@@ -77,7 +77,7 @@
   register: kpt_live_init
   when: not kpt_resourcegroup.stat.exists
 
-- name: "Print '{{pkg}}' package initialization"
+- name: "Print package initialization for {{ pkg }}"
   ansible.builtin.debug:
     var: kpt_live_init
 
@@ -95,11 +95,11 @@
   until: kpt_apply is not failed
   retries: 5
 
-- name: Export job ids array
+- name: "Export job ids array"
   ansible.builtin.set_fact:
     all_kpt_apply: "{{ all_kpt_apply | default([]) + [kpt_apply] }}"
   when: kpt_poll == 0
 
-- name: Print job ids
+- name: "Print job ids"
   ansible.builtin.debug:
     var: all_kpt_apply
