@@ -15,7 +15,7 @@ host_min_root_disk_space: 50  # minimum required disk space before install; valu
 container_engine: docker
 
 gtp5g_dest: /opt/gtp5g
-gtp5g_version: v0.6.8
+gtp5g_version: v0.8.3
 gtp5g_tarball_url: "https://github.com/free5gc/gtp5g/archive/refs/tags/{{ gtp5g_version }}.tar.gz"
 
 k8s:
