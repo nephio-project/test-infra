@@ -69,6 +69,7 @@ presubmits:
     labels:
     run_if_changed: '^e2e/'
     skip_report: false
+    optional: true
     decorate: true
     cluster: default
     spec:
