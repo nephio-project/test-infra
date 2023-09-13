@@ -27,7 +27,10 @@
     token: "{{ lookup('ansible.builtin.env', 'DOCKERHUB_TOKEN') }}"
   block:
     - name: Create docker-registry secret
-      ansible.builtin.shell: kubectl create secret docker-registry dockerhub --docker-username={{ username }} --docker-password={{ token }} -n {{ gitea.k8s.namespace }}
+      ansible.builtin.command: >
+        kubectl create secret docker-registry dockerhub --docker-username={{ username }}
+        --docker-password={{ token }} -n {{ gitea.k8s.namespace }}
+      changed_when: false
     - name: Create docker-registry service account
       no_log: true
       kubernetes.core.k8s:
