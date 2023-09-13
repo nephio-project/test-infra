@@ -48,6 +48,7 @@ approve:
     - nephio-project/free5gc-packages
     - nephio-project/free5gc
     - nephio-project/edge-status-aggregator
+    - nephio-project/test-infra
     require_self_approval: true
     lgtm_acts_as_approve: false
     
