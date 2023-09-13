@@ -12,13 +12,13 @@
   ansible.builtin.set_fact:
     workdir: "{{ local_dest_directory | default('/tmp/kpt-pkg/' + pkg) }}"
 
-- name: Create base directory if it does not exist
+- name: "Create base directory if it does not exist: {{ workdir }}"
   ansible.builtin.file:
     mode: '0755'
     path: "{{ workdir | dirname }}"
     state: directory
 
-- name: Fetch package
+- name: "Fetch package: {{ pkg }}"
   kpt:
     repo_uri: "{{ repo_uri }}"
     pkg_path: "{{ pkg }}"
@@ -27,18 +27,18 @@
     for_deployment: "{{ for_deployment | default(false) | bool }}"
     command: pkg-get
 
-- name: Get package content information
+- name: "Get package content information for {{ pkg }}"
   kpt:
     directory: "{{ workdir }}"
     command: pkg-tree
   register: kpt_pkg_tree
 
-- name: Print package content information
+- name: "Print package content information for {{ pkg }}"
   ansible.builtin.debug:
     var: kpt_pkg_tree.stdout_lines
 
 # TODO: Improve the render function
-- name: Render package
+- name: "Render package: {{ pkg }}"
   become: true
   kpt:
     pkg_path: "{{ workdir }}"
@@ -52,14 +52,14 @@
     group: "{{ ansible_user_gid }}"
     recurse: true
 
-- name: Get package differences between local and upstream
+- name: "Get package differences between local and upstream: {{ pkg }}"
   kpt:
     pkg_path: "{{ workdir }}"
     version: "{{ version }}"
     command: pkg-diff
   register: kpt_pkg_diff
 
-- name: Print package differences
+- name: "Print package differences: {{ pkg }}"
   ansible.builtin.debug:
     var: kpt_pkg_diff.stdout_lines
 
@@ -68,7 +68,7 @@
     path: "{{ workdir }}/resourcegroup.yaml"
   register: kpt_resourcegroup
 
-- name: Init package
+- name: "Init package: {{ pkg }}"
   kpt:
     pkg_path: "{{ workdir }}"
     version: "{{ version }}"
@@ -77,11 +77,11 @@
   register: kpt_live_init
   when: not kpt_resourcegroup.stat.exists
 
-- name: Print package initialization
+- name: "Print package initialization for {{ pkg }}"
   ansible.builtin.debug:
     var: kpt_live_init
 
-- name: Apply package
+- name: "Apply package: {{ pkg }}"
   kpt:
     pkg_path: "{{ workdir }}"
     version: "{{ version }}"
@@ -95,11 +95,11 @@
   until: kpt_apply is not failed
   retries: 5
 
-- name: Export job ids array
+- name: "Export job ids array"
   ansible.builtin.set_fact:
     all_kpt_apply: "{{ all_kpt_apply | default([]) + [kpt_apply] }}"
   when: kpt_poll == 0
 
-- name: Print job ids
+- name: "Print job ids"
   ansible.builtin.debug:
     var: all_kpt_apply
