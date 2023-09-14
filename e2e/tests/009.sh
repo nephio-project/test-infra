@@ -45,9 +45,11 @@ current_memory=$(k8s_get_first_container_requests "$cluster_kubeconfig" free5gc-
 debug "current_memory: $current_memory"
 
 # Scale the SMF pod
+k8s_wait_exists "packagevariant" "regional-free5gc-smf-regional-free5gc-smf"
 smf_deployment_pkg=$(kubectl --kubeconfig "$kubeconfig" get packagevariant regional-free5gc-smf-regional-free5gc-smf -o jsonpath='{.status.downstreamTargets[0].name}')
 
 #if it's already a Draft, we will edit it directly, otherwise we will create a copy
+k8s_wait_exists "packagerevision" "$smf_deployment_pkg"
 lifecycle=$(kubectl --kubeconfig "$kubeconfig" get packagerevision "$smf_deployment_pkg" -o jsonpath='{.spec.lifecycle}')
 ws="regional-smf-scaling"
 
