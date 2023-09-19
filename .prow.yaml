@@ -14,6 +14,21 @@ presubmits:
           args:
             - "--plugin-config=prow/config/plugins.yaml"
             - "--config-path=prow/config/config.yaml"
+  - name: provision-linter
+    annotations:
+    labels:
+    run_if_changed: '^e2e/provision'
+    skip_report: false
+    decorate: true
+    cluster: default
+    spec:
+      containers:
+        - image: "nephio/linter:1"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - set -eE; cd e2e/provision; /usr/local/bin/tox -e lint
   - name: e2e-ubuntu-focal
     annotations:
     labels:
