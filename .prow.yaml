@@ -23,7 +23,7 @@ presubmits:
     cluster: default
     spec:
       containers:
-        - image: "nephio/linter:1"
+        - image: "nephio/linter:latest"
           command:
             - "/bin/sh"
           args:
