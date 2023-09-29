@@ -88,11 +88,12 @@ if [ "${DEPLOYMENT_TYPE:-r1}" == "one-summit" ]; then
     popd >/dev/null
 else
     # Management cluster creation
-    if [[ ${DEBUG:-false} != "true" ]]; then
-        ansible-playbook -i 127.0.0.1, playbooks/cluster.yml --extra-vars="nephio_pkg_version={{ lookup('env', 'PKG_VERSION') }}"
-    else
-        ansible-playbook -vvv -i 127.0.0.1, playbooks/cluster.yml --extra-vars="nephio_pkg_version={{ lookup('env', 'PKG_VERSION') }}"
-    fi
+    ansible_cmd="$(command -v ansible-playbook) -i 127.0.0.1, playbooks/cluster.yml "
+    [[ ${DEBUG:-false} != "true" ]] || ansible_cmd+="-vvv "
+    for nephio_var in NEPHIO_PKG_VERSION NEPHIO_EXAMPLE_REPO_URI; do
+        [[ -z ${!nephio_var:-} ]] || ansible_cmd+="--extra-vars=\"${nephio_var,,}=${!nephio_var}\" "
+    done
+    eval "$ansible_cmd" | tee ~/cluster.log
 fi
 
 echo "Done installing Nephio Sandbox Environment"

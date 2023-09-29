@@ -48,11 +48,12 @@ Vagrant.configure('2') do |config|
   # Provision test bed
   config.vm.provision 'shell', privileged: true do |sh|
     sh.env = {
-      NEPHIO_DEBUG: ENV.fetch('DEBUG', true),
-      NEPHIO_DEPLOYMENT_TYPE: ENV.fetch('DEPLOYMENT_TYPE', 'r1'),
-      NEPHIO_RUN_E2E: ENV.fetch('RUN_E2E', false),
+      NEPHIO_DEBUG: ENV.fetch('NEPHIO_DEBUG', true),
+      NEPHIO_DEPLOYMENT_TYPE: ENV.fetch('NEPHIO_DEPLOYMENT_TYPE', 'r1'),
+      NEPHIO_RUN_E2E: ENV.fetch('NEPHIO_RUN_E2E', false),
       NEPHIO_USER: ENV.fetch('NEPHIO_USER', 'vagrant'),
-      NEPHIO_PKG_VERSION: ENV.fetch('PKG_VERSION', 'main'),
+      NEPHIO_PKG_VERSION: ENV.fetch('NEPHIO_PKG_VERSION', 'main'),
+      NEPHIO_EXAMPLE_REPO_URI: ENV.fetch('NEPHIO_EXAMPLE_REPO_URI', 'https://github.com/nephio-project/nephio-example-packages.git'),
       NEPHIO_REPO_DIR: '/opt/test-infra',
       E2EDIR: '/opt/test-infra/e2e'
     }
