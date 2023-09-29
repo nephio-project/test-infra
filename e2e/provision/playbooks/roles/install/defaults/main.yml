@@ -17,6 +17,7 @@ gitea:
     password: secret
 
 nephio_pkg_version: v1.0.1
+nephio_example_repo_uri: https://github.com/nephio-project/nephio-example-packages.git
 
 nephio:
   k8s:
@@ -29,27 +30,27 @@ nephio:
       - resource-group-system
   kpt:
     packages:
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages.git
+      - repo_uri: "{{ nephio_example_repo_uri }}"
         pkg: porch-dev
         version: "{{ nephio_pkg_version }}"
         async: 480
         poll: 5
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages.git
+      - repo_uri: "{{ nephio_example_repo_uri }}"
         pkg: nephio-controllers
         version: "{{ nephio_pkg_version }}"
         async: 480
         poll: 5
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages.git
+      - repo_uri: "{{ nephio_example_repo_uri }}"
         pkg: configsync
         version: "{{ nephio_pkg_version }}"
         async: 240
         poll: 5
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages.git
+      - repo_uri: "{{ nephio_example_repo_uri }}"
         pkg: network-config
         version: "{{ nephio_pkg_version }}"
         async: 480
         poll: 0
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages.git
+      - repo_uri: "{{ nephio_example_repo_uri }}"
         pkg: nephio-stock-repos
         version: "{{ nephio_pkg_version }}"
         async: 60

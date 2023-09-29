@@ -104,7 +104,7 @@
         - {pkg: rootsync, dest: /tmp/rootsync/mgmt}
         - {pkg: repository, dest: /tmp/repository/mgmt-staging}
       vars:
-        repo_uri: https://github.com/nephio-project/nephio-example-packages
+        repo_uri: "{{ nephio_example_repo_uri }}"
         local_dest_directory: "{{ item.dest }}"
         pkg: "{{ item.pkg }}"
         version: "{{ nephio_pkg_version }}"
