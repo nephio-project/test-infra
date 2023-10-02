@@ -135,6 +135,5 @@
           type: Ready
           status: true
       loop:
-        - nephio-example-packages
         - mgmt
         - mgmt-staging

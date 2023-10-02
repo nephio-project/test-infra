@@ -19,6 +19,14 @@ gitea:
 nephio_pkg_version: v1.0.1
 nephio_example_repo_uri: https://github.com/nephio-project/nephio-example-packages.git
 
+nephio_stock_repos:
+  - name: nephio-example-packages
+    repo: "{{ nephio_example_repo_uri }}"
+    branch: main
+  - name: free5gc-packages
+    repo: https://github.com/nephio-project/free5gc-packages.git
+    branch: main
+
 nephio:
   k8s:
     namespaces:
@@ -49,11 +57,6 @@ nephio:
         pkg: network-config
         version: "{{ nephio_pkg_version }}"
         async: 480
-        poll: 0
-      - repo_uri: "{{ nephio_example_repo_uri }}"
-        pkg: nephio-stock-repos
-        version: "{{ nephio_pkg_version }}"
-        async: 60
         poll: 0
 
 nephio_webui:
