@@ -29,6 +29,81 @@ presubmits:
           args:
             - "-c"
             - set -eE; cd e2e/provision; /usr/local/bin/tox -e lint
+  - name: bootstrap-integration
+    annotations:
+    labels:
+    run_if_changed: '^e2e/provision/playbooks/roles/bootstrap'
+    skip_report: false
+    decorate: true
+    cluster: default
+    spec:
+      containers:
+        - image: "nephio/linter:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - set -eE; apt update && apt-get install openssh-client -y; cd e2e/provision; USER=root /usr/local/bin/tox -e bootstrap -- --scenario-name ci --driver-name gce
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+  - name: kpt-integration
+    annotations:
+    labels:
+    run_if_changed: '^e2e/provision/playbooks/roles/kpt'
+    skip_report: false
+    decorate: true
+    cluster: default
+    spec:
+      containers:
+        - image: "nephio/linter:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - set -eE; apt update && apt-get install openssh-client -y; cd e2e/provision; USER=root /usr/local/bin/tox -e kpt -- --scenario-name ci --driver-name gce
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+  - name: install-integration
+    annotations:
+    labels:
+    run_if_changed: '^e2e/provision/playbooks/roles/install'
+    skip_report: false
+    decorate: true
+    cluster: default
+    spec:
+      containers:
+        - image: "nephio/linter:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - set -eE; apt update && apt-get install openssh-client -y; cd e2e/provision; USER=root /usr/local/bin/tox -e install -- --scenario-name ci --driver-name gce
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
   - name: e2e-ubuntu-focal
     annotations:
     labels:

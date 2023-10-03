@@ -1,5 +1,7 @@
 ansible-lint # MIT
 molecule # MIT
 molecule-plugins[vagrant] # MIT
+molecule-plugins[gce] # MIT
 pytest-testinfra # Apache-2.0
 yamllint # GPLv3
+google-auth # Apache-2.0
