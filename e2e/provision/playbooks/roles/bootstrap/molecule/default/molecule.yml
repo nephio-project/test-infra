@@ -21,7 +21,7 @@ lint: |
   yamllint -c ../../../.yaml-lint.yml .
   ansible-lint -v -c ../../../.ansible-lint
 platforms:
-  - name: focal
+  - name: focal-${RANDOM}
     box: generic/ubuntu2004
     memory: 8192
     cpus: 4
@@ -29,7 +29,7 @@ platforms:
       gui: false
     groups:
       - ubuntu
-  - name: jammy
+  - name: jammy-${RANDOM}
     box: generic/ubuntu2204
     memory: 8192
     cpus: 4
@@ -37,7 +37,7 @@ platforms:
       gui: false
     groups:
       - ubuntu
-  - name: fedora34
+  - name: fedora34-${RANDOM}
     box: generic/fedora34
     memory: 8192
     cpus: 4
