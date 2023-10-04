@@ -424,6 +424,42 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
+  - name: build-push-image-molecule
+    cluster: default
+    run_if_changed: 'images/molecule/.*'
+    branches:
+    - "main"
+    annotations:
+      description: Build and Push Image to DockerHub every commit
+    decorate: true
+    decoration_config:
+      censor_secrets: true
+    max_concurrency: 0
+    spec:
+      containers:
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:debug
+        command:
+        - "/bin/sh"
+        - "-c"
+        - |
+          executor --context=${PWD}/images/molecule \
+            --dockerfile=Dockerfile --destination=nephio/molecule:${BUILD_ID} \
+            --destination=nephio/molecule:latest
+        volumeMounts:
+          - name: kaniko-secret
+            mountPath: /kaniko/.docker/
+        resources:
+          requests:
+            cpu: 1
+            memory: 1Gi
+      volumes:
+        - name: kaniko-secret
+          secret:
+            secretName: regcred
+            items:
+              - key: .dockerconfigjson
+                path: config.json
 
 periodics:
   - name: e2e-ubuntu-focal-daily
