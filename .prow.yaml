@@ -29,6 +29,81 @@ presubmits:
           args:
             - "-c"
             - set -eE; cd e2e/provision; /usr/local/bin/tox -e lint
+  - name: bootstrap-integration
+    annotations:
+    labels:
+    run_if_changed: '^e2e/provision/playbooks/roles/bootstrap'
+    skip_report: false
+    decorate: true
+    cluster: default
+    spec:
+      containers:
+        - image: "nephio/linter:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - set -eE; apt update && apt-get install openssh-client -y; cd e2e/provision; USER=root /usr/local/bin/tox -e bootstrap -- --scenario-name ci --driver-name gce
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+  - name: kpt-integration
+    annotations:
+    labels:
+    run_if_changed: '^e2e/provision/playbooks/roles/kpt'
+    skip_report: false
+    decorate: true
+    cluster: default
+    spec:
+      containers:
+        - image: "nephio/linter:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - set -eE; apt update && apt-get install openssh-client -y; cd e2e/provision; USER=root /usr/local/bin/tox -e kpt -- --scenario-name ci --driver-name gce
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+  - name: install-integration
+    annotations:
+    labels:
+    run_if_changed: '^e2e/provision/playbooks/roles/install'
+    skip_report: false
+    decorate: true
+    cluster: default
+    spec:
+      containers:
+        - image: "nephio/linter:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - set -eE; apt update && apt-get install openssh-client -y; cd e2e/provision; USER=root /usr/local/bin/tox -e install -- --scenario-name ci --driver-name gce
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
   - name: e2e-ubuntu-focal
     annotations:
     labels:
@@ -335,6 +410,42 @@ postsubmits:
           executor --context=${PWD}/images/linter \
             --dockerfile=Dockerfile --destination=nephio/linter:${BUILD_ID} \
             --destination=nephio/linter:latest
+        volumeMounts:
+          - name: kaniko-secret
+            mountPath: /kaniko/.docker/
+        resources:
+          requests:
+            cpu: 1
+            memory: 1Gi
+      volumes:
+        - name: kaniko-secret
+          secret:
+            secretName: regcred
+            items:
+              - key: .dockerconfigjson
+                path: config.json
+  - name: build-push-image-molecule
+    cluster: default
+    run_if_changed: 'images/molecule/.*'
+    branches:
+    - "main"
+    annotations:
+      description: Build and Push Image to DockerHub every commit
+    decorate: true
+    decoration_config:
+      censor_secrets: true
+    max_concurrency: 0
+    spec:
+      containers:
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:debug
+        command:
+        - "/bin/sh"
+        - "-c"
+        - |
+          executor --context=${PWD}/images/molecule \
+            --dockerfile=Dockerfile --destination=nephio/molecule:${BUILD_ID} \
+            --destination=nephio/molecule:latest
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
