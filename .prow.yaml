@@ -38,12 +38,12 @@ presubmits:
     cluster: default
     spec:
       containers:
-        - image: "nephio/linter:latest"
+        - image: "nephio/molecule:latest"
           command:
             - "/bin/sh"
           args:
             - "-c"
-            - set -eE; apt update && apt-get install openssh-client -y; cd e2e/provision; USER=root /usr/local/bin/tox -e bootstrap -- --scenario-name ci --driver-name gce
+            - set -eE; cd e2e/provision; /usr/local/bin/tox -e bootstrap -- --scenario-name ci --driver-name gce
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -63,12 +63,12 @@ presubmits:
     cluster: default
     spec:
       containers:
-        - image: "nephio/linter:latest"
+        - image: "nephio/molecule:latest"
           command:
             - "/bin/sh"
           args:
             - "-c"
-            - set -eE; apt update && apt-get install openssh-client -y; cd e2e/provision; USER=root /usr/local/bin/tox -e kpt -- --scenario-name ci --driver-name gce
+            - set -eE; cd e2e/provision; /usr/local/bin/tox -e kpt -- --scenario-name ci --driver-name gce
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -88,12 +88,12 @@ presubmits:
     cluster: default
     spec:
       containers:
-        - image: "nephio/linter:latest"
+        - image: "nephio/molecule:latest"
           command:
             - "/bin/sh"
           args:
             - "-c"
-            - set -eE; apt update && apt-get install openssh-client -y; cd e2e/provision; USER=root /usr/local/bin/tox -e install -- --scenario-name ci --driver-name gce
+            - set -eE; cd e2e/provision; /usr/local/bin/tox -e install -- --scenario-name ci --driver-name gce
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
