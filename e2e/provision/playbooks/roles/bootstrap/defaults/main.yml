@@ -26,12 +26,13 @@ kind:
   enabled: true
 
 nephio_pkg_version: v1.0.1
+nephio_example_repo_uri: https://github.com/nephio-project/nephio-example-packages.git
 
 gitea:
   enabled: true
   k8s:
     namespace: gitea
-    postgres_password: c2VjcmV0  # echo "secret" | base64
+    postgres_password: c2VjcmV0  # echo -n "secret" | base64
     db_password: c2VjcmV0
     username: nephio
     password: secret
@@ -39,7 +40,7 @@ gitea:
       - gitea
   kpt:
     packages:
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages
+      - repo_uri: "{{ nephio_example_repo_uri }}"
         pkg: gitea
         version: "{{ nephio_pkg_version }}"
         async: 780
@@ -52,7 +53,7 @@ resource_backend:
       - backend-system
   kpt:
     packages:
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages
+      - repo_uri: "{{ nephio_example_repo_uri }}"
         pkg: resource-backend
         version: "{{ nephio_pkg_version }}"
         async: 780
@@ -65,7 +66,7 @@ cert_manager:
       - cert-manager
   kpt:
     packages:
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages
+      - repo_uri: "{{ nephio_example_repo_uri }}"
         pkg: cert-manager
         version: "{{ nephio_pkg_version }}"
         async: 660
@@ -81,17 +82,17 @@ cluster_api:
       - capd-system
   kpt:
     packages:
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages
+      - repo_uri: "{{ nephio_example_repo_uri }}"
         pkg: cluster-capi
         version: "{{ nephio_pkg_version }}"
         async: 900
         poll: 5
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages
+      - repo_uri: "{{ nephio_example_repo_uri }}"
         pkg: cluster-capi-infrastructure-docker
         version: "{{ nephio_pkg_version }}"
         async: 780
         poll: 5
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages
+      - repo_uri: "{{ nephio_example_repo_uri }}"
         pkg: cluster-capi-kind-docker-templates
         version: "{{ nephio_pkg_version }}"
         async: 1500
@@ -104,12 +105,12 @@ metallb:
       - metallb-system
   kpt:
     packages:
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages
+      - repo_uri: "{{ nephio_example_repo_uri }}"
         pkg: metallb
         version: "{{ nephio_pkg_version }}"
         async: 1020
         poll: 5
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages
+      - repo_uri: "{{ nephio_example_repo_uri }}"
         pkg: metallb-sandbox-config
         version: "{{ nephio_pkg_version }}"
         async: 660
