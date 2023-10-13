@@ -7,6 +7,3 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && pip install --no-cache-dir tox==4.11.3
-
-RUN useradd -ms /bin/bash $USER
-USER $USER
