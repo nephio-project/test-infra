@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-ENV USER molecule
+ENV USER root
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
   openssh-client=1:9.2p1-2+deb12u1 \
