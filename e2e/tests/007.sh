@@ -48,9 +48,10 @@ function _wait_for_uesimtun0 {
     debug "timeout: $timeout"
 
     if [[ -z $found ]]; then
+        kubectl logs -n ueransim --kubeconfig "$kubeconfig" "$pod_name"
         k8s_exec "$kubeconfig" "ueransim" "$pod_name" "ip address show"
         for worker in $(sudo docker ps --filter "name=edge01-md*" --format "{{.Names}}"); do
-            sudo docker exec "$worker" dmesg
+            sudo docker exec "$worker" dmesg -l warn,err
         done
         error "Timed out waiting for tunnel"
     fi
