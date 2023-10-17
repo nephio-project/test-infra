@@ -29,6 +29,21 @@ presubmits:
           args:
             - "-c"
             - set -eE; cd e2e/provision; /usr/local/bin/tox -e lint
+  - name: images-hadolint
+    annotations:
+    labels:
+    run_if_changed: '^images/'
+    skip_report: false
+    decorate: true
+    cluster: default
+    spec:
+      containers:
+        - image: "hadolint/hadolint:v2.12.0-debian"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - set -eE; for dockerfile in images/*/Dockerfile; do hadolint $dockerfile -t warning; done
   - name: bootstrap-integration
     annotations:
     labels:
