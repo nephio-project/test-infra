@@ -94,6 +94,9 @@ function k8s_wait_ready_replicas {
     local resource_namespace=${4:-default}
     local timeout=${5:-600}
     local min_ready=${6:-1}
+    local status_field=${7:-readyReplicas}
+    status_field=readyReplicas
+    [ $resource_type != "daemonset" ] || status_field=numberReady
 
     # should validate the params...
     [ -f $kubeconfig ] || error "Kubeconfig file doesn't exist"
@@ -103,7 +106,7 @@ function k8s_wait_ready_replicas {
     info "checking readiness of $resource_type $resource_namespace/$resource_name using $kubeconfig"
     local ready=""
     while [[ $ready -lt $min_ready && $timeout -gt 0 ]]; do
-        ready=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath='{.status.readyReplicas}' || echo)
+        ready=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath="{.status.$status_field}" || echo)
         timeout=$((timeout - 5))
         if [[ $ready -lt $min_ready && $timeout -gt 0 ]]; then
             sleep 5
