@@ -1452,7 +1452,7 @@ periodics:
     cluster: default
     spec:
       containers:
-        - image: "nephio/e2e:1"
+        - image: "nephio/e2e:latest"
           command:
             - "/bin/sh"
           args:
@@ -1502,7 +1502,7 @@ periodics:
     cluster: default
     spec:
       containers:
-        - image: "nephio/e2e:1"
+        - image: "nephio/e2e:latest"
           command:
             - "/bin/sh"
           args:

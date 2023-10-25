@@ -128,7 +128,7 @@ presubmits:
     cluster: default
     spec:
       containers:
-        - image: "nephio/e2e:1"
+        - image: "nephio/e2e:latest"
           command:
             - "/bin/sh"
           args:
@@ -179,7 +179,7 @@ presubmits:
     cluster: default
     spec:
       containers:
-        - image: "nephio/e2e:1"
+        - image: "nephio/e2e:latest"
           command:
             - "/bin/sh"
           args:
