@@ -28,7 +28,7 @@ presubmits:
             - "/bin/sh"
           args:
             - "-c"
-            - set -eE; cd e2e/provision; /usr/local/bin/tox -e lint
+            - set -eE; cd "$(git rev-parse --show-toplevel)/e2e/provision"; /usr/local/bin/tox -e lint
   - name: images-hadolint
     annotations:
     labels:
@@ -43,7 +43,7 @@ presubmits:
             - "/bin/sh"
           args:
             - "-c"
-            - set -eE; for dockerfile in images/*/Dockerfile; do hadolint $dockerfile -t warning; done
+            - set -eE; for dockerfile in "$(git rev-parse --show-toplevel)/images/*/Dockerfile"; do hadolint $dockerfile -t warning; done
   - name: bootstrap-integration
     annotations:
     labels:
@@ -58,7 +58,7 @@ presubmits:
             - "/bin/sh"
           args:
             - "-c"
-            - set -eE; cd e2e/provision; /usr/local/bin/tox -e bootstrap -- --scenario-name ci --driver-name gce
+            - set -eE; cd "$(git rev-parse --show-toplevel)/e2e/provision"; /usr/local/bin/tox -e bootstrap -- --scenario-name ci --driver-name gce
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -83,7 +83,7 @@ presubmits:
             - "/bin/sh"
           args:
             - "-c"
-            - set -eE; cd e2e/provision; /usr/local/bin/tox -e kpt -- --scenario-name ci --driver-name gce
+            - set -eE; cd "$(git rev-parse --show-toplevel)/e2e/provision"; /usr/local/bin/tox -e kpt -- --scenario-name ci --driver-name gce
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -108,7 +108,7 @@ presubmits:
             - "/bin/sh"
           args:
             - "-c"
-            - set -eE; cd e2e/provision; /usr/local/bin/tox -e install -- --scenario-name ci --driver-name gce
+            - set -eE; cd "$(git rev-parse --show-toplevel)/e2e/provision"; /usr/local/bin/tox -e install -- --scenario-name ci --driver-name gce
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -128,13 +128,13 @@ presubmits:
     cluster: default
     spec:
       containers:
-        - image: "nephio/e2e:1"
+        - image: "nephio/e2e:latest"
           command:
             - "/bin/sh"
           args:
             - "-c"
             - |
-              set -eE; cd e2e/terraform; trap 'terraform destroy -target module.gcp-ubuntu-focal -auto-approve' EXIT;
+              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-focal -auto-approve' EXIT;
               terraform init && timeout 75m terraform apply -target module.gcp-ubuntu-focal -var="pkg_version=v1.0.1" -auto-approve
           volumeMounts:
             - name: satoken
@@ -179,13 +179,13 @@ presubmits:
     cluster: default
     spec:
       containers:
-        - image: "nephio/e2e:1"
+        - image: "nephio/e2e:latest"
           command:
             - "/bin/sh"
           args:
             - "-c"
             - |
-              set -eE; cd e2e/terraform; trap 'terraform destroy -target module.gcp-fedora-34 -auto-approve' EXIT;
+              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-34 -auto-approve' EXIT;
               terraform init && timeout 75m terraform apply -target module.gcp-fedora-34 -var="pkg_version=v1.0.1" -auto-approve
           volumeMounts:
             - name: satoken
