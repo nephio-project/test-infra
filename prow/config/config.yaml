@@ -1522,6 +1522,10 @@ periodics:
     skip_report: false
     decorate: true
     cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: test-infra
+        base_ref: main
     spec:
       containers:
         - image: "nephio/e2e:latest"
@@ -1572,6 +1576,10 @@ periodics:
     skip_report: false
     decorate: true
     cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: test-infra
+        base_ref: main
     spec:
       containers:
         - image: "nephio/e2e:latest"
