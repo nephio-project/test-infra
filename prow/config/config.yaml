@@ -1526,6 +1526,7 @@ periodics:
       - org: nephio-project
         repo: test-infra
         base_ref: main
+        path_alias: nephio_repo/test-infra
     spec:
       containers:
         - image: "nephio/e2e:latest"
@@ -1534,7 +1535,7 @@ periodics:
           args:
             - "-c"
             - |
-              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-focal -auto-approve' EXIT;
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-focal -auto-approve' EXIT;
               terraform init && timeout 75m terraform apply -target module.gcp-ubuntu-focal -auto-approve
           volumeMounts:
             - name: satoken
@@ -1580,6 +1581,7 @@ periodics:
       - org: nephio-project
         repo: test-infra
         base_ref: main
+        path_alias: nephio_repo/test-infra
     spec:
       containers:
         - image: "nephio/e2e:latest"
@@ -1588,7 +1590,7 @@ periodics:
           args:
             - "-c"
             - |
-              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-34 -auto-approve' EXIT;
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-34 -auto-approve' EXIT;
               terraform init && timeout 75m terraform apply -target module.gcp-fedora-34 -auto-approve
           volumeMounts:
             - name: satoken
