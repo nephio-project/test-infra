@@ -15,6 +15,7 @@ in_repo_config:
     nephio-project/edge-status-aggregator: true
     nephio-project/kpt-backstage-plugins: true
     nephio-project/oai: true
+    nephio-experimental/nephio-experimental-test-prow-project: true
   allowed_clusters:
     "*": ["default"]
 
@@ -83,6 +84,7 @@ tide:
     nephio-project/free5gc-packages: squash
     nephio-project/free5gc: squash
     nephio-project/edge-status-aggregator: squash
+    nephio-experimental/nephio-experimental-test-prow-project: squash
 
 decorate_all_jobs: true
 postsubmits:

@@ -20,9 +20,33 @@ plugins:
   nephio-project/test-infra:
     plugins:
     - config-updater
+  nephio-experimental:
+    plugins:
+    - approve
+    - assign
+    - blunderbuss
+    - help
+    - heart
+    - hold
+    - invalidcommitmsg
+    - label
+    - lgtm
+    - trigger
+    - verify-owners
+    - wip
+    - retitle
+    - override
+    - lifecycle
+    - cla
+    - welcome
 
 external_plugins:
   nephio-project:
+  - name: needs-rebase
+    events:
+      - issue_comment
+      - pull_request
+  nephio-experimental:
   - name: needs-rebase
     events:
       - issue_comment
