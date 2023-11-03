@@ -44,7 +44,7 @@
     NO_PROXY: "{{ gitea_ip }}"
   register: push_result
   until: push_result is not failed
-  retries: 60
+  retries: 12
   delay: 10
   changed_when: "'Everything up-to-date' not in push_result.stdout"
 
