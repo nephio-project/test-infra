@@ -75,9 +75,12 @@
     context: "{{ k8s.context }}"
     namespace: "{{ nephio_webui.k8s.namespace }}"
 
-- name: Create stock repositories
+- name: Clone stock GitHub repositories to Gitea
+  ansible.builtin.include_tasks: mirror_git_repo_to_gitea.yaml
+  loop: "{{ nephio_stock_repos }}"
+
+- name: "Wait for stock repository: {{ item.name }}"
   kubernetes.core.k8s:
-    state: present
     context: "{{ k8s.context }}"
     definition:
       apiVersion: config.porch.kpt.dev/v1alpha1
@@ -85,29 +88,8 @@
       metadata:
         name: "{{ item.name }}"
         namespace: default
-      spec:
-        content: Package
-        deployment: false
-        git:
-          branch: "{{ item.branch }}"
-          directory: /
-          repo: "{{ item.repo }}"
-        type: git
-  loop: "{{ nephio_stock_repos }}"
-
-- name: Wait for stock repositories
-  kubernetes.core.k8s:
-    context: "{{ k8s.context }}"
-    definition:
-      apiVersion: config.porch.kpt.dev/v1alpha1
-      kind: Repository
-      metadata:
-        name: "{{ item }}"
-        namespace: default
     wait: true
     wait_condition:
       type: Ready
       status: true
-  loop:
-    - nephio-example-packages
-    - free5gc-packages
+  loop: "{{ nephio_stock_repos }}"

@@ -14,7 +14,7 @@
 
 - name: "Pull GitHub repo {{ item.name }}"
   ansible.builtin.git:
-    repo: "{{ item.repo_uri }}"
+    repo: "{{ item.repo }}"
     dest: "/tmp/repository/{{ item.name }}.git"
     bare: yes
 
@@ -51,7 +51,7 @@
         content: Package
         deployment: false
         git:
-          branch: main
+          branch: "{{ item.branch }}"
           directory: /
           repo: "http://172.18.0.200:3000/nephio/{{ item.name }}.git"
         type: git
