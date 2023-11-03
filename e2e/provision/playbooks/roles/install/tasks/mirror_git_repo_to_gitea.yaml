@@ -1,6 +1,6 @@
 - name: "Create gitea repo: {{ item.name }}"
   kubernetes.core.k8s:
-    context: kind-kind
+    context: "{{ k8s.context }}"
     state: present
     definition:
       apiVersion: infra.nephio.org/v1alpha1
@@ -19,24 +19,33 @@
     bare: yes
 
 - name: "Add gitea remote to local git repo"
-  ansible.builtin.shell: |
-    cd /tmp/repository/{{ item.name }}.git ; git remote add gitea http://nephio:secret@172.18.0.200:3000/nephio/{{ item.name }}.git
+  ansible.builtin.command:
+    cmd: "git remote add gitea http://{{ gitea.k8s.username }}:{{ gitea.k8s.password }}@{{ gitea_ip }}:3000/nephio/{{ item.name }}.git"
+    chdir: "/tmp/repository/{{ item.name }}.git"
 
 - name: "Push tags to gitea: {{ item.name }}"
-  ansible.builtin.shell: |
-    cd /tmp/repository/{{ item.name }}.git ; no_proxy="$no_proxy,172.18.0.200" NO_PROXY="$NO_PROXY,172.18.0.200"  git push gitea --tags --force
+  ansible.builtin.command:
+    cmd: git push gitea --tags --force
+    chdir: /tmp/repository/{{ item.name }}.git
+  environment:
+    no_proxy: "{{ gitea_ip}}"
+    NO_PROXY: "{{ gitea_ip}}"
   register: push_result
   until: push_result is not failed
   retries: 60
   delay: 10
 
 - name: "Push branches to gitea: {{ item.name }}"
-  ansible.builtin.shell: |
-    cd /tmp/repository/{{ item.name }}.git ; no_proxy="$no_proxy,172.18.0.200" NO_PROXY="$NO_PROXY,172.18.0.200"  git push gitea --all --force
+  ansible.builtin.command:
+    cmd: git push gitea --all --force
+    chdir: /tmp/repository/{{ item.name }}.git
+  environment:
+    no_proxy: "{{ gitea_ip}}"
+    NO_PROXY: "{{ gitea_ip}}"
 
 - name: "Create porch repository object: {{ item.name }}"
   kubernetes.core.k8s:
-    context: kind-kind
+    context: "{{ k8s.context }}"
     state: present
     definition:
       apiVersion: config.porch.kpt.dev/v1alpha1
@@ -53,5 +62,5 @@
         git:
           branch: "{{ item.branch }}"
           directory: /
-          repo: "http://172.18.0.200:3000/nephio/{{ item.name }}.git"
+          repo: "http://{{ gitea_ip }}:3000/nephio/{{ item.name }}.git"
         type: git
