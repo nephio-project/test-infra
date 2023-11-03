@@ -54,4 +54,4 @@
           branch: main
           directory: /
           repo: "http://172.18.0.200:3000/nephio/{{ item.name }}.git"
-        type: git   
+        type: git
