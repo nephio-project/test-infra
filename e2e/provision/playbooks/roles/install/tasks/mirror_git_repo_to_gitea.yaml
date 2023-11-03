@@ -18,7 +18,7 @@
         name: "{{ item.name }}"
         namespace: default
       spec:
-        description: "{{ item.name }} repository"
+        description: "Clone of GitHub repository {{ item.name }}"
         defaultBranch: main
 
 - name: "Pull GitHub repo {{ item.name }}"
@@ -29,7 +29,7 @@
 
 - name: "Add gitea remote to local git repo"
   ansible.builtin.command:
-    cmd: "git remote add gitea http://{{ gitea.k8s.username }}:{{ gitea.k8s.password }}@{{ gitea_ip }}:3000/nephio/{{ item.name }}.git"
+    cmd: "git remote add gitea http://{{ gitea.k8s.username }}:{{ gitea.k8s.password }}@{{ gitea.k8s.loadbalancer_ip }}:{{ gitea.k8s.loadbalancer_port }}/nephio/{{ item.name }}.git"
     chdir: "/tmp/repository/{{ item.name }}.git"
   register: add_remote_result
   changed_when: "add_remote_result is succeeded"
@@ -40,8 +40,8 @@
     cmd: git push gitea --tags --force
     chdir: /tmp/repository/{{ item.name }}.git
   environment:
-    no_proxy: "{{ gitea_ip }}"
-    NO_PROXY: "{{ gitea_ip }}"
+    no_proxy: "{{ gitea.k8s.loadbalancer_ip }}"
+    NO_PROXY: "{{ gitea.k8s.loadbalancer_ip }}"
   register: push_result
   until: push_result is not failed
   retries: 12
@@ -53,8 +53,8 @@
     cmd: git push gitea --all --force
     chdir: /tmp/repository/{{ item.name }}.git
   environment:
-    no_proxy: "{{ gitea_ip }}"
-    NO_PROXY: "{{ gitea_ip }}"
+    no_proxy: "{{ gitea.k8s.loadbalancer_ip }}"
+    NO_PROXY: "{{ gitea.k8s.loadbalancer_ip }}"
   register: push_result
   changed_when: "'Everything up-to-date' not in push_result.stdout"
 
@@ -77,5 +77,5 @@
         git:
           branch: "{{ item.branch }}"
           directory: /
-          repo: "http://{{ gitea_ip }}:3000/nephio/{{ item.name }}.git"
+          repo: "http://{{ gitea.k8s.loadbalancer_ip }}:{{ gitea.k8s.loadbalancer_port }}/nephio/{{ item.name }}.git"
         type: git
