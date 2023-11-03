@@ -25,32 +25,38 @@
   ansible.builtin.git:
     repo: "{{ item.repo }}"
     dest: "/tmp/repository/{{ item.name }}.git"
-    bare: yes
+    bare: true
 
 - name: "Add gitea remote to local git repo"
   ansible.builtin.command:
     cmd: "git remote add gitea http://{{ gitea.k8s.username }}:{{ gitea.k8s.password }}@{{ gitea_ip }}:3000/nephio/{{ item.name }}.git"
     chdir: "/tmp/repository/{{ item.name }}.git"
+  register: add_remote_result
+  changed_when: "add_remote_result is succeeded"
+  ignore_errors: true
 
 - name: "Push tags to gitea: {{ item.name }}"
   ansible.builtin.command:
     cmd: git push gitea --tags --force
     chdir: /tmp/repository/{{ item.name }}.git
   environment:
-    no_proxy: "{{ gitea_ip}}"
-    NO_PROXY: "{{ gitea_ip}}"
+    no_proxy: "{{ gitea_ip }}"
+    NO_PROXY: "{{ gitea_ip }}"
   register: push_result
   until: push_result is not failed
   retries: 60
   delay: 10
+  changed_when: "'Everything up-to-date' not in push_result.stdout"
 
 - name: "Push branches to gitea: {{ item.name }}"
   ansible.builtin.command:
     cmd: git push gitea --all --force
     chdir: /tmp/repository/{{ item.name }}.git
   environment:
-    no_proxy: "{{ gitea_ip}}"
-    NO_PROXY: "{{ gitea_ip}}"
+    no_proxy: "{{ gitea_ip }}"
+    NO_PROXY: "{{ gitea_ip }}"
+  register: push_result
+  changed_when: "'Everything up-to-date' not in push_result.stdout"
 
 - name: "Create porch repository object: {{ item.name }}"
   kubernetes.core.k8s:
