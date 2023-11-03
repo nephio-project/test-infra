@@ -737,7 +737,7 @@ postsubmits:
                 path: config.json
 
 
-  - name: build-push-image-amfdeployfn-release-conf
+  - name: build-push-image-nfdeployfn-release-conf
     cluster: default
     always_run: true
     branches:
@@ -757,7 +757,7 @@ postsubmits:
         - "-c"
         - |
           executor --context=${PWD} \
-            --dockerfile=krm-functions/nfdeploy-fn/amfdeployfn/Dockerfile --destination=nephio/amf-deploy-fn:${PULL_BASE_REF}
+            --dockerfile=krm-functions/nfdeploy-fn/Dockerfile --destination=nephio/nfdeploy-fn:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -772,7 +772,7 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
-  - name: build-push-image-amfdeployfn-commit-conf
+  - name: build-push-image-nfdeployfn-commit-conf
     cluster: default
     always_run: true
     branches:
@@ -792,151 +792,7 @@ postsubmits:
         - "-c"
         - |
           executor --context=${PWD} \
-            --dockerfile=krm-functions/nfdeploy-fn/amfdeployfn/Dockerfile --destination=nephio/amf-deploy-fn:${BUILD_ID}
-        volumeMounts:
-          - name: kaniko-secret
-            mountPath: /kaniko/.docker/
-        resources:
-          requests:
-            cpu: 2
-            memory: 1Gi
-      volumes:
-        - name: kaniko-secret
-          secret:
-            secretName: regcred
-            items:
-              - key: .dockerconfigjson
-                path: config.json
-
-
-  - name: build-push-image-smfdeployfn-release-conf
-    cluster: default
-    always_run: true
-    branches:
-    - "^v.*$"
-    annotations:
-      description: Build and Push Image to DockerHub when release tag is created
-    decorate: true
-    decoration_config:
-      censor_secrets: true
-    max_concurrency: 0
-    spec:
-      containers:
-      - name: kaniko
-        image: gcr.io/kaniko-project/executor:debug
-        command:
-        - "/bin/sh"
-        - "-c"
-        - |
-          executor --context=${PWD} \
-            --dockerfile=krm-functions/nfdeploy-fn/smfdeployfn/Dockerfile --destination=nephio/smf-deploy-fn:${PULL_BASE_REF}
-        volumeMounts:
-          - name: kaniko-secret
-            mountPath: /kaniko/.docker/
-        resources:
-          requests:
-            cpu: 2
-            memory: 1Gi
-      volumes:
-        - name: kaniko-secret
-          secret:
-            secretName: regcred
-            items:
-              - key: .dockerconfigjson
-                path: config.json
-  - name: build-push-image-smfdeployfn-commit-conf
-    cluster: default
-    always_run: true
-    branches:
-    - "main"
-    annotations:
-      description: Build and Push Image to DockerHub every commit
-    decorate: true
-    decoration_config:
-      censor_secrets: true
-    max_concurrency: 0
-    spec:
-      containers:
-      - name: kaniko
-        image: gcr.io/kaniko-project/executor:debug
-        command:
-        - "/bin/sh"
-        - "-c"
-        - |
-          executor --context=${PWD} \
-            --dockerfile=krm-functions/nfdeploy-fn/smfdeployfn/Dockerfile --destination=nephio/smf-deploy-fn:${BUILD_ID}
-        volumeMounts:
-          - name: kaniko-secret
-            mountPath: /kaniko/.docker/
-        resources:
-          requests:
-            cpu: 2
-            memory: 1Gi
-      volumes:
-        - name: kaniko-secret
-          secret:
-            secretName: regcred
-            items:
-              - key: .dockerconfigjson
-                path: config.json
-
-
-  - name: build-push-image-upfdeployfn-release-conf
-    cluster: default
-    always_run: true
-    branches:
-    - "^v.*$"
-    annotations:
-      description: Build and Push Image to DockerHub when release tag is created
-    decorate: true
-    decoration_config:
-      censor_secrets: true
-    max_concurrency: 0
-    spec:
-      containers:
-      - name: kaniko
-        image: gcr.io/kaniko-project/executor:debug
-        command:
-        - "/bin/sh"
-        - "-c"
-        - |
-          executor --context=${PWD} \
-            --dockerfile=krm-functions/nfdeploy-fn/upfdeployfn/Dockerfile --destination=nephio/upf-deploy-fn:${PULL_BASE_REF}
-        volumeMounts:
-          - name: kaniko-secret
-            mountPath: /kaniko/.docker/
-        resources:
-          requests:
-            cpu: 2
-            memory: 1Gi
-      volumes:
-        - name: kaniko-secret
-          secret:
-            secretName: regcred
-            items:
-              - key: .dockerconfigjson
-                path: config.json
-  - name: build-push-image-upfdeployfn-commit-conf
-    cluster: default
-    always_run: true
-    branches:
-    - "main"
-    annotations:
-      description: Build and Push Image to DockerHub every commit
-    decorate: true
-    decoration_config:
-      censor_secrets: true
-    max_concurrency: 0
-    spec:
-      containers:
-      - name: kaniko
-        image: gcr.io/kaniko-project/executor:debug
-        command:
-        - "/bin/sh"
-        - "-c"
-        - |
-          executor --context=${PWD} \
-            --dockerfile=krm-functions/nfdeploy-fn/upfdeployfn/Dockerfile --destination=nephio/upf-deploy-fn:${BUILD_ID}
+            --dockerfile=krm-functions/nfdeploy-fn/Dockerfile --destination=nephio/nfdeploy-fn:${BUILD_ID}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
