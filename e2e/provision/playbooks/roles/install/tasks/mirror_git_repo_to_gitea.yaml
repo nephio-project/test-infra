@@ -29,7 +29,9 @@
 
 - name: "Add gitea remote to local git repo"
   ansible.builtin.command:
-    cmd: "git remote add gitea http://{{ gitea.k8s.username }}:{{ gitea.k8s.password }}@{{ gitea.k8s.loadbalancer_ip }}:{{ gitea.k8s.loadbalancer_port }}/nephio/{{ item.name }}.git"
+    cmd: >-
+      git remote add gitea http://{{ gitea.k8s.username }}:{{ gitea.k8s.password }}@
+      {{ gitea.k8s.loadbalancer_ip }}:{{ gitea.k8s.loadbalancer_port }}/nephio/{{ item.name }}.git
     chdir: "/tmp/repository/{{ item.name }}.git"
   register: add_remote_result
   changed_when: "add_remote_result is succeeded"

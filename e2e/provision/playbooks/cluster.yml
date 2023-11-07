@@ -78,11 +78,15 @@
       block:
         - name: Install container lab on Ubuntu family OS
           ansible.builtin.apt:
-            deb: "{{ clab.download_url }}/v{{ clab.version }}/containerlab_{{ clab.version }}_linux_{{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}.deb"
+            deb: >-
+              {{ clab.download_url }}/v{{ clab.version }}/containerlab_{{ clab.version }}_linux_
+              {{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}.deb
           when: ansible_os_family == 'Debian'
         - name: Install container lab on RedHat family OS
           ansible.builtin.yum:
-            name: "{{ clab.download_url }}/v{{ clab.version }}/containerlab_{{ clab.version }}_linux_{{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}.rpm"
+            name: >-
+              {{ clab.download_url }}/v{{ clab.version }}/containerlab_{{ clab.version }}_linux_
+              {{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}.rpm
             state: present
             disable_gpg_check: true
           when: ansible_os_family == 'RedHat'
