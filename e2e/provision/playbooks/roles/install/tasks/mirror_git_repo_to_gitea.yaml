@@ -22,13 +22,13 @@
         defaultBranch: main
 
 - name: "Pull GitHub repo {{ item.name }}"
-  ansible.builtin.git:
+  ansible.builtin.git: # noqa: latest[git]
     repo: "{{ item.repo }}"
     dest: "/tmp/repository/{{ item.name }}.git"
     bare: true
 
 - name: "Add gitea remote to local git repo"
-  ansible.builtin.command:
+  ansible.builtin.command: # noqa: command-instead-of-module
     cmd: >-
       git remote add gitea http://{{ gitea.k8s.username }}:{{ gitea.k8s.password }}@
       {{ gitea.k8s.loadbalancer_ip }}:{{ gitea.k8s.loadbalancer_port }}/nephio/{{ item.name }}.git
@@ -38,7 +38,7 @@
   ignore_errors: true
 
 - name: "Push tags to gitea: {{ item.name }}"
-  ansible.builtin.command:
+  ansible.builtin.command: # noqa: command-instead-of-module
     cmd: git push gitea --tags --force
     chdir: /tmp/repository/{{ item.name }}.git
   environment:
@@ -51,7 +51,7 @@
   changed_when: "'Everything up-to-date' not in push_result.stdout"
 
 - name: "Push branches to gitea: {{ item.name }}"
-  ansible.builtin.command:
+  ansible.builtin.command: # noqa: command-instead-of-module
     cmd: git push gitea --all --force
     chdir: /tmp/repository/{{ item.name }}.git
   environment:
