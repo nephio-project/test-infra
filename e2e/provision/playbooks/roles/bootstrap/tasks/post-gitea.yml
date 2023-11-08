@@ -23,7 +23,7 @@
 
 
 - name: Set local git facts
-  ansible.builtin.set_facts:
+  ansible.builtin.set_fact:
     local_git:
       push_uri: http://{{ gitea.k8s.username }}:{{ gitea.k8s.password }}@{{ gitea_ip_result.stdout }}:{{ gitea_port_result.stdout }}/nephio
       fetch_uri: http://{{ gitea_ip_result.stdout }}:{{ gitea_port_result.stdout }}/nephio
