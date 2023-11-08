@@ -32,3 +32,7 @@
 
 - name: Apply kpt packages
   ansible.builtin.include_tasks: apply-pkgs.yml
+
+- name: Set local git facts
+  ansible.builtin.include_tasks: post-gitea.yml
+  when: gitea.enabled

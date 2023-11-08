@@ -7,7 +7,7 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-- name: "Create gitea repo: {{ item.name }}"
+- name: "Create new repo in local git: {{ item.name }}"
   kubernetes.core.k8s:
     context: "{{ k8s.context }}"
     state: present
@@ -21,42 +21,44 @@
         description: "Clone of GitHub repository {{ item.name }}"
         defaultBranch: main
 
-- name: "Pull GitHub repo {{ item.name }}"
+- name: "Fetch GitHub repo {{ item.name }}"
   ansible.builtin.git: # noqa: latest[git]
     repo: "{{ item.repo }}"
     dest: "/tmp/repository/{{ item.name }}.git"
     bare: true
 
-- name: "Add gitea remote to local git repo"
+- name: "Add git remote for local repo"
   ansible.builtin.command: # noqa: command-instead-of-module
-    cmd: >-
-      git remote add gitea http://{{ gitea.k8s.username }}:{{ gitea.k8s.password }}@
-      {{ gitea.k8s.loadbalancer_ip }}:{{ gitea.k8s.loadbalancer_port }}/nephio/{{ item.name }}.git
+    cmd: git remote add local {{ local_git.push_uri }}/{{ item.name }}.git
     chdir: "/tmp/repository/{{ item.name }}.git"
   register: add_remote_result
   changed_when: "add_remote_result is succeeded"
   ignore_errors: true
 
-- name: "Push tags to gitea: {{ item.name }}"
+- name: "Push tags to local git repo: {{ item.name }}"
   ansible.builtin.command: # noqa: command-instead-of-module
-    cmd: git push gitea --tags --force
+    cmd: git push local --tags --force
     chdir: /tmp/repository/{{ item.name }}.git
   environment:
-    no_proxy: "{{ gitea.k8s.loadbalancer_ip }}"
-    NO_PROXY: "{{ gitea.k8s.loadbalancer_ip }}"
+    http_proxy: ""
+    https_proxy: ""
+    HTTP_PROXY: ""
+    HTTPS_PROXY: ""
   register: push_result
   until: push_result is not failed
   retries: 12
   delay: 10
   changed_when: "'Everything up-to-date' not in push_result.stdout"
 
-- name: "Push branches to gitea: {{ item.name }}"
+- name: "Push branches to local git repo: {{ item.name }}"
   ansible.builtin.command: # noqa: command-instead-of-module
-    cmd: git push gitea --all --force
+    cmd: git push local --all --force
     chdir: /tmp/repository/{{ item.name }}.git
   environment:
-    no_proxy: "{{ gitea.k8s.loadbalancer_ip }}"
-    NO_PROXY: "{{ gitea.k8s.loadbalancer_ip }}"
+    http_proxy: ""
+    https_proxy: ""
+    HTTP_PROXY: ""
+    HTTPS_PROXY: ""
   register: push_result
   changed_when: "'Everything up-to-date' not in push_result.stdout"
 
@@ -79,5 +81,5 @@
         git:
           branch: "{{ item.branch }}"
           directory: /
-          repo: "http://{{ gitea.k8s.loadbalancer_ip }}:{{ gitea.k8s.loadbalancer_port }}/nephio/{{ item.name }}.git"
+          repo: "{{ local_git.fetch_uri }}/{{ item.name }}.git"
         type: git
