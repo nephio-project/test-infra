@@ -14,12 +14,12 @@
   until: "gitea_ip_result is succeeded"
   retries: 10
   delay: 10
-  changed_when: "gitea_ip_result is succeeded"
+  changed_when: false
 
 - name: Query the external gitea TCP port
   ansible.builtin.command: kubectl get services -n gitea gitea -o jsonpath='{.spec.ports[?(@.name=="http")].port}'
   register: gitea_port_result
-  changed_when: "gitea_port_result is succeeded"
+  changed_when: false
 
 
 - name: Set local git facts

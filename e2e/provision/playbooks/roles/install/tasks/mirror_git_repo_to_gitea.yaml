@@ -32,7 +32,7 @@
     cmd: git remote add local {{ local_git.push_uri }}/{{ item.name }}.git
     chdir: "/tmp/repository/{{ item.name }}.git"
   register: add_remote_result
-  changed_when: "add_remote_result is succeeded"
+  changed_when: false
   ignore_errors: true
 
 - name: "Push tags to local git repo: {{ item.name }}"
