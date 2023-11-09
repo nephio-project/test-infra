@@ -33,7 +33,7 @@
 
     - name: "Deploy kpt package {{ item }}"
       loop:
-        - gitea 
+        - gitea
         - metallb
         - metallb-sandbox-config
       block:
