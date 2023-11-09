@@ -38,24 +38,28 @@
         - metallb-sandbox-config
       block:
         - name: "Fetch kpt package: {{ item }}"
-          ansible.builtin.command: 
+          ansible.builtin.command:
             cmd: "kpt pkg get --for-deployment '{{ nephio_example_repo_uri }}/{{ item }}@{{ nephio_pkg_version }}'"
             chdir: "/tmp"
+          changed_when: false
 
         - name: "Render kpt package: {{ item }}"
-          ansible.builtin.command: 
+          ansible.builtin.command:
             cmd: kpt fn render
             chdir: "/tmp/{{ item }}"
+          changed_when: false
 
         - name: "Init kpt package: {{ item }}"
-          ansible.builtin.command: 
+          ansible.builtin.command:
             cmd: "kpt live init --namespace default"
             chdir: "/tmp/{{ item }}"
+          changed_when: false
 
         - name: "Apply kpt package: {{ item }}"
-          ansible.builtin.command: 
+          ansible.builtin.command:
             cmd: "kpt live apply --namespace default --reconcile-timeout 3600"
             chdir: "/tmp/{{ item }}"
+          changed_when: false
 
     - name: Create Gitea K8s resources
       ansible.builtin.include_tasks: ../../../bootstrap/tasks/post-gitea.yml
