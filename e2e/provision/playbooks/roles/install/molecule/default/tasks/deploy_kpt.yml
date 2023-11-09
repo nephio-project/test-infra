@@ -10,13 +10,13 @@
 
 - name: "Fetch kpt package: {{ item }}"
   ansible.builtin.command:
-    cmd: "kpt pkg get --for-deployment --context {{ k8s.context }} '{{ nephio_example_repo_uri }}/{{ item }}@{{ nephio_pkg_version }}'"
+    cmd: "kpt pkg get --for-deployment '{{ nephio_example_repo_uri }}/{{ item }}@{{ nephio_pkg_version }}'"
     chdir: "/tmp"
   changed_when: false
 
 - name: "Render kpt package: {{ item }}"
   ansible.builtin.command:
-    cmd: "kpt fn render --context {{ k8s.context }}"
+    cmd: "kpt fn render"
     chdir: "/tmp/{{ item }}"
   changed_when: false
 
