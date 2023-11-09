@@ -11,7 +11,7 @@
 - name: Include the kpt role's prepare playbook
   ansible.builtin.import_playbook: ../../../kpt/molecule/default/prepare.yml
 
-- name: Boostrap servers
+- name: Deploy Gitea 
   hosts: all
   tasks:
     - name: Set Gitea config
@@ -27,6 +27,14 @@
             password: secret
         nephio_pkg_version: v1.0.1
         nephio_example_repo_uri: https://github.com/nephio-project/nephio-example-packages.git
+
+    - name: Wait for cluster to set up
+      ansible.builtin.command: "kubectl get all --context {{ k8s.context }}"
+      register: checkcluster_result
+      until: "checkcluster_result is succeeded"
+      retries: 100
+      delay: 10
+      changed_when: false
 
     - name: Create Gitea K8s resources
       ansible.builtin.include_tasks: ../../../bootstrap/tasks/prep-gitea.yml
