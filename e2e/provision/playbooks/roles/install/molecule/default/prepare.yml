@@ -11,7 +11,7 @@
 - name: Include the kpt role's prepare playbook
   ansible.builtin.import_playbook: ../../../kpt/molecule/default/prepare.yml
 
-- name: Deploy Gitea 
+- name: Deploy Gitea
   hosts: all
   tasks:
     - name: Set Gitea config
@@ -45,7 +45,6 @@
         - gitea
         - metallb
         - metallb-sandbox-config
-
 
     - name: Create Gitea K8s resources
       ansible.builtin.include_tasks: ../../../bootstrap/tasks/post-gitea.yml
