@@ -9,7 +9,7 @@
 ##############################################################################
 
 - name: Query the external gitea IP address
-  ansible.builtin.command: kubectl get services -n gitea gitea -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+  ansible.builtin.command: "kubectl --context {{ k8s.context }} get services -n gitea gitea -o jsonpath='{.status.loadBalancer.ingress[0].ip}'"
   register: gitea_ip_result
   until: "gitea_ip_result is succeeded"
   retries: 10
@@ -17,10 +17,9 @@
   changed_when: false
 
 - name: Query the external gitea TCP port
-  ansible.builtin.command: kubectl get services -n gitea gitea -o jsonpath='{.spec.ports[?(@.name=="http")].port}'
+  ansible.builtin.command: "kubectl --context {{ k8s.context }} get services -n gitea gitea -o jsonpath='{.spec.ports[?(@.name==\"http\")].port}'"
   register: gitea_port_result
   changed_when: false
-
 
 - name: Set local git facts
   ansible.builtin.set_fact:

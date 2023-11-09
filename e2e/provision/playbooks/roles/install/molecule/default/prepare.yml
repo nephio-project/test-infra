@@ -1,0 +1,61 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- name: Include the kpt role's prepare playbook
+  ansible.builtin.import_playbook: ../../../kpt/molecule/default/prepare.yml
+
+- name: Boostrap servers
+  hosts: all
+  tasks:
+    - name: Set Gitea config
+      ansible.builtin.set_fact:
+        k8s:
+          context: kind-kind
+        gitea:
+          k8s:
+            namespace: gitea
+            postgres_password: c2VjcmV0  # echo -n "secret" | base64
+            db_password: c2VjcmV0
+            username: nephio
+            password: secret
+        nephio_pkg_version: v1.0.1
+        nephio_example_repo_uri: https://github.com/nephio-project/nephio-example-packages.git
+
+    - name: Create Gitea K8s resources
+      ansible.builtin.include_tasks: ../../../bootstrap/tasks/prep-gitea.yml
+
+    - name: "Deploy kpt package {{ item }}"
+      loop:
+        - gitea 
+        - metallb
+        - metallb-sandbox-config
+      block:
+        - name: "Fetch kpt package: {{ item }}"
+          ansible.builtin.command: 
+            cmd: "kpt pkg get --for-deployment '{{ nephio_example_repo_uri }}/{{ item }}@{{ nephio_pkg_version }}'"
+            chdir: "/tmp"
+
+        - name: "Render kpt package: {{ item }}"
+          ansible.builtin.command: 
+            cmd: kpt fn render
+            chdir: "/tmp/{{ item }}"
+
+        - name: "Init kpt package: {{ item }}"
+          ansible.builtin.command: 
+            cmd: "kpt live init --namespace default"
+            chdir: "/tmp/{{ item }}"
+
+        - name: "Apply kpt package: {{ item }}"
+          ansible.builtin.command: 
+            cmd: "kpt live apply --namespace default --reconcile-timeout 3600"
+            chdir: "/tmp/{{ item }}"
+
+    - name: Create Gitea K8s resources
+      ansible.builtin.include_tasks: ../../../bootstrap/tasks/post-gitea.yml

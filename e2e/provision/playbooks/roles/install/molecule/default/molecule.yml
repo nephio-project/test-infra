@@ -29,8 +29,6 @@ platforms:
       gui: false
 provisioner:
   name: ansible
-  playbooks:
-    prepare: ${MOLECULE_PROJECT_DIRECTORY}/../kpt/molecule/default/prepare.yml
   env:
     ANSIBLE_LIBRARY: ${MOLECULE_PROJECT_DIRECTORY}/../../../playbooks/library
 verifier:
