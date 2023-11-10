@@ -8,8 +8,8 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-- name: print local git server parameters
-  debug:
+- name: Print local git server parameters
+  ansible.builtin.debug:
     var: local_git
 
 - name: Init job ids array

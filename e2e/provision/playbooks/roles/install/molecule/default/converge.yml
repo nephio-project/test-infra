@@ -11,6 +11,19 @@
 - name: Converge
   hosts: all
   tasks:
+    - name: Set Gitea config
+      ansible.builtin.set_fact:
+        k8s:
+          context: kind-kind
+        gitea:
+          k8s:
+            namespace: gitea
+            username: nephio
+            password: secret
+
+    - name: Set local git facts
+      ansible.builtin.include_tasks: ../../../bootstrap/tasks/post-gitea.yml
+
     - name: Include install
       ansible.builtin.include_role:
         name: install

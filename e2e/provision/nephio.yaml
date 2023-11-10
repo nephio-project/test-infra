@@ -28,10 +28,8 @@ all:
     tmp_directory: "/tmp"
     bin_directory: "/usr/local/bin"
     kubectl_version: "1.25.0"
-    kubectl_checksum_binary: >-
-      sha512:
-      fac91d79079672954b9ae9f80b9845fbf373e1c4d3663a84cc1538f89bf70cb8
-      5faee1bcd01b6263449f4a2995e7117e1c85ed8e5f137732650e8635b4ecee09
+    kubectl_checksum_binary: "sha512:fac91d79079672954b9ae9f80b9845fbf373e1c4d3663a84cc1538f89bf70cb8\
+      5faee1bcd01b6263449f4a2995e7117e1c85ed8e5f137732650e8635b4ecee09"
     kind_version: "0.17.0"
     cni_version: "0.8.6"
     kpt_version: "1.0.0-beta.31"

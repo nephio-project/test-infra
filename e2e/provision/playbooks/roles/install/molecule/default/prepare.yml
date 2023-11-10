@@ -45,6 +45,3 @@
         - gitea
         - metallb
         - metallb-sandbox-config
-
-    - name: Create Gitea K8s resources
-      ansible.builtin.include_tasks: ../../../bootstrap/tasks/post-gitea.yml
