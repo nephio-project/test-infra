@@ -28,6 +28,6 @@
 
 - name: "Apply kpt package: {{ item }}"
   ansible.builtin.command:
-    cmd: "kpt live apply --namespace default --reconcile-timeout 15m --context {{ k8s.context }}"
+    cmd: "kpt live apply --reconcile-timeout 15m --context {{ k8s.context }}"
     chdir: "/tmp/{{ item }}"
   changed_when: false
