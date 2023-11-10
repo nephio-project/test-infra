@@ -37,7 +37,7 @@
   kpt:
     command: live-apply
     pkg_path: "{{ workdir }}"
-    context: "{{ context }}"
+    context: "{{ k8s.context }}"
     reconcile_timeout: "15m"
   changed_when: false
   register: kpt_apply_result
