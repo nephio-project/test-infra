@@ -56,7 +56,6 @@
       stringData:
         username: "{{ local_git.username }}"
         password: "{{ local_git.password }}"
-  no_log: true
 
 - name: Deploy Nephio webui
   ansible.builtin.include_role:
