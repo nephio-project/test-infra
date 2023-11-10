@@ -44,4 +44,3 @@
   until: kpt_apply_result is not failed
   retries: 5
   delay: 10
-
