@@ -42,6 +42,22 @@
   vars:
     context: "{{ k8s.context }}"
 
+- name: Save local git server credentials in nephio-system namespace
+  kubernetes.core.k8s:
+    context: "{{ k8s.context }}"
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: git-user-secret
+        namespace: nephio-system
+      type: kubernetes.io/basic-auth
+      stringData:
+        username: "{{ local_git.username }}"
+        password: "{{ local_git.password }}"
+  no_log: true
+
 - name: Deploy Nephio webui
   ansible.builtin.include_role:
     name: kpt
