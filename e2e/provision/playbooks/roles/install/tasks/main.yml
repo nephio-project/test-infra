@@ -8,6 +8,10 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
+- name: print local git server parameters
+  debug:
+    var: local_git
+
 - name: Init job ids array
   ansible.builtin.set_fact:
     all_kpt_apply: []
