@@ -64,7 +64,7 @@
         password: "{{ gitea.k8s.db_password }}"
   no_log: true
 
-- name: Create gitea user password
+- name: Create gitea user password in Gitea namespace
   kubernetes.core.k8s:
     context: "{{ k8s.context }}"
     state: present
@@ -74,6 +74,22 @@
       metadata:
         name: git-user-secret
         namespace: "{{ gitea.k8s.namespace }}"
+      type: kubernetes.io/basic-auth
+      stringData:
+        username: "{{ gitea.k8s.username }}"
+        password: "{{ gitea.k8s.password }}"
+  no_log: true
+
+- name: Create gitea user password in nephio-system namespace
+  kubernetes.core.k8s:
+    context: "{{ k8s.context }}"
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: git-user-secret
+        namespace: nephio-system
       type: kubernetes.io/basic-auth
       stringData:
         username: "{{ gitea.k8s.username }}"
