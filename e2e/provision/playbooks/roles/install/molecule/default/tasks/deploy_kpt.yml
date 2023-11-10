@@ -8,26 +8,40 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
+
+- name: Define working directory
+  ansible.builtin.set_fact:
+    workdir: "/tmp/{{ item }}"
+
 - name: "Fetch kpt package: {{ item }}"
-  ansible.builtin.command:
-    cmd: "kpt pkg get --for-deployment '{{ nephio_example_repo_uri }}/{{ item }}@{{ nephio_pkg_version }}'"
-    chdir: "/tmp"
-  changed_when: false
+  kpt:
+    command: pkg-get
+    repo_uri: "{{ nephio_example_repo_uri }}"
+    pkg_path: "{{ item }}"
+    version: "{{ nephio_pkg_version }}"
+    local_dest_directory: "{{ workdir }}"
+    for_deployment: true
 
 - name: "Render kpt package: {{ item }}"
-  ansible.builtin.command:
-    cmd: "kpt fn render"
-    chdir: "/tmp/{{ item }}"
-  changed_when: false
+  kpt:
+    command: fn-render
+    pkg_path: "{{ workdir }}"
 
 - name: "Init kpt package: {{ item }}"
-  ansible.builtin.command:
-    cmd: "kpt live init --namespace default --context {{ k8s.context }}"
-    chdir: "/tmp/{{ item }}"
-  changed_when: false
+  kpt:
+    command: live-init
+    pkg_path: "{{ workdir }}"
+    context: "{{ k8s.context }}"
 
 - name: "Apply kpt package: {{ item }}"
-  ansible.builtin.command:
-    cmd: "kpt live apply --reconcile-timeout 15m --context {{ k8s.context }}"
-    chdir: "/tmp/{{ item }}"
+  kpt:
+    command: live-apply
+    pkg_path: "{{ workdir }}"
+    context: "{{ context }}"
+    reconcile_timeout: "15m"
   changed_when: false
+  register: kpt_apply_result
+  until: kpt_apply_result is not failed
+  retries: 5
+  delay: 10
+
