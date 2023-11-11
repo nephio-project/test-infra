@@ -15,7 +15,28 @@
     clab:
       version: 0.42.0
       download_url: "https://github.com/srl-labs/containerlab/releases/download"
+    proxy_env:
+      http_proxy: "{{ lookup('ansible.builtin.env', 'http_proxy') }}"
+      https_proxy: "{{ lookup('ansible.builtin.env', 'https_proxy') }}"
+      no_proxy: "{{ lookup('ansible.builtin.env', 'no_proxy') }}"
+      HTTP_PROXY: "{{ lookup('ansible.builtin.env', 'HTTP_PROXY') }}"
+      HTTPS_PROXY: "{{ lookup('ansible.builtin.env', 'HTTPS_PROXY') }}"
+      NO_PROXY: "{{ lookup('ansible.builtin.env', 'NO_PROXY') }}"
+  environment: "{{ proxy_env | dict2items | selectattr('value') | items2dict }}"
+
   pre_tasks:
+    - name: "Print environment variable-based configuration"
+      become: true
+      ansible.builtin.debug:
+        msg:
+          - "DOCKERHUB_USERNAME: {{ lookup('ansible.builtin.env', 'DOCKERHUB_USERNAME') }}"
+          - "DOCKERHUB_TOKEN: {{ lookup('ansible.builtin.env', 'DOCKERHUB_TOKEN') }}"
+          - "DOCKER_REGISTRY_MIRRORS: {{ lookup('ansible.builtin.env', 'DOCKER_REGISTRY_MIRRORS') }}"
+          - "HTTP_PROXY: {{ lookup('ansible.builtin.env', 'HTTP_PROXY') }}, HTTPS_PROXY: {{ lookup('ansible.builtin.env', 'HTTPS_PROXY') }}"
+          - "NO_PROXY: {{ lookup('ansible.builtin.env', 'NO_PROXY') }}"
+          - "http_proxy: {{ lookup('ansible.builtin.env', 'http_proxy') }}, https_proxy: {{ lookup('ansible.builtin.env', 'https_proxy') }}"
+          - "no_proxy: {{ lookup('ansible.builtin.env', 'no_proxy') }}"
+
     - name: Install kubernetes python package
       become: true
       ansible.builtin.pip:
@@ -29,6 +50,16 @@
             docker_engine_daemon_json:
               registry-mirrors: "{{ lookup('ansible.builtin.env', 'DOCKER_REGISTRY_MIRRORS') }}"
           when: lookup('ansible.builtin.env', 'DOCKER_REGISTRY_MIRRORS')
+
+        - name: Pass HTTP proxy parameters to the Docker daemon
+          ansible.builtin.set_fact:
+            docker_engine_init_exports:
+              http_proxy: "{{ lookup('ansible.builtin.env', 'http_proxy', default=omit) }}"
+              HTTP_PROXY: "{{ lookup('ansible.builtin.env', 'HTTP_PROXY', default=omit) }}"
+              https_proxy: "{{ lookup('ansible.builtin.env', 'https_proxy', default=omit) }}"
+              HTTPS_PROXY: "{{ lookup('ansible.builtin.env', 'HTTPS_PROXY', default=omit) }}"
+              no_proxy: "{{ lookup('ansible.builtin.env', 'no_proxy', default=omit) }}"
+              NO_PROXY: "{{ lookup('ansible.builtin.env', 'NO_PROXY', default=omit) }}"
 
         - name: Install docker binaries
           ansible.builtin.include_role:
