@@ -26,22 +26,32 @@ export LIBDIR=${LIBDIR:-$E2EDIR/lib}
 # shellcheck source=e2e/lib/k8s.sh
 source "${LIBDIR}/k8s.sh"
 
-k8s_apply "$TESTDIR/003-network.yaml"
+# shellcheck source=e2e/lib/kpt.sh
+source "${LIBDIR}/kpt.sh"
 
-k8s_wait_ready "packagevariant" "network"
+# shellcheck source=e2e/lib/porch.sh
+source "${LIBDIR}/porch.sh"
 
-## Apply the network topology
-k8s_apply "$TESTDIR/003-secret.yaml"
+# shellcheck source=e2e/lib/_assertions.sh
+source "${LIBDIR}/_assertions.sh"
 
-"$E2EDIR/provision/hacks/network-topo.sh"
+pkg_rev=$(kpt alpha rpkg clone -n default https://github.com/nephio-project/free5gc-packages.git/free5gc-cp@v1 --repository regional free5gc-cp | cut -f 1 -d ' ')
+k8s_wait_exists "packagerev" "$pkg_rev"
 
-k8s_apply "$TESTDIR/003-network-topo.yaml"
-
-upstream_pkg_rev=$(kpt alpha rpkg get --name free5gc-cp --revision v1 -o jsonpath='{.metadata.name}')
-pkg_rev=$(kpt alpha rpkg clone -n default "$upstream_pkg_rev" --repository regional free5gc-cp | cut -f 1 -d ' ')
+porch_wait_log_entry "Creating packagerev default/regional-"
+assert_lifecycle_equals "$pkg_rev" "Draft"
+assert_branch_exists "drafts/free5gc-cp/v1" "nephio/regional"
+assert_commit_msg_in_branch "Intermediate commit" "drafts/free5gc-cp/v1" "nephio/regional"
 
 kpt alpha rpkg propose -n default "$pkg_rev"
-k8s_wait_exists "packagerev" "$pkg_rev"
-kpt alpha rpkg approve -n default "$pkg_rev"
+porch_wait_log_entry "Update.*packagerevisions/${pkg_rev},"
+assert_lifecycle_equals "$pkg_rev" "Proposed"
+assert_branch_exists "proposed/free5gc-cp/v1" "nephio/regional"
+assert_commit_msg_in_branch "Intermediate commit" "proposed/free5gc-cp/v1" "nephio/regional"
 
+kpt alpha rpkg approve -n default "$pkg_rev"
+porch_wait_log_entry "Update.*/${pkg_rev}.*/approval"
+assert_lifecycle_equals "$pkg_rev" "Published"
+
+kpt_wait_pkg "regional" "free5gc-cp"
 k8s_wait_ready_replicas "statefulset" "mongodb" "$(k8s_get_capi_kubeconfig "regional")" "free5gc-cp"

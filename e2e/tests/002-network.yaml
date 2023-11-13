@@ -8,27 +8,17 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-apiVersion: config.porch.kpt.dev/v1alpha2
-kind: PackageVariantSet
+apiVersion: config.porch.kpt.dev/v1alpha1
+kind: PackageVariant
 metadata:
-  name: edge-clusters
+  name: network
 spec:
   upstream:
     repo: nephio-example-packages
-    package: nephio-workload-cluster
-    revision: v9
-  targets:
-  - repositories:
-    - name: mgmt
-      packageNames:
-      - edge01
-      - edge02
-    template:
-      annotations:
-        approval.nephio.org/policy: initial
-      pipeline:
-        mutators:
-        - image: gcr.io/kpt-fn/set-labels:v0.2.0
-          configMap:
-            nephio.org/site-type: edge
-            nephio.org/region: us-west1
+    package: network
+    revision: v1
+  downstream:
+    repo: mgmt
+    package: network
+  annotations:
+    approval.nephio.org/policy: initial
