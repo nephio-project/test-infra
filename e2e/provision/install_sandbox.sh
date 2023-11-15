@@ -24,8 +24,7 @@ ubuntu | debian)
     sudo -E NEEDRESTART_SUSPEND=1 DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confnew" --allow-downgrades --allow-remove-essential --allow-change-held-packages -fuy install -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" python3-pip
     ;;
 rhel | centos | fedora | rocky)
-    PKG_MANAGER=$(command -v dnf || command -v yum)
-    sudo $PKG_MANAGER install python3-pip -y
+    sudo "$(command -v dnf || command -v yum)" install python3-pip -y
     ;;
 *)
     echo "OS not supported"
@@ -90,9 +89,11 @@ else
     # Management cluster creation
     ansible_cmd="$(command -v ansible-playbook) -i 127.0.0.1, playbooks/cluster.yml "
     [[ ${DEBUG:-false} != "true" ]] || ansible_cmd+="-vvv "
-    for nephio_var in NEPHIO_PKG_VERSION NEPHIO_EXAMPLE_REPO_URI; do
-        [[ -z ${!nephio_var:-} ]] || ansible_cmd+="--extra-vars=\"${nephio_var,,}=${!nephio_var}\" "
-    done
+    if [ -n "${ANSIBLE_CMD_EXTRA_VAR_LIST:-}" ]; then
+        for extra_var in ${ANSIBLE_CMD_EXTRA_VAR_LIST//,/ }; do
+            ansible_cmd+=" --extra-vars=$extra_var"
+        done
+    fi
     eval "$ansible_cmd" | tee ~/cluster.log
 fi
 
