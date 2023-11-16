@@ -26,21 +26,25 @@ export LIBDIR=${LIBDIR:-$E2EDIR/lib}
 # shellcheck source=e2e/lib/k8s.sh
 source "${LIBDIR}/k8s.sh"
 
+# shellcheck source=e2e/lib/kpt.sh
+source "${LIBDIR}/kpt.sh"
+
+# shellcheck source=e2e/lib/capi.sh
+source "${LIBDIR}/capi.sh"
+
 k8s_apply "$TESTDIR/002-edge-clusters.yaml"
 
 # Wait for cluster resources creation
 for cluster in edge01 edge02; do
     k8s_wait_exists "workloadcluster" "$cluster"
+    k8s_wait_exists "packagevariant" "edge-clusters-mgmt-$cluster"
     k8s_wait_exists "cl" "$cluster"
 done
 
 # Wait for cluster readiness
 kubeconfig="$HOME/.kube/config"
 for cluster in $(kubectl get cl -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --kubeconfig "$kubeconfig"); do
-    k8s_wait_ready "cl" "$cluster"
-    for machineset in $(kubectl get machineset -l cluster.x-k8s.io/cluster-name="$cluster" -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --kubeconfig "$kubeconfig"); do
-        k8s_wait_ready "machineset" "$machineset"
-    done
+    capi_cluster_ready "$cluster"
 done
 
 # Inter-connect worker nodes
@@ -48,3 +52,15 @@ done
 
 # Configure VLAN interfaces
 "$E2EDIR/provision/hacks/vlan-interfaces.sh"
+
+# Create network package variant
+k8s_apply "$TESTDIR/002-network.yaml"
+
+# Provide a secret for external backend connection
+k8s_apply "$TESTDIR/002-secret.yaml"
+
+k8s_wait_ready "packagevariant" "network"
+kpt_wait_pkg "mgmt" "network"
+
+# Generate a RawTopology to interconnect clusters
+"$E2EDIR/provision/hacks/network-topo.sh"
