@@ -8,6 +8,7 @@
 # which accompanies this distribution, and is available at
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
+
 ## TEST METADATA
 ## TEST-NAME: Vertically Scale free5gc UPF in Edge Clusters
 ## Usage : 008.sh <Capacity> , Capacity > 5G
@@ -17,20 +18,18 @@ set -o errexit
 set -o nounset
 [[ ${DEBUG:-false} != "true" ]] || set -o xtrace
 
-# Set the new value for maxUplinkThroughput as a parameter
-new_capacity_value=${1:-20G}
-
-export HOME=${HOME:-/home/ubuntu/}
-export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
-export TESTDIR=${TESTDIR:-$E2EDIR/tests}
-export LIBDIR=${LIBDIR:-$E2EDIR/lib}
+# shellcheck source=e2e/defaults.env
+source "$E2EDIR/defaults.env"
 
 # shellcheck source=e2e/lib/_utils.sh
 source "${LIBDIR}/_utils.sh"
+
 # shellcheck source=e2e/lib/k8s.sh
 source "${LIBDIR}/k8s.sh"
 
 kubeconfig="$HOME/.kube/config"
+# Set the new value for maxUplinkThroughput as a parameter
+new_capacity_value=${1:-20G}
 
 #Get the cluster kubeconfig
 info "Getting kubeconfig for edge01"

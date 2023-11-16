@@ -8,6 +8,7 @@
 # which accompanies this distribution, and is available at
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
+
 ## TEST METADATA
 ## TEST-NAME: Vertically Scale free5gc SMF in Regional Clusters
 ## Usage : 009.sh <maxSessions, maxNFConnections> , maxSessions > 2000, maxNFConnections > 20
@@ -17,13 +18,12 @@ set -o errexit
 set -o nounset
 [[ ${DEBUG:-false} != "true" ]] || set -o xtrace
 
-export HOME=${HOME:-/home/ubuntu/}
-export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
-export TESTDIR=${TESTDIR:-$E2EDIR/tests}
-export LIBDIR=${LIBDIR:-$E2EDIR/lib}
+# shellcheck source=e2e/defaults.env
+source "$E2EDIR/defaults.env"
 
 # shellcheck source=e2e/lib/_utils.sh
 source "${LIBDIR}/_utils.sh"
+
 # shellcheck source=e2e/lib/k8s.sh
 source "${LIBDIR}/k8s.sh"
 
