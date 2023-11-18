@@ -140,7 +140,7 @@
         pkg: "{{ item.pkg }}"
         version: "{{ nephio_pkg_version }}"
         for_deployment: true
-        context: kind-kind
+        context: "{{ k8s.context }}"
         kpt_async: 900
         kpt_poll: 0
     - name: Wait for packages to be applied
@@ -154,7 +154,7 @@
       delay: 10
     - name: Wait for repositories
       kubernetes.core.k8s:
-        context: kind-kind
+        context: "{{ k8s.context }}"
         definition:
           apiVersion: config.porch.kpt.dev/v1alpha1
           kind: Repository
