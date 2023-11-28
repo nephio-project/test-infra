@@ -10,7 +10,7 @@
 ##############################################################################
 
 ## TEST METADATA
-## TEST-NAME: Deploy free5gc UPF to edge clusters
+## TEST-NAME: Deploy free5gc operator to all workload clusters
 ##
 
 set -o pipefail
@@ -18,20 +18,14 @@ set -o errexit
 set -o nounset
 [[ ${DEBUG:-false} != "true" ]] || set -o xtrace
 
-export HOME=${HOME:-/home/ubuntu/}
-export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
-export TESTDIR=${TESTDIR:-$E2EDIR/tests}
-export LIBDIR=${LIBDIR:-$E2EDIR/lib}
+# shellcheck source=e2e/defaults.env
+source "$E2EDIR/defaults.env"
 
 # shellcheck source=e2e/lib/k8s.sh
 source "${LIBDIR}/k8s.sh"
 
-k8s_apply "$TESTDIR/005-edge-free5gc-upf.yaml"
+k8s_apply "$TESTDIR/004-free5gc-operator.yaml"
 
-for cluster in "edge01" "edge02"; do
-    k8s_wait_ready "packagevariant" "edge-free5gc-upf-${cluster}-free5gc-upf"
-done
-
-for cluster in "edge01" "edge02"; do
-    k8s_wait_ready_replicas "deployment" "upf-${cluster}" "$(k8s_get_capi_kubeconfig "$cluster")" "free5gc-upf"
+for cluster in "regional" "edge01" "edge02"; do
+    k8s_wait_ready_replicas "deployment" "free5gc-operator" "$(k8s_get_capi_kubeconfig "$cluster")" "free5gc"
 done

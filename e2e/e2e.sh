@@ -13,11 +13,13 @@ set -o errexit
 set -o nounset
 [[ ${DEBUG:-false} != "true" ]] || set -o xtrace
 
-export HOME=${HOME:-/home/ubuntu/}
 export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
-export TESTDIR=${TESTDIR:-$E2EDIR/tests}
 
-source "$E2EDIR/lib/testing.sh"
+# shellcheck source=e2e/defaults.env
+source "$E2EDIR/defaults.env"
+
+# shellcheck source=e2e/lib/testing.sh
+source "$LIBDIR/testing.sh"
 
 failed=$((0))
 test_summary=""

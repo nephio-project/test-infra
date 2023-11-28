@@ -15,6 +15,9 @@ set -o errexit
 set -o nounset
 [[ ${DEBUG:-false} != "true" ]] || set -o xtrace
 
+# shellcheck source=e2e/defaults.env
+source "$E2EDIR/defaults.env"
+
 kubeconfig="$HOME/.kube/config"
 
 for worker in $(kubectl get machines -l cluster.x-k8s.io/control-plane!= -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --kubeconfig "$kubeconfig"); do

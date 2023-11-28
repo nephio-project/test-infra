@@ -8,6 +8,9 @@
 # which accompanies this distribution, and is available at
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
+
+## TEST METADATA
+## TEST-NAME: Deploy free5gc UPF to edge clusters
 ##
 
 set -o pipefail
@@ -18,7 +21,15 @@ set -o nounset
 # shellcheck source=e2e/defaults.env
 source "$E2EDIR/defaults.env"
 
-export LEAF_IP=$(docker inspect net-free5gc-net-leaf -f '{{.NetworkSettings.Networks.kind.IPAddress}}')
-kubeconfig="$HOME/.kube/config"
+# shellcheck source=e2e/lib/k8s.sh
+source "${LIBDIR}/k8s.sh"
 
-envsubst <"$TESTDIR/002-network-topo.tmpl" | kubectl --kubeconfig $kubeconfig apply -f -
+k8s_apply "$TESTDIR/005-edge-free5gc-upf.yaml"
+
+for cluster in "edge01" "edge02"; do
+    k8s_wait_ready "packagevariant" "edge-free5gc-upf-${cluster}-free5gc-upf"
+done
+
+for cluster in "edge01" "edge02"; do
+    k8s_wait_ready_replicas "deployment" "upf-${cluster}" "$(k8s_get_capi_kubeconfig "$cluster")" "free5gc-upf"
+done
