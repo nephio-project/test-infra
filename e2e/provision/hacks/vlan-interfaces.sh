@@ -21,7 +21,7 @@ source "$E2EDIR/defaults.env"
 kubeconfig="$HOME/.kube/config"
 
 for worker in $(kubectl get machines -l cluster.x-k8s.io/control-plane!= -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --kubeconfig "$kubeconfig"); do
-    for i in {2..4}; do
+    for i in {2..6}; do
         docker exec "$worker" ip link add link eth1 name "eth1.$i" type vlan id "$i"
         docker exec "$worker" ip link set up "eth1.$i"
     done
