@@ -18,7 +18,7 @@ set -o nounset
 # shellcheck source=e2e/defaults.env
 source "$E2EDIR/defaults.env"
 
-export LEAF_IP=$(docker inspect net-free5gc-net-leaf -f '{{.NetworkSettings.Networks.kind.IPAddress}}')
+export LEAF_IP=$(docker inspect net-5g-leaf -f '{{.NetworkSettings.Networks.kind.IPAddress}}')
 kubeconfig="$HOME/.kube/config"
 
 envsubst <"$TESTDIR/002-network-topo.tmpl" | kubectl --kubeconfig $kubeconfig apply -f -
