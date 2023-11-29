@@ -69,3 +69,9 @@ variable "nephio_pkg_version" {
   default     = "main"
   type        = string
 }
+
+variable "nephio_e2e_type" {
+  description = "The Nephio End-to-End testing type"
+  default     = "free5gc"
+  type        = string
+}

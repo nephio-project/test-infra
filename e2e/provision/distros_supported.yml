@@ -12,6 +12,10 @@ ubuntu_focal:
   name: generic/ubuntu2004
   project_id: ubuntu-os-cloud
   family: ubuntu-2004-lts
+ubuntu_jammy:
+  name: generic/ubuntu2204
+  project_id: ubuntu-os-cloud
+  family: ubuntu-2204-lts
 fedora_34:
   name: fedora/34-cloud-base
   reload: true
