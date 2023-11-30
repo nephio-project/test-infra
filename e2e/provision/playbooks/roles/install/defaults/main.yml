@@ -29,6 +29,9 @@ nephio_stock_repos:
   - name: catalog
     repo: https://github.com/nephio-project/catalog.git
     branch: main
+  - name: oai-packages
+    repo: https://github.com/OPENAIRINTERFACE/oai-packages.git
+    branch: main
 
 nephio:
   k8s:
