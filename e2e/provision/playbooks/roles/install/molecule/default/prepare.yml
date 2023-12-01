@@ -13,35 +13,45 @@
 
 - name: Deploy Gitea
   hosts: all
-  tasks:
-    - name: Set Gitea config
-      ansible.builtin.set_fact:
-        k8s:
-          context: kind-kind
-        gitea:
-          k8s:
-            namespace: gitea
-            postgres_password: c2VjcmV0  # echo -n "secret" | base64
-            db_password: c2VjcmV0
-            username: nephio
-            password: secret
-        nephio_pkg_version: v1.0.1
-        nephio_example_repo_uri: https://github.com/nephio-project/nephio-example-packages.git
-
-    - name: Wait for cluster to set up
-      ansible.builtin.command: "kubectl get all --context {{ k8s.context }}"
-      register: checkcluster_result
-      until: "checkcluster_result is succeeded"
-      retries: 100
-      delay: 10
+  pre_tasks:
+    - name: Update Apt cache
+      ansible.builtin.raw: apt-get update --allow-releaseinfo-change
+      become: true
       changed_when: false
-
-    - name: Create Gitea K8s resources
+      when: ansible_distribution == 'Ubuntu'
+    - name: Install pip package
+      become: true
+      ansible.builtin.package:
+        name: python3-pip
+        state: present
+      when: ansible_distribution == 'Ubuntu'
+    - name: Install kubernetes python package
+      become: true
+      ansible.builtin.pip:
+        name: kubernetes==26.1.0
+  tasks:
+    - name: Set local git facts
       ansible.builtin.include_tasks: ../../../bootstrap/tasks/prep-gitea.yml
-
-    - name: "Deploy kpt package {{ item }}"
-      ansible.builtin.include_tasks: tasks/deploy_kpt.yml
+    - name: Deploy gitea kpt packages
+      ansible.builtin.include_role:
+        name: kpt
+      vars:
+        repo_uri: "{{ nephio_example_repo_uri }}"
+        pkg: "{{ item }}"
+        version: "{{ nephio_pkg_version }}"
+        context: "{{ k8s.context }}"
+        kpt_async: 1020
+        kpt_poll: 5
       loop:
         - gitea
         - metallb
         - metallb-sandbox-config
+    - name: Wait for deployments
+      ansible.builtin.include_tasks: ../../tasks/wait_deployments.yml
+      loop_control:
+        loop_var: namespace
+      vars:
+        context: "{{ k8s.context }}"
+      loop:
+        - gitea
+        - metallb-system

@@ -8,10 +8,6 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-- name: Print local git server parameters
-  ansible.builtin.debug:
-    var: local_git
-
 - name: Init job ids array
   ansible.builtin.set_fact:
     all_kpt_apply: []
@@ -58,8 +54,9 @@
         namespace: nephio-system
       type: kubernetes.io/basic-auth
       stringData:
-        username: "{{ local_git.username }}"
-        password: "{{ local_git.password }}"
+        username: "{{ gitea.k8s.username }}"
+        password: "{{ gitea.k8s.password }}"
+  no_log: true
 
 - name: Deploy Nephio webui
   ansible.builtin.include_role:

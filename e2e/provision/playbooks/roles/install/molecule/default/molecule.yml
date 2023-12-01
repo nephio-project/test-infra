@@ -31,5 +31,19 @@ provisioner:
   name: ansible
   env:
     ANSIBLE_LIBRARY: ${MOLECULE_PROJECT_DIRECTORY}/../../../playbooks/library
+  inventory:
+    group_vars:
+      all:
+        k8s:
+          context: kind-kind
+        gitea:
+          k8s:
+            namespace: gitea
+            postgres_password: c2VjcmV0  # echo -n "secret" | base64
+            db_password: c2VjcmV0
+            username: nephio
+            password: secret
+        nephio_pkg_version: v1.0.1
+        nephio_example_repo_uri: https://github.com/nephio-project/nephio-example-packages.git
 verifier:
   name: testinfra
