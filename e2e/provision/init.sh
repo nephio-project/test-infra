@@ -60,7 +60,7 @@ BRANCH=${NEPHIO_BRANCH:-$(get_metadata nephio-test-infra-branch "main")}
 NEPHIO_USER=${NEPHIO_USER:-$(get_metadata nephio-user "ubuntu")}
 NEPHIO_PKG_VERSION=${NEPHIO_PKG_VERSION:-$(get_metadata nephio-pkg-version "main")}
 NEPHIO_EXAMPLE_REPO_URI=${NEPHIO_EXAMPLE_REPO_URI:-$(get_metadata nephio-example-repo-uri "https://github.com/nephio-project/nephio-example-packages.git")}
-export ANSIBLE_CMD_EXTRA_VAR_LIST="nephio_pkg_version=$NEPHIO_PKG_VERSION,nephio_example_repo_uri=$NEPHIO_EXAMPLE_REPO_URI"
+export ANSIBLE_CMD_EXTRA_VAR_LIST="nephio_pkg_version='$NEPHIO_PKG_VERSION' nephio_example_repo_uri='$NEPHIO_EXAMPLE_REPO_URI'"
 HOME=${NEPHIO_HOME:-/home/$NEPHIO_USER}
 REPO_DIR=${NEPHIO_REPO_DIR:-$HOME/test-infra}
 DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME:-""}

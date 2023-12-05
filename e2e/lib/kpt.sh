@@ -68,7 +68,7 @@ function kpt_wait_pkg {
 
     if [[ $found != "True" ]]; then
         curl_gitea_api "repos/$user/$repo/contents" 'import json; import sys; print("\n".join(dir["path"] for dir in json.loads(sys.stdin.read()) if dir["type"] == "dir" ))'
-        error "Timed out waiting for $repo repository"
+        error "Timed out waiting for $pkg kpt package"
     else
         info "Found $user/$repo repository"
     fi
