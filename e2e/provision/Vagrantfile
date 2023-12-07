@@ -54,7 +54,8 @@ Vagrant.configure('2') do |config|
       NEPHIO_USER: ENV.fetch('NEPHIO_USER', 'vagrant'),
       NEPHIO_REPO_DIR: '/opt/test-infra',
       ANSIBLE_CMD_EXTRA_VAR_LIST: "k8s.context='kind-kind' nephio_pkg_version= '#{ENV['NEPHIO_PKG_VERSION'] || 'main'}' nephio_example_repo_uri='#{ENV['NEPHIO_EXAMPLE_REPO_URI'] || 'https://github.com/nephio-project/nephio-example-packages.git'}'",
-      E2EDIR: '/opt/test-infra/e2e'
+      E2EDIR: '/opt/test-infra/e2e',
+      E2ETYPE: ENV.fetch('E2ETYPE', 'free5gc')
     }
     sh.inline = <<-SHELL
       set -o errexit
