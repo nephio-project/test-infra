@@ -16,6 +16,7 @@ vagrant_root = File.dirname(__FILE__)
 vagrant_boxes = YAML.load_file("#{vagrant_root}/distros_supported.yml")
 os_distro = ENV['OS_DISTRO'] || 'ubuntu_focal'
 box = vagrant_boxes[os_distro]
+num_sandboxes = ENV['NUM_SANDBOXES'] || '1'
 
 # rubocop:disable Metrics/BlockLength
 Vagrant.configure('2') do |config|
@@ -24,6 +25,11 @@ Vagrant.configure('2') do |config|
   config.vm.provider :virtualbox
   config.vm.provider :google
 
+  (1..num_sandboxes.to_i).each do |i|
+    config.vm.define "sandbox#{i.to_s.rjust(2, '0')}" do |nodeconfig|
+      nodeconfig.vm.hostname = "sandbox#{i.to_s.rjust(2, '0')}"
+    end
+  end
   config.vm.box = box['name']
   config.vm.box_check_update = false
   config.vm.synced_folder "#{vagrant_root}/../../", '/opt/test-infra'
