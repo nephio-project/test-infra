@@ -31,7 +31,7 @@ nephio_stock_repos:
     branch: main
   - name: oai-packages
     repo: https://github.com/OPENAIRINTERFACE/oai-packages.git
-    branch: main
+    branch: r2
 
 nephio:
   k8s:
