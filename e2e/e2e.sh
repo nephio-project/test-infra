@@ -26,7 +26,7 @@ test_summary=""
 for t in $TESTDIR/*.sh; do
     if ! run_test "$t"; then
         failed=$((failed + 1))
-        [[ ${FAIL_FAST:-false} != "true" ]] ||  break
+        [[ ${FAIL_FAST:-false} != "true" ]] || break
     fi
 done
 echo "TEST SUMMARY"
