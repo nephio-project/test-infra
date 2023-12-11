@@ -8,14 +8,12 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-GOMAIN_DIRS=$(egrep -rl --null --include \*.go 'package\s+main\b' | xargs -0 -L 1 dirname)
 REPORTS_DIR=$(pwd)/reports/
 
 mkdir -p $REPORTS_DIR/
 
-for go_main in $GOMAIN_DIRS; do
+for go_main in $(egrep -rl --null --include \*.go 'package\s+main\b' | xargs -0 -L 1 dirname); do
     pushd "$go_main" >/dev/null
-    REPORT_FILENAME=$(tr '/' '_' <<< $go_main)
-    gocov test ./... | gocov-html > $REPORTS_DIR/$REPORT_FILENAME.html
+    gocov test ./... | gocov-html > $REPORTS_DIR/${go_main//\//_}.html
     popd >/dev/null
 done
