@@ -32,7 +32,7 @@ spec:
             secretKeyRef:
               name: github-token
               key: appid
-        image: gcr.io/k8s-prow/prow-controller-manager:v20221208-8898931a7f
+        image: gcr.io/k8s-prow/prow-controller-manager:v20231207-9497c89ee4
         volumeMounts:
         - name: github-token
           mountPath: /etc/github
