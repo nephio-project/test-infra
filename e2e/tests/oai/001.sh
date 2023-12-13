@@ -108,5 +108,10 @@ k8s_apply "$TESTDIR/001-secret.yaml"
 k8s_wait_ready "packagevariant" "network"
 kpt_wait_pkg "mgmt" "network"
 
+# Wait for cluster resources creation
+for vpc in cu-e1 cudu-f1 internal internet ran; do
+    k8s_wait_exists "networkinstance" "vpc-$vpc"
+done
+
 # Generate a RawTopology to interconnect clusters
 "$E2EDIR/provision/hacks/network-topo.sh"
