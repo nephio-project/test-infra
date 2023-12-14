@@ -79,7 +79,7 @@ k8s_apply "$TESTDIR/001-infra.yaml"
 for cluster in "${!clusters[@]}"; do
     k8s_wait_exists "workloadcluster" "$cluster"
     k8s_wait_exists "packagevariant" "oai-$cluster-clusters-mgmt-$cluster"
-    k8s_wait_exists "cl" "$cluster"
+    k8s_wait_exists "cl" "$cluster" "$HOME/.kube/config" "default" 900
 done
 
 # Wait for cluster readiness
