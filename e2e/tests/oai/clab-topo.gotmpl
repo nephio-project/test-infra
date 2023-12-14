@@ -25,16 +25,6 @@ topology:
       kind: ext-container
 {{- end }}
   links:
-{{ with $workers := .workers }}
-{{- range $i, $worker := $workers }}
+{{- range $i, $worker := .workers }}
     - endpoints: ["leaf:e1-{{ $i | add 1 }}", "{{ $worker }}:eth1"]
-  {{ if contains $worker "regional" }}
-    {{ range $edge := $workers }}
-      {{ if contains $edge "edge" }}
-    - endpoints: ["{{ $worker }}:eth2", "{{ $edge }}:eth2"]
-    - endpoints: ["{{ $worker }}:eth3", "{{ $edge }}:eth3"]
-      {{ end }}
-    {{ end }}
-  {{ end }}
 {{- end }}
-{{ end }}

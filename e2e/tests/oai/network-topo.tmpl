@@ -19,15 +19,15 @@ spec:
       provider: srl.nokia.com
     mgmt:
       provider: docker.io
-    regional:
+    core:
       provider: docker.io
       labels:
         nephio.org/cluster-name: core
-    edge:
+    regional:
       provider: docker.io
       labels:
         nephio.org/cluster-name: regional
-    edge02:
+    edge:
       provider: docker.io
       labels:
         nephio.org/cluster-name: edge
@@ -41,9 +41,3 @@ spec:
   - endpoints:
     - { nodeName: srl, interfaceName: e1-3}
     - { nodeName: edge, interfaceName: eth1}
-  - endpoints:
-    - { nodeName: regional, interfaceName: eth2}
-    - { nodeName: edge, interfaceName: eth2}
-  - endpoints:
-    - { nodeName: regional, interfaceName: eth3}
-    - { nodeName: edge, interfaceName: eth3}
