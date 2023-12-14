@@ -29,16 +29,16 @@ source "${LIBDIR}/kpt.sh"
 
 k8s_apply "$TESTDIR/002-oai-operators.yaml"
 
-for pkgvar in common-regional-database cp-operators up-operators; do
+for pkgvar in common-core-database cp-operators up-operators; do
     k8s_wait_ready "packagevariant" "oai-$pkgvar"
 done
-kpt_wait_pkg "regional" "database"
-kpt_wait_pkg "regional" "oai-cp-operators"
+kpt_wait_pkg "core" "database"
+kpt_wait_pkg "core" "oai-cp-operators"
 kpt_wait_pkg "edge" "oai-up-operators"
 
-_regional_kubeconfig="$(k8s_get_capi_kubeconfig "regional")"
-k8s_wait_ready_replicas "deployment" "mysql" "$_regional_kubeconfig" "oai-core"
+_core_kubeconfig="$(k8s_get_capi_kubeconfig "core")"
+k8s_wait_ready_replicas "deployment" "mysql" "$_core_kubeconfig" "oai-core"
 for controller in amf ausf nrf smf udm udr; do
-    k8s_wait_ready_replicas "deployment" "oai-$controller-controller" "$_regional_kubeconfig" "oai-operators"
+    k8s_wait_ready_replicas "deployment" "oai-$controller-controller" "$_core_kubeconfig" "oai-operators"
 done
 k8s_wait_ready_replicas "deployment" "oai-upf-controller" "$(k8s_get_capi_kubeconfig "edge")" "oai-operators"
