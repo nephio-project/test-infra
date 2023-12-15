@@ -8,23 +8,19 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-name: 5g
-prefix: net
-mgmt:
-  network: kind
-topology:
-  kinds:
-    srl:
-      type: ixrd3
-      image: ghcr.io/nokia/srlinux:22.11.2-116
-  nodes:
-    leaf:
-      kind: srl
-{{- range .workers }}
-    {{ . }}:
-      kind: ext-container
-{{- end }}
-  links:
-{{- range $i, $worker := .workers }}
-    - endpoints: ["leaf:e1-{{ $i | add 1 }}", "{{ $worker }}:eth1"]
-{{- end }}
+apiVersion: config.porch.kpt.dev/v1alpha1
+kind: PackageVariant
+metadata:
+  name: oai-upf-edge
+spec:
+  upstream:
+    repo: oai-packages
+    package: oai-upf-edge
+    revision: r2
+  downstream:
+    repo: edge
+    package: oai-upf
+  annotations:
+    approval.nephio.org/policy: initial
+  injectors:
+  - name: edge

@@ -22,7 +22,7 @@ spec:
       apiVersion: infra.nephio.org/v1alpha1
       kind: WorkloadCluster
       matchLabels:
-        nephio.org/site-type: regional
+        nephio.org/site-type: core
     template:
       downstream:
         package: database
@@ -41,12 +41,12 @@ spec:
     package: oai-cp-operators
     revision: r2
   downstream:
-    repo: regional
+    repo: core
     package: oai-cp-operators
   annotations:
     approval.nephio.org/policy: initial
   injectors:
-  - name: regional
+  - name: core
 ---
 apiVersion: config.porch.kpt.dev/v1alpha1
 kind: PackageVariant
