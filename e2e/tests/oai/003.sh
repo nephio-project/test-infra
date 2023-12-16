@@ -33,6 +33,22 @@ source "${LIBDIR}/porch.sh"
 # shellcheck source=e2e/lib/_assertions.sh
 source "${LIBDIR}/_assertions.sh"
 
+function _wait_for_pfcp_session {
+    local kubeconfig=$1
+
+    info "waiting for PFCP session to be established"
+    timeout=600
+    until kubectl logs "$(kubectl get pods -n oai-core --kubeconfig "$kubeconfig" -l workload.nephio.org/oai=upf -o jsonpath='{.items[*].metadata.name}')" -n oai-core -c upf-edge --kubeconfig "$kubeconfig" | grep -q 'Received SX HEARTBEAT REQUEST'; do
+        if [[ $timeout -lt 0 ]]; then
+            kubectl logs -l workload.nephio.org/oai=upf -n oai-core -c upf-edge --kubeconfig "$kubeconfig" --tail 50
+            error "Timed out waiting for PFCP session"
+        fi
+        timeout=$((timeout - 5))
+        sleep 5
+    done
+    debug "timeout: $timeout"
+}
+
 for nf in nrf udm udr ausf amf smf; do
     cat <<EOF | kubectl apply -f -
 apiVersion: config.porch.kpt.dev/v1alpha2
@@ -76,6 +92,5 @@ for nf in nrf udm udr ausf amf smf; do
 done
 k8s_wait_ready_replicas "deployment" "upf-edge" "$_edge_kubeconfig" "oai-core"
 
-# TODO: Verify PFCP session
-#upf_podname=$(kubectl get pods -n oai-core --kubeconfig "$_edge_kubeconfig" -l workload.nephio.org/oai=upf -o jsonpath='{.items[*].metadata.name}')
-#kubectl logs "$upf_podname" -n oai-core -c upf-edge --kubeconfig "$_edge_kubeconfig" | grep 'Received SX HEARTBEAT REQUEST' | wc -l
+# Check if the PFCP session between UPF and SMF is established
+_wait_for_pfcp_session "$_edge_kubeconfig"
