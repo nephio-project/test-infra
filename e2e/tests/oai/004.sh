@@ -27,80 +27,39 @@ source "${LIBDIR}/k8s.sh"
 # shellcheck source=e2e/lib/kpt.sh
 source "${LIBDIR}/kpt.sh"
 
-# shellcheck source=e2e/lib/porch.sh
-source "${LIBDIR}/porch.sh"
-
-# shellcheck source=e2e/lib/_assertions.sh
-source "${LIBDIR}/_assertions.sh"
-
-function _wait_for_n2_link {
+function _wait_for_ran {
     local kubeconfig=$1
+    local wait_msg=$2
+    local link_name=$3
 
-    info "waiting for N2 link to be established"
+    info "waiting for $link_name link to be established"
     timeout=600
-    until kubectl logs "$(kubectl get pods -n oai-ran-cucp --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-gnb-cu-cp -o jsonpath='{.items[*].metadata.name}')" -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" | grep -q 'Received NGAP_REGISTER_GNB_CNF: associated AMF'; do
+    until kubectl logs "$(kubectl get pods -n oai-ran-cucp --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-gnb-cu-cp -o jsonpath='{.items[*].metadata.name}')" -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" | grep -q "$wait_msg"; do
         if [[ $timeout -lt 0 ]]; then
             kubectl logs -l app.kubernetes.io/name=oai-gnb-cu-cp -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" --tail 50
-            error "Timed out waiting for N2 link to be established"
+            error "Timed out waiting for $link_name link to be established"
         fi
         timeout=$((timeout - 5))
         sleep 5
     done
     debug "timeout: $timeout"
+}
+
+function _wait_for_n2_link {
+    _wait_for_ran "$1" "Received NGAP_REGISTER_GNB_CNF: associated AMF" "N2"
 }
 
 function _wait_for_e1_link {
-    local kubeconfig=$1
     # Connection between CU-CP and CU-UP
-    info "waiting for E1 link to be established"
-    timeout=600
-    until kubectl logs "$(kubectl get pods -n oai-ran-cucp --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-gnb-cu-cp -o jsonpath='{.items[*].metadata.name}')" -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" | grep -q 'e1ap_send_SETUP_RESPONSE'; do
-        if [[ $timeout -lt 0 ]]; then
-            kubectl logs -l app.kubernetes.io/name=oai-gnb-cu-cp -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" --tail 50
-            error "Timed out waiting for E1 link to be established"
-        fi
-        timeout=$((timeout - 5))
-        sleep 5
-    done
-    debug "timeout: $timeout"
+    _wait_for_ran "$1" "e1ap_send_SETUP_RESPONSE" "E1"
 }
 
 function _wait_for_f1_link {
-    local kubeconfig=$1
     # Connection between DU and CU-CP
-    info "waiting for F1 link to be established"
-    timeout=600
-    until kubectl logs "$(kubectl get pods -n oai-ran-cucp --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-gnb-cu-cp -o jsonpath='{.items[*].metadata.name}')" -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" | grep -q 'Cell Configuration ok'; do
-        if [[ $timeout -lt 0 ]]; then
-            kubectl logs -l app.kubernetes.io/name=oai-gnb-cu-cp -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" --tail 50
-            error "Timed out waiting for F1 link to be established"
-        fi
-        timeout=$((timeout - 5))
-        sleep 5
-    done
-    debug "timeout: $timeout"
+    _wait_for_ran "$1" "Cell Configuration ok" "F1"
 }
 
-cat <<EOF | kubectl apply -f -
-apiVersion: config.porch.kpt.dev/v1alpha1
-kind: PackageVariant
-metadata:
-  name: oai-cucp
-spec:
-  upstream:
-    repo: oai-ran-packages
-    package: pkg-example-cucp-bp
-    revision: v1
-  downstream:
-    repo: regional
-    package: oai-ran-cucp
-  annotations:
-    approval.nephio.org/policy: initial
-  injectors:
-  - name: regional
-EOF
-
-kpt_wait_pkg "regional" "oai-cucp"
+k8s_apply "$TESTDIR/004-ran-cucp.yaml"
 
 for nf in du cuup; do
     cat <<EOF | kubectl apply -f -
@@ -110,9 +69,9 @@ metadata:
   name: oai-$nf
 spec:
   upstream:
-    repo: oai-ran-packages 
-    package: pkg-example-$nf-bp
-    revision: v1
+    repo: catalog
+    package: workloads/oai/pkg-example-$nf-bp
+    revision: main
   downstream:
     repo: edge
     package: oai-ran-$nf
@@ -123,14 +82,14 @@ spec:
 EOF
 done
 
-
-for nf in du cuup; do
+for nf in du cuup cucp; do
     k8s_wait_ready "packagevariant" "oai-$nf"
 done
 
 for nf in du cuup; do
     kpt_wait_pkg "edge" "oai-ran-$nf" "nephio" "900"
 done
+kpt_wait_pkg "regional" "oai-cucp"
 
 _regional_kubeconfig="$(k8s_get_capi_kubeconfig "regional")"
 _edge_kubeconfig="$(k8s_get_capi_kubeconfig "edge")"
