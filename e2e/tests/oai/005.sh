@@ -72,7 +72,7 @@ metadata:
   name: oai-ue
 spec:
   upstream:
-    repo: catalog
+    repo: oai-ran-packages
     package: pkg-example-ue-bp
     revision: v1
   downstream:
@@ -84,14 +84,14 @@ spec:
   - name: edge
 EOF
 
-kpt_wait_pkg "edge" "oai-ue"
+kpt_wait_pkg "edge" "oai-ran-ue"
 
-k8s_wait_ready "packagevariant" "oai-ue-core-oai-ue"
+k8s_wait_ready "packagevariant" "oai-ue"
 
 _regional_kubeconfig="$(k8s_get_capi_kubeconfig "regional")"
 _edge_kubeconfig="$(k8s_get_capi_kubeconfig "edge")"
 
-k8s_wait_ready_replicas "deployment" "oai-ue" "$_edge_kubeconfig" "oai-ue"
+k8s_wait_ready_replicas "deployment" "oai-nr-ue" "$_edge_kubeconfig" "oai-ue"
 
 # Check if the Registration is finished
 _wait_for_ue_registration "$_edge_kubeconfig"

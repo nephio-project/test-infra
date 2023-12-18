@@ -64,3 +64,20 @@ spec:
     approval.nephio.org/policy: initial
   injectors:
   - name: edge
+---
+apiVersion: config.porch.kpt.dev/v1alpha2
+kind: PackageVariantSet
+metadata:
+  name: oai-ran-operator
+spec:
+  upstream:
+    repo: oai-ran-packages
+    package: oai-ran-operator
+    revision: v1
+  targets:
+  - objectSelector:
+      apiVersion: infra.nephio.org/v1alpha1
+      kind: WorkloadCluster
+    template:
+      annotations:
+        approval.nephio.org/policy: initial

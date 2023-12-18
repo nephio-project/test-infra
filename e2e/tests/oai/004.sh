@@ -81,8 +81,6 @@ function _wait_for_f1_link {
     debug "timeout: $timeout"
 }
 
-kpt alpha repo register --namespace default https://github.com/josephthaliath/catalog.git --directory=workloads/oai --name=oai-ran-packages
-
 cat <<EOF | kubectl apply -f -
 apiVersion: config.porch.kpt.dev/v1alpha1
 kind: PackageVariant
@@ -127,11 +125,11 @@ done
 
 
 for nf in du cuup; do
-    k8s_wait_ready "packagevariant" "oai-$nf-core-oai-$nf"
+    k8s_wait_ready "packagevariant" "oai-$nf"
 done
 
 for nf in du cuup; do
-    kpt_wait_pkg "core" "oai-$nf" "nephio" "900"
+    kpt_wait_pkg "edge" "oai-ran-$nf" "nephio" "900"
 done
 
 _regional_kubeconfig="$(k8s_get_capi_kubeconfig "regional")"
