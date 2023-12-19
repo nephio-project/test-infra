@@ -27,21 +27,17 @@ source "${LIBDIR}/k8s.sh"
 # shellcheck source=e2e/lib/kpt.sh
 source "${LIBDIR}/kpt.sh"
 
-# shellcheck source=e2e/lib/porch.sh
-source "${LIBDIR}/porch.sh"
-
-# shellcheck source=e2e/lib/_assertions.sh
-source "${LIBDIR}/_assertions.sh"
-
-function _wait_for_ue_registration {
+function _wait_for_ue {
     local kubeconfig=$1
+    local log_msg=$2
+    local msg=$3
 
-    info "waiting for Registration to be finished"
+    info "waiting for $msg to be finished"
     timeout=600
-    until kubectl logs "$(kubectl get pods -n oai-ue --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-nr-ue -o jsonpath='{.items[*].metadata.name}')" -n oai-ue -c nr-ue --kubeconfig "$kubeconfig" | grep -q 'REGISTRATION ACCEPT'; do
+    until kubectl logs "$(kubectl get pods -n oai-ue --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-nr-ue -o jsonpath='{.items[*].metadata.name}')" -n oai-ue -c nr-ue --kubeconfig "$kubeconfig" | grep -q "$log_msg"; do
         if [[ $timeout -lt 0 ]]; then
             kubectl logs -l app.kubernetes.io/name=oai-nr-ue -n oai-ue -c nr-ue --kubeconfig "$kubeconfig" --tail 50
-            error "Timed out waiting for UE Registration"
+            error "Timed out waiting for $msg"
         fi
         timeout=$((timeout - 5))
         sleep 5
@@ -49,20 +45,12 @@ function _wait_for_ue_registration {
     debug "timeout: $timeout"
 }
 
-function _wait_for_ue_pdu_session {
-    local kubeconfig=$1
+function _wait_for_ue_registration {
+    _wait_for_ue "$1" "REGISTRATION ACCEPT" "UE Registration"
+}
 
-    info "waiting for PDU session"
-    timeout=600
-    until kubectl logs "$(kubectl get pods -n oai-ue --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-nr-ue -o jsonpath='{.items[*].metadata.name}')" -n oai-ue -c nr-ue --kubeconfig "$kubeconfig" | grep -q 'Interface oaitun_ue1 successfully configured'; do
-        if [[ $timeout -lt 0 ]]; then
-            kubectl logs -l app.kubernetes.io/name=oai-nr-ue -n oai-ue -c nr-ue --kubeconfig "$kubeconfig" --tail 50
-            error "Timed out waiting for PDU session"
-        fi
-        timeout=$((timeout - 5))
-        sleep 5
-    done
-    debug "timeout: $timeout"
+function _wait_for_ue_pdu_session {
+    _wait_for_ue "$1" "Interface oaitun_ue1 successfully configured" "PDU session"
 }
 
 cat <<EOF | kubectl apply -f -
@@ -72,9 +60,9 @@ metadata:
   name: oai-ue
 spec:
   upstream:
-    repo: oai-ran-packages
-    package: pkg-example-ue-bp
-    revision: v1
+    repo: catalog
+    package: workloads/oai/pkg-example-ue-bp
+    revision: main
   downstream:
     repo: edge
     package: oai-ran-ue
@@ -85,12 +73,8 @@ spec:
 EOF
 
 kpt_wait_pkg "edge" "oai-ran-ue"
-
 k8s_wait_ready "packagevariant" "oai-ue"
-
-_regional_kubeconfig="$(k8s_get_capi_kubeconfig "regional")"
 _edge_kubeconfig="$(k8s_get_capi_kubeconfig "edge")"
-
 k8s_wait_ready_replicas "deployment" "oai-nr-ue" "$_edge_kubeconfig" "oai-ue"
 
 # Check if the Registration is finished
