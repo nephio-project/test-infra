@@ -27,8 +27,7 @@ nephio_stock_repos:
     repo: https://github.com/nephio-project/free5gc-packages.git
     branch: main
   - name: catalog
-    #repo: https://github.com/nephio-project/catalog.git
-    repo: https://github.com/josephthaliath/catalog.git
+    repo: https://github.com/nephio-project/catalog.git
     branch: main
   - name: oai-packages
     repo: https://github.com/OPENAIRINTERFACE/oai-packages.git
