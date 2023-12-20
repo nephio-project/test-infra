@@ -1,0 +1,92 @@
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- name: "Define local git variables"
+  ansible.builtin.set_fact:
+    local_git_push_uri: "http://{{ gitea.k8s.username }}:{{ gitea.k8s.password }}@{{ gitea.k8s.ingress_ip }}:{{ gitea.k8s.ingress_port }}/nephio"
+    local_git_fetch_uri: "http://{{ gitea.k8s.ingress_ip }}:{{ gitea.k8s.ingress_port }}/nephio"
+  no_log: true
+
+- name: "Create new repo in local git: {{ item.name }}"
+  kubernetes.core.k8s:
+    context: "{{ k8s.context }}"
+    state: present
+    definition:
+      apiVersion: infra.nephio.org/v1alpha1
+      kind: Repository
+      metadata:
+        name: "{{ item.name }}"
+        namespace: default
+      spec:
+        description: "Clone of GitHub repository {{ item.name }}"
+        defaultBranch: main
+
+- name: "Fetch GitHub repo {{ item.name }}"
+  ansible.builtin.git: # noqa: latest[git]
+    repo: "{{ item.repo }}"
+    dest: "/tmp/repository/{{ item.name }}.git"
+    bare: true
+
+- name: "Add git remote for local repo"
+  ansible.builtin.command: # noqa: command-instead-of-module
+    cmd: git remote add local {{ local_git_push_uri }}/{{ item.name }}.git
+    chdir: "/tmp/repository/{{ item.name }}.git"
+  register: add_remote_result
+  changed_when: false
+  ignore_errors: true
+  no_log: true
+
+- name: "Push tags to local git repo: {{ item.name }}"
+  ansible.builtin.command: # noqa: command-instead-of-module
+    cmd: git push local --tags --force
+    chdir: /tmp/repository/{{ item.name }}.git
+  environment:
+    http_proxy: ""
+    https_proxy: ""
+    HTTP_PROXY: ""
+    HTTPS_PROXY: ""
+  register: push_result
+  until: push_result is not failed
+  retries: 12
+  delay: 10
+  changed_when: "'Everything up-to-date' not in push_result.stdout"
+
+- name: "Push branches to local git repo: {{ item.name }}"
+  ansible.builtin.command: # noqa: command-instead-of-module
+    cmd: git push local --all --force
+    chdir: /tmp/repository/{{ item.name }}.git
+  environment:
+    http_proxy: ""
+    https_proxy: ""
+    HTTP_PROXY: ""
+    HTTPS_PROXY: ""
+  register: push_result
+  changed_when: "'Everything up-to-date' not in push_result.stdout"
+
+- name: "Create porch repository object: {{ item.name }}"
+  kubernetes.core.k8s:
+    context: "{{ k8s.context }}"
+    state: present
+    definition:
+      apiVersion: config.porch.kpt.dev/v1alpha1
+      kind: Repository
+      metadata:
+        name: "{{ item.name }}"
+        namespace: default
+        labels:
+          kpt.dev/repository-access: read-only
+          kpt.dev/repository-content: external-blueprints
+      spec:
+        content: Package
+        deployment: false
+        git:
+          branch: "{{ item.branch }}"
+          directory: /
+          repo: "{{ local_git_fetch_uri }}/{{ item.name }}.git"
+        type: git

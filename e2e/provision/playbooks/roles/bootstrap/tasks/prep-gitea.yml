@@ -64,7 +64,7 @@
         password: "{{ gitea.k8s.db_password }}"
   no_log: true
 
-- name: Create gitea user password
+- name: Create gitea user password in Gitea namespace
   kubernetes.core.k8s:
     context: "{{ k8s.context }}"
     state: present
