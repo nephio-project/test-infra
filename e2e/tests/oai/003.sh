@@ -81,7 +81,7 @@ for nf in nrf udm udr ausf amf smf; do
     k8s_wait_ready "packagevariant" "oai-$nf-core-oai-$nf"
 done
 for nf in nrf udm udr ausf amf smf; do
-    kpt_wait_pkg "core" "oai-$nf" "nephio" "900"
+    kpt_wait_pkg "core" "oai-$nf" "nephio" "1800"
 done
 kpt_wait_pkg "edge" "oai-upf"
 

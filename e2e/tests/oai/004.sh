@@ -28,21 +28,27 @@ source "${LIBDIR}/k8s.sh"
 source "${LIBDIR}/kpt.sh"
 
 function _wait_for_ran {
-    local kubeconfig=$1
-    local wait_msg=$2
-    local link_name=$3
+    kubeconfig=$1
+    wait_msg=$2
+    link_name=$3
 
     info "waiting for $link_name link to be established"
     timeout=600
-    until kubectl logs "$(kubectl get pods -n oai-ran-cucp --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-gnb-cu-cp -o jsonpath='{.items[*].metadata.name}')" -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" | grep -q "$wait_msg"; do
-        if [[ $timeout -lt 0 ]]; then
-            kubectl logs -l app.kubernetes.io/name=oai-gnb-cu-cp -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" --tail 50
-            error "Timed out waiting for $link_name link to be established"
-        fi
-        timeout=$((timeout - 5))
-        sleep 5
+
+    temp_file=$(mktemp)
+    kubectl logs "$(kubectl get pods -n oai-ran-cucp --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-gnb-cu-cp -o jsonpath='{.items[*].metadata.name}')" -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" > temp_file
+    while grep -q "$wait_msg" temp_file;status=$?; [[ $status != 0 ]]
+    	do
+        	if [[ $timeout -lt 0 ]]; then
+            		kubectl logs -l app.kubernetes.io/name=oai-gnb-cu-cp -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" --tail 50
+            		error "Timed out waiting for $link_name link to be established"
+        	fi
+        	timeout=$((timeout - 5))
+        	sleep 5
+		kubectl logs "$(kubectl get pods -n oai-ran-cucp --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-gnb-cu-cp -o jsonpath='{.items[*].metadata.name}')" -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" > temp_file
     done
     debug "timeout: $timeout"
+    rm "${temp_file}"
 }
 
 function _wait_for_n2_link {
@@ -87,9 +93,9 @@ for nf in du cuup cucp; do
 done
 
 for nf in du cuup; do
-    kpt_wait_pkg "edge" "oai-ran-$nf" "nephio" "900"
+    kpt_wait_pkg "edge" "oai-ran-$nf" "nephio" "1800"
 done
-kpt_wait_pkg "regional" "oai-cucp"
+kpt_wait_pkg "regional" "oai-ran-cucp" "nephio" "1800"
 
 _regional_kubeconfig="$(k8s_get_capi_kubeconfig "regional")"
 _edge_kubeconfig="$(k8s_get_capi_kubeconfig "edge")"

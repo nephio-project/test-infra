@@ -34,15 +34,20 @@ function _wait_for_ue {
 
     info "waiting for $msg to be finished"
     timeout=600
-    until kubectl logs "$(kubectl get pods -n oai-ue --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-nr-ue -o jsonpath='{.items[*].metadata.name}')" -n oai-ue -c nr-ue --kubeconfig "$kubeconfig" | grep -q "$log_msg"; do
-        if [[ $timeout -lt 0 ]]; then
-            kubectl logs -l app.kubernetes.io/name=oai-nr-ue -n oai-ue -c nr-ue --kubeconfig "$kubeconfig" --tail 50
-            error "Timed out waiting for $msg"
-        fi
-        timeout=$((timeout - 5))
-        sleep 5
+    temp_file=$(mktemp)
+    kubectl logs "$(kubectl get pods -n oai-ue --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-nr-ue -o jsonpath='{.items[*].metadata.name}')" -n oai-ue -c nr-ue --kubeconfig "$kubeconfig" > temp_file
+    while grep -q "$log_msg" temp_file;status=$?; [ $status != 0 ]
+    	do
+        	if [[ $timeout -lt 0 ]]; then
+            		kubectl logs -l app.kubernetes.io/name=oai-nr-ue -n oai-ue -c nr-ue --kubeconfig "$kubeconfig" --tail 50
+            		error "Timed out waiting for $msg"
+        	fi
+        	timeout=$((timeout - 5))
+        	sleep 5
+		kubectl logs "$(kubectl get pods -n oai-ue --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-nr-ue -o jsonpath='{.items[*].metadata.name}')" -n oai-ue -c nr-ue --kubeconfig "$kubeconfig" > temp_file
     done
     debug "timeout: $timeout"
+    rm "${temp_file}"
 }
 
 function _wait_for_ue_registration {
@@ -72,8 +77,9 @@ spec:
   - name: edge
 EOF
 
-kpt_wait_pkg "edge" "oai-ran-ue"
 k8s_wait_ready "packagevariant" "oai-ue"
+kpt_wait_pkg "edge" "oai-ran-ue" "nephio" "1800"
+
 _edge_kubeconfig="$(k8s_get_capi_kubeconfig "edge")"
 k8s_wait_ready_replicas "deployment" "oai-nr-ue" "$_edge_kubeconfig" "oai-ue"
 
