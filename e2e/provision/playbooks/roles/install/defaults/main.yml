@@ -65,9 +65,9 @@ nephio:
       - resource-group-system
   kpt:
     packages:
-      - repo_uri: "{{ nephio_example_repo_uri }}"
-        pkg: porch-dev
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: nephio/core/porch
+        version: main
         async: 480
         poll: 5
       - repo_uri: "{{ nephio_example_repo_uri }}"
