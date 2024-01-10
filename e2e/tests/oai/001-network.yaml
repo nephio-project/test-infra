@@ -14,8 +14,8 @@ metadata:
   name: network
 spec:
   upstream:
-    repo: catalog
-    package: workloads/oai/network
+    repo: catalog-workloads-oai-ran
+    package: network
     revision: main
   downstream:
     repo: mgmt

@@ -14,7 +14,7 @@ metadata:
   name: oai-upf-edge
 spec:
   upstream:
-    repo: oai-packages
+    repo: oai-core-packages
     package: oai-upf-edge
     revision: r2
   downstream:

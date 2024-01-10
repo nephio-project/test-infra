@@ -57,7 +57,7 @@ metadata:
   name: oai-$nf
 spec:
   upstream:
-    repo: oai-packages
+    repo: oai-core-packages
     package: oai-$nf
     revision: r2
   targets:

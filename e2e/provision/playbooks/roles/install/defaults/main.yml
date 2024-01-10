@@ -18,20 +18,41 @@ gitea:
 
 nephio_pkg_version: v1.0.1
 nephio_example_repo_uri: https://github.com/nephio-project/nephio-example-packages.git
+nephio_catalog_repo_uri: https://github.com/nephio-project/catalog.git
 
 nephio_stock_repos:
   - name: nephio-example-packages
     repo: "{{ nephio_example_repo_uri }}"
+    directory: /
     branch: main
   - name: free5gc-packages
     repo: https://github.com/nephio-project/free5gc-packages.git
+    directory: /
     branch: main
-  - name: catalog
-    repo: https://github.com/nephio-project/catalog.git
+  - name: catalog-workloads-free5gc
+    repo: "{{ nephio_catalog_repo_uri }}"
+    directory: /workloads/free5gc
     branch: main
-  - name: oai-packages
+  - name: catalog-infra-capi
+    repo: "{{ nephio_catalog_repo_uri }}"
+    directory: /infra/capi
+    branch: main
+  - name: catalog-nephio-core
+    repo: "{{ nephio_catalog_repo_uri }}"
+    directory: /nephio/core
+    branch: main
+  - name: catalog-nephio-optional
+    repo: "{{ nephio_catalog_repo_uri }}"
+    directory: /nephio/optional
+    branch: main
+  - name: oai-core-packages
     repo: https://github.com/OPENAIRINTERFACE/oai-packages.git
+    directory: /
     branch: r2
+  - name: catalog-workloads-oai-ran
+    repo: "{{ nephio_catalog_repo_uri }}"
+    directory: /workloads/oai
+    branch: main
 
 nephio:
   k8s:
