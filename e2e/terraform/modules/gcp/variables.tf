@@ -75,3 +75,9 @@ variable "nephio_e2e_type" {
   default     = "free5gc"
   type        = string
 }
+
+variable "nephio_e2e_fail_fast" {
+  description = "The Nephio End-to-End testing failing behavior"
+  default     = "false"
+  type        = string
+}

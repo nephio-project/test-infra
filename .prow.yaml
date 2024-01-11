@@ -135,7 +135,7 @@ presubmits:
             - "-c"
             - |
               set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-focal -auto-approve' EXIT;
-              terraform init && timeout 75m terraform apply -target module.gcp-ubuntu-focal -var="pkg_version=v1.0.1" -auto-approve
+              terraform init && timeout 75m terraform apply -target module.gcp-ubuntu-focal -var="fail_fast=true" -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -186,7 +186,7 @@ presubmits:
             - "-c"
             - |
               set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-34 -auto-approve' EXIT;
-              terraform init && timeout 75m terraform apply -target module.gcp-fedora-34 -var="pkg_version=v1.0.1" -auto-approve
+              terraform init && timeout 75m terraform apply -target module.gcp-fedora-34 -var="fail_fast=true" -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -236,7 +236,7 @@ presubmits:
             - "-c"
             - |
               set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
-              terraform init && timeout 75m terraform apply -target module.gcp-ubuntu-jammy -var="pkg_version=v1.0.1" -var="e2e_type=oai" -auto-approve
+              terraform init && timeout 75m terraform apply -target module.gcp-ubuntu-jammy -var="e2e_type=oai" -var="fail_fast=true" -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
