@@ -1396,7 +1396,7 @@ periodics:
             - "-c"
             - |
               set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-focal -auto-approve' EXIT;
-              terraform init && timeout 75m terraform apply -target module.gcp-ubuntu-focal -auto-approve
+              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-focal -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -1451,7 +1451,7 @@ periodics:
             - "-c"
             - |
               set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-34 -auto-approve' EXIT;
-              terraform init && timeout 75m terraform apply -target module.gcp-fedora-34 -auto-approve
+              terraform init && timeout 120m terraform apply -target module.gcp-fedora-34 -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
