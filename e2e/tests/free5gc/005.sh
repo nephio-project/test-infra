@@ -31,5 +31,5 @@ for cluster in "edge01" "edge02"; do
 done
 
 for cluster in "edge01" "edge02"; do
-    k8s_wait_ready_replicas "deployment" "upf-${cluster}" "$(k8s_get_capi_kubeconfig "$cluster")" "free5gc-upf"
+    k8s_wait_ready_replicas "deployment" "upf-${cluster}" "$(k8s_get_capi_kubeconfig "$cluster")" "free5gc-upf" "900"
 done
