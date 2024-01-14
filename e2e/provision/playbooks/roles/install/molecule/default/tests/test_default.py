@@ -71,7 +71,6 @@ def test_repositories_creation(host):
     expected = [
         "free5gc-packages",
         "catalog-workloads-free5gc",
-        "nephio-example-packages",
         "catalog-infra-capi",
         "catalog-nephio-core",
         "catalog-nephio-optional",

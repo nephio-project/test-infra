@@ -114,6 +114,5 @@
     - catalog-nephio-optional
     - catalog-workloads-free5gc
     - catalog-workloads-oai-ran
-    - nephio-example-packages
     - free5gc-packages
     - oai-core-packages

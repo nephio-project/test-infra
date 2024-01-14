@@ -14,9 +14,9 @@ metadata:
   name: edge-clusters
 spec:
   upstream:
-    repo: nephio-example-packages
+    repo: catalog-infra-capi
     package: nephio-workload-cluster
-    revision: v9
+    revision: main
   targets:
   - repositories:
     - name: mgmt

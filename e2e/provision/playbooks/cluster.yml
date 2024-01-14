@@ -131,14 +131,14 @@
       ansible.builtin.include_role:
         name: kpt
       loop:
-        - {pkg: repository, dest: /tmp/repository/mgmt}
-        - {pkg: rootsync, dest: /tmp/rootsync/mgmt}
-        - {pkg: repository, dest: /tmp/repository/mgmt-staging}
+        - {pkg: distros/sandbox/repository, dest: /tmp/repository/mgmt}
+        - {pkg: nephio/optional/rootsync, dest: /tmp/rootsync/mgmt}
+        - {pkg: distros/sandbox/repository, dest: /tmp/repository/mgmt-staging}
       vars:
-        repo_uri: "{{ nephio_example_repo_uri }}"
+        repo_uri: "{{ nephio_catalog_repo_uri }}"
         local_dest_directory: "{{ item.dest }}"
         pkg: "{{ item.pkg }}"
-        version: "{{ nephio_pkg_version }}"
+        version: main
         for_deployment: true
         context: "{{ k8s.context }}"
         kpt_async: 900

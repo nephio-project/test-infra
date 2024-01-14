@@ -4,9 +4,9 @@ metadata:
   name: edge01-ueransim
 spec:
   upstream:
-    repo: nephio-example-packages
+    repo: catalog-workloads-free5gc
     package: ueransim
-    revision: v3
+    revision: main
   downstream:
     repo: edge01
     package: ueransim
