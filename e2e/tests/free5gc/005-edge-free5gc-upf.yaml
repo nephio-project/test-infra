@@ -4,9 +4,9 @@ metadata:
   name: edge-free5gc-upf
 spec:
   upstream:
-    repo: free5gc-packages
+    repo: catalog-workloads-free5gc
     package: pkg-example-upf-bp
-    revision: v5
+    revision: main
   targets:
   - objectSelector:
       apiVersion: infra.nephio.org/v1alpha1

@@ -69,7 +69,6 @@ def test_network_config_deployments_creation(host):
 
 def test_repositories_creation(host):
     expected = [
-        "free5gc-packages",
         "catalog-workloads-free5gc",
         "catalog-infra-capi",
         "catalog-nephio-core",

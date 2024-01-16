@@ -19,10 +19,6 @@ gitea:
 nephio_catalog_repo_uri: https://github.com/nephio-project/catalog.git
 
 nephio_stock_repos:
-  - name: free5gc-packages
-    repo: https://github.com/nephio-project/free5gc-packages.git
-    directory: /
-    branch: main
   - name: catalog-distros-sandbox
     repo: "{{ nephio_catalog_repo_uri }}"
     directory: /distros/sandbox
