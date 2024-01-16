@@ -4,7 +4,7 @@ metadata:
   name: edge01-ueransim
 spec:
   upstream:
-    repo: catalog-workloads-free5gc
+    repo: catalog-workloads-tools
     package: ueransim
     revision: main
   downstream:

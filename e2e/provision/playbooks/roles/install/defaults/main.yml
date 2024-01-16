@@ -55,6 +55,10 @@ nephio_stock_repos:
     repo: "{{ nephio_catalog_repo_uri }}"
     directory: /workloads/oai
     branch: main
+  - name: catalog-workloads-tools
+    repo: "{{ nephio_catalog_repo_uri }}"
+    directory: /workloads/tools
+    branch: main
 
 nephio:
   k8s:
