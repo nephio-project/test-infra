@@ -27,10 +27,6 @@ nephio_stock_repos:
     repo: "{{ nephio_catalog_repo_uri }}"
     directory: /workloads/free5gc
     branch: main
-  - name: catalog-workloads-oai
-    repo: "{{ nephio_catalog_repo_uri }}"
-    directory: /workloads/oai
-    branch: main
   - name: catalog-infra-capi
     repo: "{{ nephio_catalog_repo_uri }}"
     directory: /infra/capi
