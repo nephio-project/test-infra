@@ -64,12 +64,6 @@ variable "nephio_e2e_nodes" {
   type        = number
 }
 
-variable "nephio_pkg_version" {
-  description = "The version used for all the nephio packages"
-  default     = "main"
-  type        = string
-}
-
 variable "nephio_e2e_type" {
   description = "The Nephio End-to-End testing type"
   default     = "free5gc"
