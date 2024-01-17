@@ -14,9 +14,9 @@ metadata:
   name: network
 spec:
   upstream:
-    repo: nephio-example-packages
+    repo: catalog-distros-sandbox
     package: network
-    revision: v1
+    revision: main
   downstream:
     repo: mgmt
     package: network

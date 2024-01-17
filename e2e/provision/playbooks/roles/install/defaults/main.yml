@@ -16,22 +16,41 @@ gitea:
     username: nephio
     password: secret
 
-nephio_pkg_version: v1.0.1
-nephio_example_repo_uri: https://github.com/nephio-project/nephio-example-packages.git
+nephio_catalog_repo_uri: https://github.com/nephio-project/catalog.git
 
 nephio_stock_repos:
-  - name: nephio-example-packages
-    repo: "{{ nephio_example_repo_uri }}"
+  - name: catalog-distros-sandbox
+    repo: "{{ nephio_catalog_repo_uri }}"
+    directory: /distros/sandbox
     branch: main
-  - name: free5gc-packages
-    repo: https://github.com/nephio-project/free5gc-packages.git
+  - name: catalog-workloads-free5gc
+    repo: "{{ nephio_catalog_repo_uri }}"
+    directory: /workloads/free5gc
     branch: main
-  - name: catalog
-    repo: https://github.com/nephio-project/catalog.git
+  - name: catalog-infra-capi
+    repo: "{{ nephio_catalog_repo_uri }}"
+    directory: /infra/capi
     branch: main
-  - name: oai-packages
+  - name: catalog-nephio-core
+    repo: "{{ nephio_catalog_repo_uri }}"
+    directory: /nephio/core
+    branch: main
+  - name: catalog-nephio-optional
+    repo: "{{ nephio_catalog_repo_uri }}"
+    directory: /nephio/optional
+    branch: main
+  - name: oai-core-packages
     repo: https://github.com/OPENAIRINTERFACE/oai-packages.git
+    directory: /
     branch: r2
+  - name: catalog-workloads-oai-ran
+    repo: "{{ nephio_catalog_repo_uri }}"
+    directory: /workloads/oai
+    branch: main
+  - name: catalog-workloads-tools
+    repo: "{{ nephio_catalog_repo_uri }}"
+    directory: /workloads/tools
+    branch: main
 
 nephio:
   k8s:
@@ -44,24 +63,24 @@ nephio:
       - resource-group-system
   kpt:
     packages:
-      - repo_uri: "{{ nephio_example_repo_uri }}"
-        pkg: porch-dev
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: nephio/core/porch
+        version: main
         async: 480
         poll: 5
-      - repo_uri: "{{ nephio_example_repo_uri }}"
-        pkg: nephio-controllers
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: nephio/core/nephio-operator
+        version: main
         async: 480
         poll: 5
-      - repo_uri: "{{ nephio_example_repo_uri }}"
-        pkg: configsync
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: nephio/core/configsync
+        version: main
         async: 240
         poll: 5
-      - repo_uri: "{{ nephio_example_repo_uri }}"
-        pkg: network-config
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: nephio/optional/network-config
+        version: main
         async: 480
         poll: 0
 
@@ -70,6 +89,6 @@ nephio_webui:
     namespace: nephio-webui
   kpt:
     package:
-      repo_uri: https://github.com/nephio-project/nephio-packages.git
-      pkg: nephio-webui
-      version: "{{ nephio_pkg_version }}"
+      repo_uri: "{{ nephio_catalog_repo_uri }}"
+      pkg: nephio/optional/webui
+      version: main

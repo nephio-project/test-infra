@@ -14,8 +14,8 @@ metadata:
   name: oai-core-clusters-mgmt-core
 spec:
   upstream:
-    repo: catalog
-    package: workloads/oai/workload-cluster
+    repo: catalog-infra-capi
+    package: nephio-workload-cluster
     revision: main
   downstream:
     repo: mgmt
@@ -35,8 +35,8 @@ metadata:
   name: oai-regional-clusters
 spec:
   upstream:
-    repo: catalog
-    package: workloads/oai/workload-cluster
+    repo: catalog-infra-capi
+    package: nephio-workload-cluster
     revision: main
   targets:
   - repositories:
@@ -59,8 +59,8 @@ metadata:
   name: oai-edge-clusters
 spec:
   upstream:
-    repo: catalog
-    package: workloads/oai/workload-cluster
+    repo: catalog-infra-capi
+    package: nephio-workload-cluster
     revision: main
   targets:
   - repositories:

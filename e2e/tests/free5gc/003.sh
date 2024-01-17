@@ -33,7 +33,7 @@ source "${LIBDIR}/porch.sh"
 # shellcheck source=e2e/lib/_assertions.sh
 source "${LIBDIR}/_assertions.sh"
 
-pkg_rev=$(kpt alpha rpkg clone -n default https://github.com/nephio-project/free5gc-packages.git/free5gc-cp@v1 --repository regional free5gc-cp | cut -f 1 -d ' ')
+pkg_rev=$(kpt alpha rpkg clone -n default https://github.com/nephio-project/catalog.git/workloads/free5gc/free5gc-cp@main --repository regional free5gc-cp | cut -f 1 -d ' ')
 k8s_wait_exists "packagerev" "$pkg_rev"
 
 porch_wait_log_entry "Creating packagerev default/regional-"

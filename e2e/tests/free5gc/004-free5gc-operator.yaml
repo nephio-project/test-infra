@@ -4,9 +4,9 @@ metadata:
   name: free5gc-operator
 spec:
   upstream:
-    repo: free5gc-packages
+    repo: catalog-workloads-free5gc
     package: free5gc-operator
-    revision: v5
+    revision: main
   targets:
   - objectSelector:
       apiVersion: infra.nephio.org/v1alpha1
