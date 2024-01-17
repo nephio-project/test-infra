@@ -14,8 +14,8 @@ metadata:
   name: network
 spec:
   upstream:
-    repo: catalog
-    package: workloads/oai/network
+    repo: catalog-distros-sandbox
+    package: network
     revision: main
   downstream:
     repo: mgmt

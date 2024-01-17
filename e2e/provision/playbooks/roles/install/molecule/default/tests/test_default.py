@@ -69,10 +69,12 @@ def test_network_config_deployments_creation(host):
 
 def test_repositories_creation(host):
     expected = [
-        "free5gc-packages",
-        "nephio-example-packages",
-        "catalog",
-        "oai-packages",
+        "catalog-workloads-free5gc",
+        "catalog-infra-capi",
+        "catalog-nephio-core",
+        "catalog-nephio-optional",
+        "oai-core-packages",
+        "catalog-workloads-oai-ran",
     ]
     got = host.check_output(
         "kubectl get repositories -o \

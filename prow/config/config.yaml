@@ -15,6 +15,7 @@ in_repo_config:
     nephio-project/edge-status-aggregator: true
     nephio-project/kpt-backstage-plugins: true
     nephio-project/oai: true
+    nephio-project/porch: true
     nephio-experimental: true
   allowed_clusters:
     "*": ["default"]

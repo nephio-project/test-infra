@@ -90,7 +90,7 @@
         deployment: false
         git:
           branch: "{{ item.branch }}"
-          directory: /
+          directory: "{{ item.directory }}"
           repo: "{{ item.repo }}"
         type: git
   loop: "{{ nephio_stock_repos }}"
@@ -109,5 +109,9 @@
       type: Ready
       status: true
   loop:
-    - nephio-example-packages
-    - free5gc-packages
+    - catalog-infra-capi
+    - catalog-nephio-core
+    - catalog-nephio-optional
+    - catalog-workloads-free5gc
+    - catalog-workloads-oai-ran
+    - oai-core-packages

@@ -17,8 +17,7 @@ Available variables are listed below, along with default values (see defaults/ma
 | k8s.context                | no       | kind-kind                                                     |         | Kubernetes context to create resources                                  |
 | gitea.k8s.username         | no       | nephio                                                        |         | Gitea admin user name                                                   |
 | gitea.k8s.password         | no       | secret                                                        |         | Gitea admin password                                                    |
-| nephio_pkg_version         | no       | v1.0.1                                                        |         | Default version for all kpt packages                                    |
-| nephio_example_repo_uri    | no       | https://github.com/nephio-project/nephio-example-packages.git |         | Default kpt examples packages repository                                |
+| nephio_catalog_repo_uri    | no       | https://github.com/nephio-project/catalog.git                 |         | Default kpt catalog packages repository                                 |
 | nephio.k8s.namespaces      | no       |                                                               |         | List of Kubernetes namespaces to watch for  Nephio deployment resources |
 | nephio.kpt.packages        | no       |                                                               |         | List of Nephio kpt packages                                             |
 | nephio_webui.k8s.namespace | no       | nephio-webui                                                  |         | Kubernetes namespace for Nephio WebUI resources                         |
@@ -52,7 +51,7 @@ None
       become_user: root
       ansible.builtin.unarchive:
         remote_src: true
-        src: https://github.com/GoogleContainerTools/kpt/releases/download/v1.0.0-beta.38/kpt_linux_amd64-1.0.0-beta.38.tar.gz
+        src: https://github.com/GoogleContainerTools/kpt/releases/download/v1.0.0-beta.49/kpt_linux_amd64-1.0.0-beta.49.tar.gz
         dest: /usr/local/bin/
         creates: /usr/local/bin/kpt
     - name: Install Docker Engine

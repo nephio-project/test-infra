@@ -25,8 +25,7 @@ k8s:
 kind:
   enabled: true
 
-nephio_pkg_version: v1.0.1
-nephio_example_repo_uri: https://github.com/nephio-project/nephio-example-packages.git
+nephio_catalog_repo_uri: https://github.com/nephio-project/catalog.git
 
 gitea:
   enabled: true
@@ -40,9 +39,9 @@ gitea:
       - gitea
   kpt:
     packages:
-      - repo_uri: "{{ nephio_example_repo_uri }}"
-        pkg: gitea
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: distros/sandbox/gitea
+        version: main
         async: 780
         poll: 0
 
@@ -53,9 +52,9 @@ resource_backend:
       - backend-system
   kpt:
     packages:
-      - repo_uri: "{{ nephio_example_repo_uri }}"
-        pkg: resource-backend
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: nephio/optional/resource-backend
+        version: main
         async: 780
         poll: 0
 
@@ -66,9 +65,9 @@ cert_manager:
       - cert-manager
   kpt:
     packages:
-      - repo_uri: "{{ nephio_example_repo_uri }}"
-        pkg: cert-manager
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: distros/sandbox/cert-manager
+        version: main
         async: 660
         poll: 0
 
@@ -82,19 +81,19 @@ cluster_api:
       - capd-system
   kpt:
     packages:
-      - repo_uri: "{{ nephio_example_repo_uri }}"
-        pkg: cluster-capi
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: infra/capi/cluster-capi
+        version: main
         async: 900
         poll: 5
-      - repo_uri: "{{ nephio_example_repo_uri }}"
-        pkg: cluster-capi-infrastructure-docker
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: infra/capi/cluster-capi-infrastructure-docker
+        version: main
         async: 780
         poll: 5
-      - repo_uri: "{{ nephio_example_repo_uri }}"
-        pkg: cluster-capi-kind-docker-templates
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: infra/capi/cluster-capi-kind-docker-templates
+        version: main
         async: 1500
         poll: 0
 
@@ -105,13 +104,13 @@ metallb:
       - metallb-system
   kpt:
     packages:
-      - repo_uri: "{{ nephio_example_repo_uri }}"
-        pkg: metallb
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: distros/sandbox/metallb
+        version: main
         async: 1020
         poll: 5
-      - repo_uri: "{{ nephio_example_repo_uri }}"
-        pkg: metallb-sandbox-config
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: distros/sandbox/metallb-sandbox-config
+        version: main
         async: 660
         poll: 0
