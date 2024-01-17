@@ -71,8 +71,8 @@ metadata:
   name: oai-ran-operator
 spec:
   upstream:
-    repo: catalog
-    package: workloads/oai/oai-ran-operator
+    repo: catalog-workloads-oai-ran
+    package: oai-ran-operator
     revision: main
   targets:
   - objectSelector:
