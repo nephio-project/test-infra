@@ -75,8 +75,8 @@ metadata:
   name: oai-$nf
 spec:
   upstream:
-    repo: catalog
-    package: workloads/oai/pkg-example-$nf-bp
+    repo: catalog-workloads-oai-ran
+    package: pkg-example-$nf-bp
     revision: main
   downstream:
     repo: edge
