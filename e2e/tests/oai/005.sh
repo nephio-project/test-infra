@@ -65,8 +65,8 @@ metadata:
   name: oai-ue
 spec:
   upstream:
-    repo: catalog
-    package: workloads/oai/pkg-example-ue-bp
+    repo: catalog-workloads-oai-ran
+    package: pkg-example-ue-bp
     revision: main
   downstream:
     repo: edge
