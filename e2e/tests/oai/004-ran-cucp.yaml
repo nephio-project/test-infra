@@ -14,8 +14,8 @@ metadata:
   name: oai-cucp
 spec:
   upstream:
-    repo: catalog
-    package: workloads/oai/pkg-example-cucp-bp
+    repo: catalog-workloads-oai-ran
+    package: pkg-example-cucp-bp
     revision: main
   downstream:
     repo: regional
