@@ -64,3 +64,39 @@ spec:
     approval.nephio.org/policy: initial
   injectors:
   - name: edge
+
+---
+apiVersion: config.porch.kpt.dev/v1alpha1
+kind: PackageVariant
+metadata:
+  name: oai-ran-operator-edge
+spec:
+  upstream:
+    repo: catalog-workloads-oai-ran
+    package: oai-ran-operator
+    revision: main
+  downstream:
+    repo: edge
+    package: oai-ran-operator
+  annotations:
+    approval.nephio.org/policy: initial
+  injectors:
+  - name: edge
+
+---
+apiVersion: config.porch.kpt.dev/v1alpha1
+kind: PackageVariant
+metadata:
+  name: oai-ran-operator-regional
+spec:
+  upstream:
+    repo: catalog-workloads-oai-ran
+    package: oai-ran-operator
+    revision: main
+  downstream:
+    repo: regional
+    package: oai-ran-operator
+  annotations:
+    approval.nephio.org/policy: initial
+  injectors:
+  - name: regional
