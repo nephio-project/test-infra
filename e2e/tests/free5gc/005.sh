@@ -24,12 +24,18 @@ source "$E2EDIR/defaults.env"
 # shellcheck source=e2e/lib/k8s.sh
 source "${LIBDIR}/k8s.sh"
 
+# shellcheck source=e2e/lib/kpt.sh
+source "${LIBDIR}/kpt.sh"
+
+# shellcheck source=e2e/lib/porch.sh
+source "${LIBDIR}/porch.sh"
+
 k8s_apply "$TESTDIR/005-edge-free5gc-upf.yaml"
 
 for cluster in "edge01" "edge02"; do
-    k8s_wait_ready "packagevariant" "edge-free5gc-upf-${cluster}-free5gc-upf"
-done
-
-for cluster in "edge01" "edge02"; do
-    k8s_wait_ready_replicas "deployment" "upf-${cluster}" "$(k8s_get_capi_kubeconfig "$cluster")" "free5gc-upf" "900"
+    k8s_wait_exists "packagevariant" "edge-free5gc-upf-${cluster}-free5gc-upf"
+    porch_wait_log_entry 'updated to "free5gc-upf"'
+    porch_wait_published_packagerev "free5gc-upf" "$cluster"
+    kpt_wait_pkg "$cluster" "free5gc-upf"
+    k8s_wait_ready_replicas "deployment" "upf-${cluster}" "$(k8s_get_capi_kubeconfig "$cluster")" "free5gc-upf"
 done
