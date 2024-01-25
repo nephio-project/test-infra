@@ -24,3 +24,38 @@ spec:
     approval.nephio.org/policy: initial
   injectors:
   - name: regional
+---
+apiVersion: config.porch.kpt.dev/v1alpha1
+kind: PackageVariant
+metadata:
+  name: oai-du
+spec:
+  upstream:
+    repo: catalog-workloads-oai-ran
+    package: pkg-example-du-bp
+    revision: main
+  downstream:
+    repo: edge
+    package: oai-ran-du
+  annotations:
+    approval.nephio.org/policy: initial
+  injectors:
+  - name: edge
+---
+apiVersion: config.porch.kpt.dev/v1alpha1
+kind: PackageVariant
+metadata:
+  name: oai-cuup
+spec:
+  upstream:
+    repo: catalog-workloads-oai-ran
+    package: pkg-example-cuup-bp
+    revision: main
+  downstream:
+    repo: edge
+    package: oai-ran-cuup
+  annotations:
+    approval.nephio.org/policy: initial
+  injectors:
+  - name: edge
+

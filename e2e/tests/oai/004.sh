@@ -10,7 +10,7 @@
 ##############################################################################
 
 ## TEST METADATA
-## TEST-NAME: Deploy OAI E1 Split RAN Network Functions
+## TEST-NAME: Deploy OAI E1 and F1 Split RAN Network Functions
 ##
 
 set -o pipefail
@@ -65,28 +65,7 @@ function _wait_for_f1_link {
     _wait_for_ran "$1" "Cell Configuration ok" "F1"
 }
 
-k8s_apply "$TESTDIR/004-ran-cucp.yaml"
-
-for nf in du cuup; do
-    cat <<EOF | kubectl apply -f -
-apiVersion: config.porch.kpt.dev/v1alpha1
-kind: PackageVariant
-metadata:
-  name: oai-$nf
-spec:
-  upstream:
-    repo: catalog-workloads-oai-ran
-    package: pkg-example-$nf-bp
-    revision: main
-  downstream:
-    repo: edge
-    package: oai-ran-$nf
-  annotations:
-    approval.nephio.org/policy: initial
-  injectors:
-  - name: edge
-EOF
-done
+k8s_apply "$TESTDIR/004.yaml"
 
 for nf in du cuup cucp; do
     k8s_wait_ready "packagevariant" "oai-$nf"

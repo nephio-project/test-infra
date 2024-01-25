@@ -1,0 +1,128 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+apiVersion: config.porch.kpt.dev/v1alpha1
+kind: PackageVariant
+metadata:
+  name: oai-nrf
+spec:
+  upstream:
+    repo: oai-core-packages
+    package: oai-nrf
+    revision: r2
+  downstream:
+    repo: core
+    package: oai-nrf
+  annotations:
+    approval.nephio.org/policy: initial
+  injectors:
+  - name: core
+---
+apiVersion: config.porch.kpt.dev/v1alpha1
+kind: PackageVariant
+metadata:
+  name: oai-udm
+spec:
+  upstream:
+    repo: oai-core-packages
+    package: oai-udm
+    revision: r2
+  downstream:
+    repo: core
+    package: oai-udm
+  annotations:
+    approval.nephio.org/policy: initial
+  injectors:
+  - name: core
+---
+apiVersion: config.porch.kpt.dev/v1alpha1
+kind: PackageVariant
+metadata:
+  name: oai-ausf
+spec:
+  upstream:
+    repo: oai-core-packages
+    package: oai-ausf
+    revision: r2
+  downstream:
+    repo: core
+    package: oai-ausf
+  annotations:
+    approval.nephio.org/policy: initial
+  injectors:
+  - name: core
+---
+apiVersion: config.porch.kpt.dev/v1alpha1
+kind: PackageVariant
+metadata:
+  name: oai-udr
+spec:
+  upstream:
+    repo: oai-core-packages
+    package: oai-udr
+    revision: r2
+  downstream:
+    repo: core
+    package: oai-udr
+  annotations:
+    approval.nephio.org/policy: initial
+  injectors:
+  - name: core
+---
+apiVersion: config.porch.kpt.dev/v1alpha1
+kind: PackageVariant
+metadata:
+  name: oai-amf
+spec:
+  upstream:
+    repo: oai-core-packages
+    package: oai-amf
+    revision: r2
+  downstream:
+    repo: core
+    package: oai-amf
+  annotations:
+    approval.nephio.org/policy: initial
+  injectors:
+  - name: core
+---
+apiVersion: config.porch.kpt.dev/v1alpha1
+kind: PackageVariant
+metadata:
+  name: oai-smf
+spec:
+  upstream:
+    repo: oai-core-packages
+    package: oai-smf
+    revision: r2
+  downstream:
+    repo: core
+    package: oai-smf
+  annotations:
+    approval.nephio.org/policy: initial
+  injectors:
+  - name: core
+---
+apiVersion: config.porch.kpt.dev/v1alpha1
+kind: PackageVariant
+metadata:
+  name: oai-upf-edge
+spec:
+  upstream:
+    repo: oai-core-packages
+    package: oai-upf-edge
+    revision: r2
+  downstream:
+    repo: edge
+    package: oai-upf
+  annotations:
+    approval.nephio.org/policy: initial
+  injectors:
+  - name: edge
