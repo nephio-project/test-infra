@@ -8,19 +8,25 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-apiVersion: config.porch.kpt.dev/v1alpha1
-kind: PackageVariant
+apiVersion: config.porch.kpt.dev/v1alpha2
+kind: PackageVariantSet
 metadata:
-  name: oai-upf-edge
+  name: oai-common
 spec:
   upstream:
     repo: oai-core-packages
-    package: oai-upf-edge
+    package: database
     revision: r2
-  downstream:
-    repo: edge
-    package: oai-upf
-  annotations:
-    approval.nephio.org/policy: initial
-  injectors:
-  - name: edge
+  targets:
+  - objectSelector:
+      apiVersion: infra.nephio.org/v1alpha1
+      kind: WorkloadCluster
+      matchLabels:
+        nephio.org/site-type: core
+    template:
+      downstream:
+        package: database
+      annotations:
+        approval.nephio.org/policy: initial
+      injectors:
+      - nameExpr: target.name

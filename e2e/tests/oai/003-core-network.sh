@@ -49,37 +49,13 @@ function _wait_for_pfcp_session {
     debug "timeout: $timeout"
 }
 
-for nf in nrf udm udr ausf amf smf; do
-    cat <<EOF | kubectl apply -f -
-apiVersion: config.porch.kpt.dev/v1alpha2
-kind: PackageVariantSet
-metadata:
-  name: oai-$nf
-spec:
-  upstream:
-    repo: oai-core-packages
-    package: oai-$nf
-    revision: r2
-  targets:
-  - objectSelector:
-      apiVersion: infra.nephio.org/v1alpha1
-      kind: WorkloadCluster
-      matchLabels:
-        nephio.org/site-type: core
-    template:
-      downstream:
-        package: oai-$nf
-      annotations:
-        approval.nephio.org/policy: initial
-      injectors:
-      - nameExpr: target.name
-EOF
-done
-k8s_apply "$TESTDIR/003-upf.yaml"
+k8s_apply "$TESTDIR/003-core-network.yaml"
 
 for nf in nrf udm udr ausf amf smf; do
-    k8s_wait_ready "packagevariant" "oai-$nf-core-oai-$nf"
+    k8s_wait_ready "packagevariant" "oai-$nf"
 done
+k8s_wait_ready "packagevariant" "oai-upf-edge"
+
 for nf in nrf udm udr ausf amf smf; do
     kpt_wait_pkg "core" "oai-$nf" "nephio" "1800"
 done

@@ -27,7 +27,8 @@ source "${LIBDIR}/k8s.sh"
 # shellcheck source=e2e/lib/kpt.sh
 source "${LIBDIR}/kpt.sh"
 
-k8s_apply "$TESTDIR/002-oai-operators.yaml"
+k8s_apply "$TESTDIR/002-database.yaml"
+k8s_apply "$TESTDIR/002-operators.yaml"
 
 for pkgvar in common-core-database cp-operators up-operators ran-operator-edge ran-operator-regional; do
     k8s_wait_ready "packagevariant" "oai-$pkgvar"
@@ -41,9 +42,9 @@ kpt_wait_pkg "edge" "oai-ran-operator"
 _core_kubeconfig="$(k8s_get_capi_kubeconfig "core")"
 _edge_kubeconfig="$(k8s_get_capi_kubeconfig "edge")"
 k8s_wait_ready_replicas "deployment" "mysql" "$_core_kubeconfig" "oai-core"
-for controller in amf ausf nrf smf udm udr; do
-    k8s_wait_ready_replicas "deployment" "oai-$controller-controller" "$_core_kubeconfig" "oai-operators"
+for nf in amf ausf nrf smf udm udr; do
+    k8s_wait_ready_replicas "deployment" "oai-$nf-operator" "$_core_kubeconfig" "oai-cn-operators"
 done
-k8s_wait_ready_replicas "deployment" "oai-upf-controller" "$_edge_kubeconfig" "oai-operators"
+k8s_wait_ready_replicas "deployment" "oai-upf-operator" "$_edge_kubeconfig" "oai-cn-operators"
 k8s_wait_ready_replicas "deployment" "oai-ran-operator" "$(k8s_get_capi_kubeconfig "regional")" "oai-ran-operators"
 k8s_wait_ready_replicas "deployment" "oai-ran-operator" "$_edge_kubeconfig" "oai-ran-operators"
