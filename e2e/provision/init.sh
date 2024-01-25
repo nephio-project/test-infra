@@ -73,6 +73,8 @@ if ! command -v git >/dev/null; then
     source /etc/os-release || source /usr/lib/os-release
     case ${ID,,} in
     ubuntu | debian)
+        # Removed the damaged list
+        rm -rvf /var/lib/apt/lists/*
         apt-get update
         apt-get install -y git
         ;;
