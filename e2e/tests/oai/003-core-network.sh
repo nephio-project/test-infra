@@ -49,11 +49,10 @@ function _wait_for_pfcp_session {
     debug "timeout: $timeout"
 }
 
-done
-k8s_apply "$TESTDIR/003.yaml"
+k8s_apply "$TESTDIR/003-core-network.yaml"
 
 for nf in nrf udm udr ausf amf smf; do
-    k8s_wait_ready "packagevariant" "oai-$nf-core"
+    k8s_wait_ready "packagevariant" "oai-$nf"
 done
 k8s_wait_ready "packagevariant" "oai-upf-edge"
 

@@ -65,7 +65,7 @@ function _wait_for_f1_link {
     _wait_for_ran "$1" "Cell Configuration ok" "F1"
 }
 
-k8s_apply "$TESTDIR/004.yaml"
+k8s_apply "$TESTDIR/004-ran-network.yaml"
 
 for nf in du cuup cucp; do
     k8s_wait_ready "packagevariant" "oai-$nf"

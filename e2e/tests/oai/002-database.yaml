@@ -1,0 +1,32 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+apiVersion: config.porch.kpt.dev/v1alpha2
+kind: PackageVariantSet
+metadata:
+  name: oai-common
+spec:
+  upstream:
+    repo: oai-core-packages
+    package: database
+    revision: r2
+  targets:
+  - objectSelector:
+      apiVersion: infra.nephio.org/v1alpha1
+      kind: WorkloadCluster
+      matchLabels:
+        nephio.org/site-type: core
+    template:
+      downstream:
+        package: database
+      annotations:
+        approval.nephio.org/policy: initial
+      injectors:
+      - nameExpr: target.name
