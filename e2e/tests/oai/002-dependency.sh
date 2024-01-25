@@ -27,7 +27,8 @@ source "${LIBDIR}/k8s.sh"
 # shellcheck source=e2e/lib/kpt.sh
 source "${LIBDIR}/kpt.sh"
 
-k8s_apply "$TESTDIR/002.yaml"
+k8s_apply "$TESTDIR/002-database.yaml"
+k8s_apply "$TESTDIR/002-operators.yaml"
 
 for pkgvar in common-core-database cp-operators up-operators ran-operator-edge ran-operator-regional; do
     k8s_wait_ready "packagevariant" "oai-$pkgvar"

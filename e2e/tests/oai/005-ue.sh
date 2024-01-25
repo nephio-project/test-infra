@@ -58,24 +58,7 @@ function _wait_for_ue_pdu_session {
     _wait_for_ue "$1" "Interface oaitun_ue1 successfully configured" "PDU session"
 }
 
-cat <<EOF | kubectl apply -f -
-apiVersion: config.porch.kpt.dev/v1alpha1
-kind: PackageVariant
-metadata:
-  name: oai-ue
-spec:
-  upstream:
-    repo: catalog-workloads-oai-ran
-    package: pkg-example-ue-bp
-    revision: main
-  downstream:
-    repo: edge
-    package: oai-ran-ue
-  annotations:
-    approval.nephio.org/policy: initial
-  injectors:
-  - name: edge
-EOF
+k8s_apply "$TESTDIR/005-ue.yaml"
 
 k8s_wait_ready "packagevariant" "oai-ue"
 kpt_wait_pkg "edge" "oai-ran-ue" "nephio" "1800"
