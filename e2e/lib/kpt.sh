@@ -41,9 +41,8 @@ function _wait_for_user_repo {
     if [[ $found != "True" ]]; then
         curl_gitea_api "users/$user/repos" 'import json; import sys; print("\n".join(repo["full_name"] for repo in json.loads(sys.stdin.read())))'
         error "Timed out waiting for $repo repository"
-    else
-        info "Found $user/$repo repository"
     fi
+    info "Found $user/$repo repository"
 }
 
 # kpt_wait_pkg() - Wait for a given kpt package to exist in a given repository
@@ -69,8 +68,6 @@ function kpt_wait_pkg {
     if [[ $found != "True" ]]; then
         curl_gitea_api "repos/$user/$repo/contents" 'import json; import sys; print("\n".join(dir["path"] for dir in json.loads(sys.stdin.read()) if dir["type"] == "dir" ))'
         error "Timed out waiting for $pkg kpt package"
-    else
-        info "Found $user/$repo repository"
     fi
-
+    info "Found $pkg kpt package in $user/$repo repository"
 }

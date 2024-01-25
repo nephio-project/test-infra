@@ -36,16 +36,19 @@ function _wait_for_ran {
     timeout=600
 
     temp_file=$(mktemp)
-    kubectl logs "$(kubectl get pods -n oai-ran-cucp --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-gnb-cu-cp -o jsonpath='{.items[*].metadata.name}')" -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" > temp_file
-    while grep -q "$wait_msg" temp_file;status=$?; [[ $status != 0 ]]
-    	do
-        	if [[ $timeout -lt 0 ]]; then
-            		kubectl logs -l app.kubernetes.io/name=oai-gnb-cu-cp -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" --tail 50
-            		error "Timed out waiting for $link_name link to be established"
-        	fi
-        	timeout=$((timeout - 5))
-        	sleep 5
-		kubectl logs "$(kubectl get pods -n oai-ran-cucp --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-gnb-cu-cp -o jsonpath='{.items[*].metadata.name}')" -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" > temp_file
+    kubectl logs "$(kubectl get pods -n oai-ran-cucp --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-gnb-cu-cp -o jsonpath='{.items[*].metadata.name}')" -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" >temp_file
+    while
+        grep -q "$wait_msg" temp_file
+        status=$?
+        [[ $status != 0 ]]
+    do
+        if [[ $timeout -lt 0 ]]; then
+            kubectl logs -l app.kubernetes.io/name=oai-gnb-cu-cp -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" --tail 50
+            error "Timed out waiting for $link_name link to be established"
+        fi
+        timeout=$((timeout - 5))
+        sleep 5
+        kubectl logs "$(kubectl get pods -n oai-ran-cucp --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-gnb-cu-cp -o jsonpath='{.items[*].metadata.name}')" -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" >temp_file
     done
     debug "timeout: $timeout"
     rm "${temp_file}"

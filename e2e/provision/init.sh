@@ -64,6 +64,7 @@ HOME=${NEPHIO_HOME:-/home/$NEPHIO_USER}
 REPO_DIR=${NEPHIO_REPO_DIR:-$HOME/test-infra}
 DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME:-""}
 DOCKERHUB_TOKEN=${DOCKERHUB_TOKEN:-""}
+FAIL_FAST=${FAIL_FAST:-$(get_metadata fail_fast "false")}
 
 echo "$DEBUG, $DEPLOYMENT_TYPE, $RUN_E2E, $REPO, $BRANCH, $NEPHIO_USER, $HOME, $REPO_DIR, $DOCKERHUB_USERNAME, $DOCKERHUB_TOKEN"
 trap get_status ERR
@@ -72,6 +73,8 @@ if ! command -v git >/dev/null; then
     source /etc/os-release || source /usr/lib/os-release
     case ${ID,,} in
     ubuntu | debian)
+        # Removed the damaged list
+        rm -rvf /var/lib/apt/lists/*
         apt-get update
         apt-get install -y git
         ;;
@@ -109,7 +112,7 @@ sed -e "s/vagrant/$NEPHIO_USER/" <"$REPO_DIR/e2e/provision/nephio.yaml" >"$HOME/
 # Sandbox Creation
 int_start=$(date +%s)
 cd "$REPO_DIR/e2e/provision"
-export DEBUG DEPLOYMENT_TYPE DOCKERHUB_USERNAME DOCKERHUB_TOKEN
+export DEBUG DEPLOYMENT_TYPE DOCKERHUB_USERNAME DOCKERHUB_TOKEN FAIL_FAST
 runuser -u "$NEPHIO_USER" ./install_sandbox.sh
 printf "%s secs\n" "$(($(date +%s) - int_start))"
 

@@ -27,6 +27,9 @@ source "${LIBDIR}/_utils.sh"
 # shellcheck source=e2e/lib/k8s.sh
 source "${LIBDIR}/k8s.sh"
 
+# shellcheck source=e2e/lib/porch.sh
+source "${LIBDIR}/porch.sh"
+
 function _wait_for_uesimtun0 {
     kubeconfig="$1"
     pod_name="$2"
@@ -34,20 +37,19 @@ function _wait_for_uesimtun0 {
     info "waiting for tunnel to be established"
     timeout=600
     found=""
-    while [[ -z $found && $timeout -gt 0 ]]; do
+    while [[ $timeout -gt 0 ]]; do
         ip_a=$(k8s_exec "$kubeconfig" "ueransim" "$pod_name" "ip address show")
         if [[ $ip_a == *"uesimtun0"* ]]; then
+            debug "timeout: $timeout"
             found="yes"
+            break
         fi
         timeout=$((timeout - 5))
-        if [[ -z $found && $timeout -gt 0 ]]; then
-            sleep 5
-        fi
+        sleep 5
     done
-    debug "timeout: $timeout"
+    debug "$(kubectl logs -n ueransim --kubeconfig "$kubeconfig" "$pod_name")"
 
     if [[ -z $found ]]; then
-        kubectl logs -n ueransim --kubeconfig "$kubeconfig" "$pod_name"
         k8s_exec "$kubeconfig" "ueransim" "$pod_name" "ip address show"
         for worker in $(sudo docker ps --filter "name=edge01-md*" --format "{{.Names}}"); do
             sudo docker exec "$worker" dmesg -l warn,err
@@ -65,11 +67,14 @@ port=$(kubectl --kubeconfig "$regional_kubeconfig" -n free5gc-cp get svc webui-s
 debug "port: $port"
 
 # Register a subscriber with free5gc
-curl -d "@${TESTDIR}/007-subscriber.json" -H 'Token: admin' -H 'Content-Type: application/json' "http://${ip}:${port}/api/subscriber/imsi-208930000000003/20893"
+curl -v -d "@${TESTDIR}/007-subscriber.json" -H 'Token: admin' -H 'Content-Type: application/json' "http://${ip}:${port}/api/subscriber/imsi-208930000000003/20893"
+# List existing subscribers
+curl -s -X GET -H 'Token: admin' "http://${ip}:${port}/api/subscriber"
 
 # Deploy UERANSIM to edge01
 k8s_apply "$TESTDIR/007-edge01-ueransim.yaml"
 k8s_wait_ready "packagevariant" "edge01-ueransim"
+porch_wait_published_packagerev "ueransim" "edge01"
 edge01_kubeconfig=$(k8s_get_capi_kubeconfig "edge01")
 k8s_wait_ready_replicas "deployment" "ueransimgnb-edge01" "$edge01_kubeconfig" "ueransim"
 k8s_wait_ready_replicas "deployment" "ueransimue-edge01" "$edge01_kubeconfig" "ueransim"

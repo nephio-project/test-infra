@@ -31,7 +31,37 @@ function porch_wait_log_entry {
     if [[ -z $found ]]; then
         kubectl logs -n porch-system "$(kubectl get pods -n porch-system -l app=porch-server -o jsonpath='{.items[*].metadata.name}')"
         error "Timed out waiting for $pattern"
-    else
-        info "Found $pattern log entry in porch server"
     fi
+    info "Found $pattern log entry in porch server"
+}
+
+# porch_wait_published_packagerev() - Waits for a kpt package revision gets published
+function porch_wait_published_packagerev {
+    local pkg_name="$1"
+    local repository="$2"
+    local revision="${3:-main}"
+    local timeout=${4:-900}
+
+    info "looking for package published revision on $pkg_name"
+    local found=""
+    while [[ $timeout -gt 0 ]]; do
+        for pkg_rev in $(kubectl get packagerevisions -o jsonpath="{range .items[?(@.spec.packageName==\"$pkg_name\")]}{.metadata.name}{\"\\n\"}{end}"); do
+            if [ "$(kubectl get packagerevision "$pkg_rev" -o jsonpath='{.spec.repository}/{.spec.revision}')" == "$repository/$revision" ]; then
+                found=$pkg_rev
+                break
+            fi
+        done
+        if [[ $found ]]; then
+            debug "timeout: $timeout"
+            break
+        fi
+        timeout=$((timeout - 5))
+        sleep 5
+    done
+
+    if [[ -z $found ]]; then
+        kubectl get packagerevisions -o jsonpath="{range .items[?(@.spec.packageName==\"$pkg_name\")]}{.metadata.name}{\"\\n\\\"}{end}"
+        error "Timed out waiting for revisions on $pkg_name package"
+    fi
+    kubectl wait --for jsonpath='{.spec.lifecycle}'=Published packagerevisions $found --timeout=10m
 }

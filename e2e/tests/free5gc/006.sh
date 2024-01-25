@@ -24,16 +24,23 @@ source "$E2EDIR/defaults.env"
 # shellcheck source=e2e/lib/k8s.sh
 source "${LIBDIR}/k8s.sh"
 
+# shellcheck source=e2e/lib/kpt.sh
+source "${LIBDIR}/kpt.sh"
+
+# shellcheck source=e2e/lib/porch.sh
+source "${LIBDIR}/porch.sh"
+
 # apply both AMF and SMF so they both start processing
 k8s_apply "$TESTDIR/006-regional-free5gc-amf.yaml"
 k8s_apply "$TESTDIR/006-regional-free5gc-smf.yaml"
 
 cluster_kubeconfig=$(k8s_get_capi_kubeconfig "regional")
 
-# check the AMF
-k8s_wait_ready "packagevariant" "regional-free5gc-amf-regional-free5gc-amf"
-k8s_wait_ready_replicas "deployment" "amf-regional" "$cluster_kubeconfig" "free5gc-cp"
-
-# check the SMF
-k8s_wait_ready "packagevariant" "regional-free5gc-smf-regional-free5gc-smf"
-k8s_wait_ready_replicas "deployment" "smf-regional" "$cluster_kubeconfig" "free5gc-cp"
+# check the NFs
+for nf in amf smf; do
+    k8s_wait_exists "packagevariant" "regional-free5gc-$nf-regional-free5gc-$nf"
+    porch_wait_log_entry "\"$nf-example\" updated to \"free5gc-cp\""
+    porch_wait_published_packagerev "free5gc-$nf" "regional"
+    kpt_wait_pkg "regional" "free5gc-$nf"
+    k8s_wait_ready_replicas "deployment" "$nf-regional" "$cluster_kubeconfig" "free5gc-cp"
+done

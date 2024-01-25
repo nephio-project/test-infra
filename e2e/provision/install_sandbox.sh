@@ -19,6 +19,8 @@ export HOME=${HOME:-/home/ubuntu/}
 source /etc/os-release || source /usr/lib/os-release
 case ${ID,,} in
 ubuntu | debian)
+    # Removed the damaged list
+    sudo rm -vrf /var/lib/apt/lists/*
     sudo apt-get update
     sudo -E DEBIAN_FRONTEND=noninteractive apt-get remove -q -y python3-openssl
     sudo -E NEEDRESTART_SUSPEND=1 DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confnew" --allow-downgrades --allow-remove-essential --allow-change-held-packages -fuy install -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" python3-pip
