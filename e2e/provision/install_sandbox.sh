@@ -88,6 +88,9 @@ if [ "${DEPLOYMENT_TYPE:-r1}" == "one-summit" ]; then
     done
     popd >/dev/null
 else
+    if [ "${CODESPACE_NAME-}" ] && ! grep -q "ansible_port: 2222" ~/nephio.yaml; then
+        echo "          ansible_port: 2222" >> ~/nephio.yaml
+    fi
     # Management cluster creation
     ansible_cmd="$(command -v ansible-playbook) -i 127.0.0.1, playbooks/cluster.yml "
     [[ ${DEBUG:-false} != "true" ]] || ansible_cmd+="-vvv "
