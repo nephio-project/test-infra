@@ -8,9 +8,13 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-host_min_vcpu: 8  # minimum required vCPUs before install
-host_min_cpu_ram: 16  # minimum required CPU RAM before install; value in GB
-host_min_root_disk_space: 50  # minimum required disk space before install; value in GB
+host_reqs:
+  sandbox:
+    vcpu: 6  # minimum vCPUs required for the Sandbox installation
+    memory: 6  # minimum memory required for the Sandbox installation
+  end_to_end:
+    vcpu: 16
+    memory: 32
 
 container_engine: docker
 

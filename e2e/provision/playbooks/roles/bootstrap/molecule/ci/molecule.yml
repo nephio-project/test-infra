@@ -66,8 +66,10 @@ provisioner:
   inventory:
     group_vars:
       all:
-        host_min_vcpu: 2
-        host_min_cpu_ram: 1
+        host_reqs:
+          sandbox:
+            vcpu: 2
+            memory: 1
 verifier:
   name: testinfra
   directory: ${MOLECULE_PROJECT_DIRECTORY}/molecule/default/tests
