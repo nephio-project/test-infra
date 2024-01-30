@@ -13,6 +13,7 @@
 
 - name: Load gtp5g kernel module
   ansible.builtin.include_tasks: load-gtp5g-module.yml
+  when: lookup('ansible.builtin.env', 'E2ETYPE', default='free5gc') == 'free5gc'
 
 - name: Load sctp kernel module
   ansible.builtin.include_tasks: load-sctp-module.yml
