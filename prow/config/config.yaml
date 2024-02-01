@@ -1231,7 +1231,7 @@ presubmits:
             - "--prow-yaml-repo-name=$(REPO_OWNER)/$(REPO_NAME)"
 
 periodics:
-  - name: e2e-ubuntu-focal-daily
+  - name: e2e-daily-ubuntu-focal-free5gc
     annotations:
     labels:
     cron: "0 15 * * 1-5"
@@ -1286,7 +1286,7 @@ periodics:
             items:
               - key: nephio.yaml
                 path: nephio.yaml
-  - name: e2e-fedora-34-daily
+  - name: e2e-daily-fedora-34-free5gc
     annotations:
     labels:
     cron: "0 15 * * 1-5"
@@ -1308,6 +1308,61 @@ periodics:
             - |
               set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-34 -auto-approve' EXIT;
               terraform init && timeout 120m terraform apply -target module.gcp-fedora-34 -auto-approve
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+            - name: ssh-key-vol
+              mountPath: "/etc/ssh-key"
+            - name: nephio-e2e-yaml
+              mountPath: "/etc/nephio"
+          resources:
+            requests:
+              cpu: 2
+              memory: 2Gi
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+        - name: ssh-key-vol
+          secret:
+            secretName: ssh-key-e2e
+            defaultMode: 256
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: id_rsa.pub
+                path: id_rsa.pub
+        - name: nephio-e2e-yaml
+          secret:
+            secretName: nephio-e2e-yaml
+            items:
+              - key: nephio.yaml
+                path: nephio.yaml
+  - name: e2e-daily-ubuntu-jammy-oai
+    annotations:
+    labels:
+    cron: "0 15 * * 1-5"
+    skip_report: false
+    decorate: true
+    cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: test-infra
+        base_ref: main
+        path_alias: nephio_repo/test-infra
+    spec:
+      containers:
+        - image: "nephio/e2e:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - |
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -var="e2e_type=oai" -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
