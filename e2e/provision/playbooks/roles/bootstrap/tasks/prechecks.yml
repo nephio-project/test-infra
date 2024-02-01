@@ -8,6 +8,11 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
+- name: Define Hardware requirements
+  ansible.builtin.set_fact:
+    host_min_vcpu: lookup('ansible.builtin.env', 'RUN_E2E', default=false) | ternary(host_reqs.end_to_end.vcpu, host_reqs.sandbox.vcpu)
+    host_min_cpu_ram: lookup('ansible.builtin.env', 'RUN_E2E', default=false) | ternary(host_reqs.end_to_end.memory, host_reqs.sandbox.memory)
+
 - name: Checking host has minimum number of CPUS
   ansible.builtin.assert:
     that: ansible_facts.processor_vcpus >= host_min_vcpu | int

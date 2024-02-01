@@ -14,9 +14,10 @@ Available variables are listed below, along with default values (see defaults/ma
 
 | Variable                        | Required | Default                                                       | Choices                   | Comments                                                                          |
 |---------------------------------|----------|---------------------------------------------------------------|---------------------------|-----------------------------------------------------------------------------------|
-| host_min_vcpu                   | no       | 8                                                             |                           | Minimum vCPUs required                                                            |
-| host_min_cpu_ram                | no       | 16                                                            |                           | Minimum RAM required (GB)                                                         |
-| host_min_root_disk_space        | no       | 50                                                            |                           | Minimum disk space required (GB)                                                  |
+| host_reqs.sanbox.vcpu           | no       | 6                                                             |                           | Minimum vCPUs required for Sandbox installation                                   |
+| host_reqs.sanbox.memory         | no       | 6                                                             |                           | Minimum RAM required (GB ) for Sandbox installation                               |
+| host_reqs.end_to_end.vcpu       | no       | 16                                                            |                           | Minimum vCPUs required for executing End-to-End testing                           |
+| host_reqs.end_to_end.memory     | no       | 32                                                            |                           | Minimum RAM required (GB ) for executing End-to-End testing                       |
 | container_engine                | no       | docker                                                        | docker                    | Container engine utilized for the management cluster creation                     |
 | gtp5g_dest                      | no       | /opt/gtp5g                                                    |                           | Destination path for GTP5G source code                                            |
 | gtp5g_version                   | no       | v0.6.8                                                        |                           | GTP5G source code version                                                         |
