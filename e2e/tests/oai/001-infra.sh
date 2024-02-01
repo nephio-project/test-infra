@@ -10,7 +10,7 @@
 ##############################################################################
 
 ## TEST METADATA
-## TEST-NAME: Deploy and interconnect OAI clusters Part I
+## TEST-NAME: Deploy and interconnect OAI clusters
 ##
 
 set -o pipefail

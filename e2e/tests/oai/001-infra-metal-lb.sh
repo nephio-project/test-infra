@@ -10,7 +10,7 @@
 ##############################################################################
 
 ## TEST METADATA
-## TEST-NAME: Deploy and interconnect OAI clusters Part II
+## TEST-NAME: Define IP Address pools on OAI clusters
 ##
 
 set -o pipefail
