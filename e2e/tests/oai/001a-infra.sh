@@ -37,6 +37,13 @@ source "${LIBDIR}/porch.sh"
 source "${LIBDIR}/_assertions.sh"
 
 
+declare -A clusters
+clusters=(
+    ["core"]="172.18.16.0/20"
+    ["regional"]="172.18.32.0/20"
+    ["edge"]="172.18.48.0/20"
+)
+
 k8s_apply "$TESTDIR/001-infra.yaml"
 
 # Wait for cluster resources creation
