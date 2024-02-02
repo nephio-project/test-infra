@@ -36,35 +36,6 @@ source "${LIBDIR}/porch.sh"
 # shellcheck source=e2e/lib/_assertions.sh
 source "${LIBDIR}/_assertions.sh"
 
-function _define_ip_address_pool {
-    local cluster=$1
-    local cidr=$2
-
-    pushd "$(mktemp -d -t "001-pkg-XXX")" >/dev/null
-    trap popd RETURN
-
-    pkg_rev=$(kpt alpha rpkg clone -n default https://github.com/nephio-project/catalog.git/distros/sandbox/metallb-sandbox-config@main --repository mgmt-staging "$cluster-metallb-sandbox-config" | cut -f 1 -d ' ')
-    k8s_wait_exists "packagerev" "$pkg_rev"
-    kpt alpha rpkg pull -n default "$pkg_rev" "$cluster-metallb-sandbox-config"
-    kpt fn eval --image "gcr.io/kpt-fn/search-replace:v0.2" "$cluster-metallb-sandbox-config" -- 'by-path=spec.addresses[0]' "put-value=$cidr"
-    kpt fn eval --image "gcr.io/kpt-fn/set-annotations:v0.1.4" "$cluster-metallb-sandbox-config" -- "nephio.org/cluster-name=$cluster"
-
-    # Push changes
-    kpt alpha rpkg push -n default "$pkg_rev" "$cluster-metallb-sandbox-config"
-    porch_wait_log_entry "Update.*packagerevisionresources/${pkg_rev},"
-
-    # Propose
-    kpt alpha rpkg propose -n default "$pkg_rev"
-    porch_wait_log_entry "Update.*packagerevisions/${pkg_rev},"
-    assert_lifecycle_equals "$pkg_rev" "Proposed"
-    assert_branch_exists "proposed/$cluster-metallb-sandbox-config/v1" "nephio/mgmt-staging"
-    assert_commit_msg_in_branch "Intermediate commit" "proposed/$cluster-metallb-sandbox-config/v1" "nephio/mgmt-staging"
-
-    # Approval
-    kpt alpha rpkg approve -n default "$pkg_rev"
-    porch_wait_log_entry "Update.*/${pkg_rev}.*/approval"
-    assert_lifecycle_equals "$pkg_rev" "Published"
-}
 
 declare -A clusters
 clusters=(
@@ -86,11 +57,6 @@ done
 kubeconfig="$HOME/.kube/config"
 for cluster in $(kubectl get cl -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --kubeconfig "$kubeconfig"); do
     capi_cluster_ready "$cluster"
-done
-
-# Define MetalLB IP ranges
-for cluster in "${!clusters[@]}"; do
-    _define_ip_address_pool "$cluster" "${clusters[$cluster]}"
 done
 
 # Inter-connect worker nodes
