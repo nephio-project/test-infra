@@ -1344,7 +1344,7 @@ periodics:
   - name: e2e-daily-ubuntu-jammy-oai
     annotations:
     labels:
-    cron: "0 15 * * 1-5"
+    cron: "0 15 * * 1-6"
     skip_report: false
     decorate: true
     cluster: default
