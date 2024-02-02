@@ -1244,7 +1244,7 @@ periodics:
   - name: e2e-ubuntu-focal-daily
     annotations:
     labels:
-    cron: "0 15 * * 1-7"
+    cron: "0 15 * * 1-6"
     skip_report: false
     decorate: true
     cluster: default
@@ -1299,7 +1299,7 @@ periodics:
   - name: e2e-fedora-34-daily
     annotations:
     labels:
-    cron: "0 15 * * 1-7"
+    cron: "0 15 * * 1-6"
     skip_report: false
     decorate: true
     cluster: default
