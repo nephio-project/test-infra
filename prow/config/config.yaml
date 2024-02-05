@@ -1037,168 +1037,168 @@ postsubmits:
                 path: config.json
   
   nephio-project/porch:
-    - name: build-push-porch-server-image
-    cluster: default
-    always_run: true
-    branches:
-    - "^v.*$"
-    annotations:
-      description: Build and Push Image to DockerHub
-    decorate: true
-    decoration_config:
-      censor_secrets: true
-    max_concurrency: 1
-    extra_refs:
-    - org: nephio-project
-      repo: porch
-      base_ref: main
-      path_alias: "porch_build/porch"
-    spec:
-      containers:
-      - name: kaniko
-        image: gcr.io/kaniko-project/executor:debug
-        command:
-        - "/bin/sh"
-        - "-c"
-        - |
-          executor --context=/home/prow/go/src/porch_build/ --dockerfile=porch/build/Dockerfile --destination=nephio/porch-server:${PULL_BASE_REF}
-        volumeMounts:
-          - name: kaniko-secret
-            mountPath: /kaniko/.docker/
-        resources:
-          requests:
-            cpu: 1
-            memory: 1Gi
-      volumes:
+  - name: build-push-porch-server-image
+  cluster: default
+  always_run: true
+  branches:
+  - "^v.*$"
+  annotations:
+    description: Build and Push Image to DockerHub
+  decorate: true
+  decoration_config:
+    censor_secrets: true
+  max_concurrency: 1
+  extra_refs:
+  - org: nephio-project
+    repo: porch
+    base_ref: main
+    path_alias: "porch_build/porch"
+  spec:
+    containers:
+    - name: kaniko
+      image: gcr.io/kaniko-project/executor:debug
+      command:
+      - "/bin/sh"
+      - "-c"
+      - |
+        executor --context=/home/prow/go/src/porch_build/ --dockerfile=porch/build/Dockerfile --destination=nephio/porch-server:${PULL_BASE_REF}
+      volumeMounts:
         - name: kaniko-secret
-          secret:
-            secretName: regcred
-            items:
-              - key: .dockerconfigjson
-                path: config.json
+          mountPath: /kaniko/.docker/
+      resources:
+        requests:
+          cpu: 1
+          memory: 1Gi
+    volumes:
+      - name: kaniko-secret
+        secret:
+          secretName: regcred
+          items:
+            - key: .dockerconfigjson
+              path: config.json
 
 
-  - name: build-push-porch-controllers-image
-    cluster: default
-    always_run: true
-    branches:
-    - "^v.*$"
-    annotations:
-      description: Build and Push Image to DockerHub
-    decorate: true
-    decoration_config:
-      censor_secrets: true
-    max_concurrency: 1
-    extra_refs:
-    - org: nephio-project
-      repo: porch
-      base_ref: main
-      path_alias: "porch_build/porch"
-    spec:
-      containers:
-      - name: kaniko
-        image: gcr.io/kaniko-project/executor:debug
-        command:
-        - "/bin/sh"
-        - "-c"
-        - |
-          executor --context=/home/prow/go/src/porch_build/ --dockerfile=porch/controllers/Dockerfile --destination=nephio/porch-controllers:${PULL_BASE_REF}
-        volumeMounts:
-          - name: kaniko-secret
-            mountPath: /kaniko/.docker/
-        resources:
-          requests:
-            cpu: 1
-            memory: 1Gi
-      volumes:
+- name: build-push-porch-controllers-image
+  cluster: default
+  always_run: true
+  branches:
+  - "^v.*$"
+  annotations:
+    description: Build and Push Image to DockerHub
+  decorate: true
+  decoration_config:
+    censor_secrets: true
+  max_concurrency: 1
+  extra_refs:
+  - org: nephio-project
+    repo: porch
+    base_ref: main
+    path_alias: "porch_build/porch"
+  spec:
+    containers:
+    - name: kaniko
+      image: gcr.io/kaniko-project/executor:debug
+      command:
+      - "/bin/sh"
+      - "-c"
+      - |
+        executor --context=/home/prow/go/src/porch_build/ --dockerfile=porch/controllers/Dockerfile --destination=nephio/porch-controllers:${PULL_BASE_REF}
+      volumeMounts:
         - name: kaniko-secret
-          secret:
-            secretName: regcred
-            items:
-              - key: .dockerconfigjson
-                path: config.json
+          mountPath: /kaniko/.docker/
+      resources:
+        requests:
+          cpu: 1
+          memory: 1Gi
+    volumes:
+      - name: kaniko-secret
+        secret:
+          secretName: regcred
+          items:
+            - key: .dockerconfigjson
+              path: config.json
 
 
-  - name: build-push-porch-function-runner-image
-    cluster: default
-    always_run: true
-    branches:
-    - "^v.*$"
-    annotations:
-      description: Build and Push Image to DockerHub
-    decorate: true
-    decoration_config:
-      censor_secrets: true
-    max_concurrency: 1
-    extra_refs:
-    - org: nephio-project
-      repo: porch
-      base_ref: main
-      path_alias: "porch_build/porch"
-    spec:
-      containers:
-      - name: kaniko
-        image: gcr.io/kaniko-project/executor:debug
-        command:
-        - "/bin/sh"
-        - "-c"
-        - |
-          executor --context=/home/prow/go/src/porch_build/ --dockerfile=porch/func/Dockerfile --destination=nephio/porch-function-runner:${PULL_BASE_REF}
-        volumeMounts:
-          - name: kaniko-secret
-            mountPath: /kaniko/.docker/
-        resources:
-          requests:
-            cpu: 1
-            memory: 1Gi
-      volumes:
+- name: build-push-porch-function-runner-image
+  cluster: default
+  always_run: true
+  branches:
+  - "^v.*$"
+  annotations:
+    description: Build and Push Image to DockerHub
+  decorate: true
+  decoration_config:
+    censor_secrets: true
+  max_concurrency: 1
+  extra_refs:
+  - org: nephio-project
+    repo: porch
+    base_ref: main
+    path_alias: "porch_build/porch"
+  spec:
+    containers:
+    - name: kaniko
+      image: gcr.io/kaniko-project/executor:debug
+      command:
+      - "/bin/sh"
+      - "-c"
+      - |
+        executor --context=/home/prow/go/src/porch_build/ --dockerfile=porch/func/Dockerfile --destination=nephio/porch-function-runner:${PULL_BASE_REF}
+      volumeMounts:
         - name: kaniko-secret
-          secret:
-            secretName: regcred
-            items:
-              - key: .dockerconfigjson
-                path: config.json
+          mountPath: /kaniko/.docker/
+      resources:
+        requests:
+          cpu: 1
+          memory: 1Gi
+    volumes:
+      - name: kaniko-secret
+        secret:
+          secretName: regcred
+          items:
+            - key: .dockerconfigjson
+              path: config.json
 
 
-  - name: build-push-porch-wrapper-server-image
-    cluster: default
-    always_run: true
-    branches:
-    - "^v.*$"
-    annotations:
-      description: Build and Push Image to DockerHub
-    decorate: true
-    decoration_config:
-      censor_secrets: true
-    max_concurrency: 1
-    extra_refs:
-    - org: nephio-project
-      repo: porch
-      base_ref: main
-      path_alias: "porch_build/porch"
-    spec:
-      containers:
-      - name: kaniko
-        image: gcr.io/kaniko-project/executor:debug
-        command:
-        - "/bin/sh"
-        - "-c"
-        - |
-          executor --context=/home/prow/go/src/porch_build/ --dockerfile=porch/func/Dockerfile-wrapperserver --destination=nephio/porch-wrapper-server:${PULL_BASE_REF}
-        volumeMounts:
-          - name: kaniko-secret
-            mountPath: /kaniko/.docker/
-        resources:
-          requests:
-            cpu: 1
-            memory: 1Gi
-      volumes:
+- name: build-push-porch-wrapper-server-image
+  cluster: default
+  always_run: true
+  branches:
+  - "^v.*$"
+  annotations:
+    description: Build and Push Image to DockerHub
+  decorate: true
+  decoration_config:
+    censor_secrets: true
+  max_concurrency: 1
+  extra_refs:
+  - org: nephio-project
+    repo: porch
+    base_ref: main
+    path_alias: "porch_build/porch"
+  spec:
+    containers:
+    - name: kaniko
+      image: gcr.io/kaniko-project/executor:debug
+      command:
+      - "/bin/sh"
+      - "-c"
+      - |
+        executor --context=/home/prow/go/src/porch_build/ --dockerfile=porch/func/Dockerfile-wrapperserver --destination=nephio/porch-wrapper-server:${PULL_BASE_REF}
+      volumeMounts:
         - name: kaniko-secret
-          secret:
-            secretName: regcred
-            items:
-              - key: .dockerconfigjson
-                path: config.json
+          mountPath: /kaniko/.docker/
+      resources:
+        requests:
+          cpu: 1
+          memory: 1Gi
+    volumes:
+      - name: kaniko-secret
+        secret:
+          secretName: regcred
+          items:
+            - key: .dockerconfigjson
+              path: config.json
 
 
 
