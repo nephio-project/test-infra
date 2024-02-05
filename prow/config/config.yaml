@@ -116,8 +116,8 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
-            memory: 2Gi
+            cpu: 1
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -153,8 +153,8 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
-            memory: 2Gi
+            cpu: 1
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -191,7 +191,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -228,7 +228,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -265,7 +265,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -301,7 +301,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -337,8 +337,8 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
-            memory: 2Gi
+            cpu: 1
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -373,7 +373,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -409,7 +409,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -445,7 +445,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -481,7 +481,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -517,7 +517,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -553,7 +553,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -589,7 +589,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -626,7 +626,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -662,7 +662,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -699,7 +699,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -735,7 +735,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -772,7 +772,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -808,7 +808,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -845,7 +845,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -881,7 +881,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -917,7 +917,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -953,7 +953,7 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
       volumes:
         - name: kaniko-secret
@@ -991,8 +991,8 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
-            memory: 2Gi
+            cpu: 1
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
@@ -1026,8 +1026,8 @@ postsubmits:
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
-            memory: 2Gi
+            cpu: 1
+            memory: 1Gi
       volumes:
         - name: kaniko-secret
           secret:
