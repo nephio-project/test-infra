@@ -30,6 +30,7 @@ kind:
   enabled: true
 
 nephio_catalog_repo_uri: https://github.com/nephio-project/catalog.git
+nephio_catalog_revision: v2.0.0
 
 gitea:
   enabled: true
@@ -45,7 +46,7 @@ gitea:
     packages:
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: distros/sandbox/gitea
-        version: main
+        version: "{{ nephio_catalog_revision }}"
         async: 780
         poll: 0
 
@@ -58,7 +59,7 @@ resource_backend:
     packages:
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: nephio/optional/resource-backend
-        version: main
+        version: "{{ nephio_catalog_revision }}"
         async: 780
         poll: 0
 
@@ -71,7 +72,7 @@ cert_manager:
     packages:
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: distros/sandbox/cert-manager
-        version: main
+        version: "{{ nephio_catalog_revision }}"
         async: 660
         poll: 0
 
@@ -87,17 +88,17 @@ cluster_api:
     packages:
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: infra/capi/cluster-capi
-        version: main
+        version: "{{ nephio_catalog_revision }}"
         async: 900
         poll: 5
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: infra/capi/cluster-capi-infrastructure-docker
-        version: main
+        version: "{{ nephio_catalog_revision }}"
         async: 780
         poll: 5
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: infra/capi/cluster-capi-kind-docker-templates
-        version: main
+        version: "{{ nephio_catalog_revision }}"
         async: 1500
         poll: 0
 
@@ -110,11 +111,11 @@ metallb:
     packages:
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: distros/sandbox/metallb
-        version: main
+        version: "{{ nephio_catalog_revision }}"
         async: 1020
         poll: 5
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: distros/sandbox/metallb-sandbox-config
-        version: main
+        version: "{{ nephio_catalog_revision }}"
         async: 660
         poll: 0

@@ -43,7 +43,7 @@ function _define_ip_address_pool {
     pushd "$(mktemp -d -t "001-pkg-XXX")" >/dev/null
     trap popd RETURN
 
-    pkg_rev=$(kpt alpha rpkg clone -n default https://github.com/nephio-project/catalog.git/distros/sandbox/metallb-sandbox-config@main --repository mgmt-staging "$cluster-metallb-sandbox-config" | cut -f 1 -d ' ')
+    pkg_rev=$(kpt alpha rpkg clone -n default "https://github.com/nephio-project/catalog.git/distros/sandbox/metallb-sandbox-config@$REVISION" --repository mgmt-staging "$cluster-metallb-sandbox-config" | cut -f 1 -d ' ')
     k8s_wait_exists "packagerev" "$pkg_rev"
     kpt alpha rpkg pull -n default "$pkg_rev" "$cluster-metallb-sandbox-config"
     kpt fn eval --image "gcr.io/kpt-fn/search-replace:v0.2" "$cluster-metallb-sandbox-config" -- 'by-path=spec.addresses[0]' "put-value=$cidr"
