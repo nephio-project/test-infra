@@ -85,6 +85,9 @@
       metadata:
         name: "{{ item.name }}"
         namespace: default
+        labels:
+          kpt.dev/repository-access: read-only
+          kpt.dev/repository-content: external-blueprints
       spec:
         content: Package
         deployment: false
