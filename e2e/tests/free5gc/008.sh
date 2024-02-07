@@ -50,11 +50,11 @@ debug "current_memory: $current_memory"
 upf_deployment_pkg=$(kubectl --kubeconfig "$kubeconfig" get packagevariant edge-free5gc-upf-edge01-free5gc-upf -o jsonpath='{.status.downstreamTargets[0].name}')
 info "Copying $upf_deployment_pkg"
 ws="edge01-upf-scaling"
-upf_pkg_rev=$(kpt alpha rpkg copy -n default "$upf_deployment_pkg" --workspace "$ws" | cut -d ' ' -f 1)
+upf_pkg_rev=$(porchctl rpkg copy -n default "$upf_deployment_pkg" --workspace "$ws" | cut -d ' ' -f 1)
 info "Copied to $upf_pkg_rev, pulling"
 
 rm -rf $ws
-kpt alpha rpkg pull -n default "$upf_pkg_rev" $ws
+porchctl rpkg pull -n default "$upf_pkg_rev" $ws
 
 rm -rf /tmp/$ws
 cp -r $ws /tmp
@@ -66,14 +66,14 @@ kpt fn eval --image gcr.io/kpt-fn/search-replace:v0.2.0 "$ws" -- by-path='spec.m
 diff -r /tmp/$ws $ws || echo
 
 info "Pushing $upf_pkg_rev update"
-kpt alpha rpkg push -n default "$upf_pkg_rev" $ws
+porchctl rpkg push -n default "$upf_pkg_rev" $ws
 
 info "Proposing $upf_pkg_rev update"
-kpt alpha rpkg propose -n default "$upf_pkg_rev"
+porchctl rpkg propose -n default "$upf_pkg_rev"
 k8s_wait_exists "packagerev" "$upf_pkg_rev"
 
 info "Approving $upf_pkg_rev update"
-kpt alpha rpkg approve -n default "$upf_pkg_rev"
+porchctl rpkg approve -n default "$upf_pkg_rev"
 
 # Get current UPF pod state after scaling
 k8s_wait_ready_replicas "deployment" "upf-edge01" "$cluster_kubeconfig" "free5gc-upf"
