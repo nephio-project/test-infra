@@ -984,8 +984,7 @@ postsubmits:
         - "-c"
         - |
           executor --context=${PWD}/ \
-            --dockerfile=Dockerfile --destination=nephio/oai-ran-controller:${PULL_BASE_REF} \
-            --destination=nephio/oai-ran-controller:latest
+            --dockerfile=Dockerfile --destination=nephio/oai-ran-controller:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -1020,7 +1019,8 @@ postsubmits:
         - "-c"
         - |
           executor --context=${PWD}/ \
-            --dockerfile=Dockerfile --destination=nephio/oai-ran-controller:${BUILD_ID}
+            --dockerfile=Dockerfile --destination=nephio/oai-ran-controller:${BUILD_ID} \
+            --destination=nephio/oai-ran-controller:latest
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
