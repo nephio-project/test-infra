@@ -33,7 +33,7 @@ source "${LIBDIR}/porch.sh"
 # shellcheck source=e2e/lib/_assertions.sh
 source "${LIBDIR}/_assertions.sh"
 
-pkg_rev=$(kpt alpha rpkg clone -n default "https://github.com/nephio-project/catalog.git/workloads/free5gc/free5gc-cp@$REVISION" --repository regional free5gc-cp | cut -f 1 -d ' ')
+pkg_rev=$(porchctl rpkg clone -n default "https://github.com/nephio-project/catalog.git/workloads/free5gc/free5gc-cp@$REVISION" --repository regional free5gc-cp | cut -f 1 -d ' ')
 k8s_wait_exists "packagerev" "$pkg_rev"
 
 porch_wait_log_entry "Creating packagerev default/regional-"
@@ -41,13 +41,13 @@ assert_lifecycle_equals "$pkg_rev" "Draft"
 assert_branch_exists "drafts/free5gc-cp/v1" "nephio/regional"
 assert_commit_msg_in_branch "Intermediate commit" "drafts/free5gc-cp/v1" "nephio/regional"
 
-kpt alpha rpkg propose -n default "$pkg_rev"
+porchctl rpkg propose -n default "$pkg_rev"
 porch_wait_log_entry "Update.*packagerevisions/${pkg_rev},"
 assert_lifecycle_equals "$pkg_rev" "Proposed"
 assert_branch_exists "proposed/free5gc-cp/v1" "nephio/regional"
 assert_commit_msg_in_branch "Intermediate commit" "proposed/free5gc-cp/v1" "nephio/regional"
 
-kpt alpha rpkg approve -n default "$pkg_rev"
+porchctl rpkg approve -n default "$pkg_rev"
 porch_wait_log_entry "Update.*/${pkg_rev}.*/approval"
 assert_lifecycle_equals "$pkg_rev" "Published"
 

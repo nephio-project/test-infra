@@ -57,7 +57,7 @@ smf_pkg_rev=$smf_deployment_pkg
 
 if [[ $lifecycle == "Published" ]]; then
     info "Copying $smf_deployment_pkg"
-    smf_pkg_rev=$(kpt alpha rpkg copy -n default "$smf_deployment_pkg" --workspace "$ws" | cut -d ' ' -f 1)
+    smf_pkg_rev=$(porchctl rpkg copy -n default "$smf_deployment_pkg" --workspace "$ws" | cut -d ' ' -f 1)
     info "Copied to $smf_pkg_rev, pulling"
 fi
 
@@ -70,7 +70,7 @@ fi
 retries=5
 while [[ $retries -gt 0 ]]; do
     rm -rf $ws
-    kpt alpha rpkg pull -n default "$smf_pkg_rev" $ws
+    porchctl rpkg pull -n default "$smf_pkg_rev" $ws
 
     rm -rf /tmp/$ws
     cp -r $ws /tmp
@@ -84,14 +84,14 @@ while [[ $retries -gt 0 ]]; do
 
     modified=false
     info "Pushing update"
-    output=$(kpt alpha rpkg push -n default "$smf_pkg_rev" $ws 2>&1)
+    output=$(porchctl rpkg push -n default "$smf_pkg_rev" $ws 2>&1)
     if [[ $output =~ "modified" ]]; then
         modified=true
     fi
 
     if [[ $modified == false ]]; then
         info "Proposing update"
-        output=$(kpt alpha rpkg propose -n default "$smf_pkg_rev" 2>&1)
+        output=$(porchctl rpkg propose -n default "$smf_pkg_rev" 2>&1)
         if [[ $output =~ "modified" ]]; then
             modified=true
         else
@@ -101,7 +101,7 @@ while [[ $retries -gt 0 ]]; do
 
     if [[ $modified == false ]]; then
         info "Approving update"
-        output=$(kpt alpha rpkg approve -n default "$smf_pkg_rev" 2>&1)
+        output=$(porchctl rpkg approve -n default "$smf_pkg_rev" 2>&1)
         if [[ $output =~ "modified" ]]; then
             modified=true
         fi
