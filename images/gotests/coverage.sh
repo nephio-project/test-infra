@@ -14,6 +14,6 @@ mkdir -p $REPORTS_DIR/
 
 for go_main in $(egrep -rl --null --include \*.go 'package\s+main\b' | xargs -0 -L 1 dirname); do
     pushd "$go_main" >/dev/null
-    gocov test ./... | gocov-html > $REPORTS_DIR/${go_main//\//_}.html
+    gocov test ./... | gocov-html >$REPORTS_DIR/${go_main//\//_}.html
     popd >/dev/null
 done
