@@ -49,8 +49,7 @@ regional_pkg_rev=$(porchctl rpkg clone -n default "https://github.com/nephio-pro
 k8s_wait_exists "packagerev" "$regional_pkg_rev"
 
 # Draft creation
-porch_wait_log_entry "Creating packagerev default/mgmt-"
-assert_lifecycle_equals "$regional_pkg_rev" "Draft"
+kubectl wait --for jsonpath='{.spec.lifecycle}'=Draft packagerevisions "$regional_pkg_rev" --timeout="600s"
 assert_branch_exists "drafts/regional/v1"
 assert_commit_msg_in_branch "Intermediate commit" "drafts/regional/v1"
 assert_workload_resource_contains "drafts/regional/v1" "clusterName: regional" "Workload cluster has not been transformed properly"
@@ -66,16 +65,14 @@ porch_wait_log_entry "Update.*packagerevisionresources/${regional_pkg_rev},"
 
 # Proposal
 porchctl rpkg propose -n default "$regional_pkg_rev"
-porch_wait_log_entry "Update.*packagerevisions/${regional_pkg_rev},"
-assert_lifecycle_equals "$regional_pkg_rev" "Proposed"
+kubectl wait --for jsonpath='{.spec.lifecycle}'=Proposed packagerevisions "$regional_pkg_rev" --timeout="600s"
 assert_branch_exists "proposed/regional/v1"
 assert_commit_msg_in_branch "Intermediate commit" "proposed/regional/v1"
 assert_workload_resource_contains "proposed/regional/v1" "nephio.org/site-type: regional" "Workload cluster has not been transformed properly to proposed"
 
 # Approval
 porchctl rpkg approve -n default "$regional_pkg_rev"
-porch_wait_log_entry "Update.*/${regional_pkg_rev}.*/approval"
-assert_lifecycle_equals "$regional_pkg_rev" "Published"
+kubectl wait --for jsonpath='{.spec.lifecycle}'=Published packagerevisions "$regional_pkg_rev" --timeout="600s"
 assert_workload_resource_contains "main" "nephio.org/site-type: regional" "Workload cluster has not been successfully merged into main branch"
 
 k8s_wait_exists "workloadcluster" "regional"

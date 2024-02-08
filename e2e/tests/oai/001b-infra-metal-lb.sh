@@ -55,15 +55,13 @@ function _define_ip_address_pool {
 
     # Propose
     porchctl rpkg propose -n default "$pkg_rev"
-    porch_wait_log_entry "Update.*packagerevisions/${pkg_rev},"
-    assert_lifecycle_equals "$pkg_rev" "Proposed"
+    kubectl wait --for jsonpath='{.spec.lifecycle}'=Proposed packagerevisions "$pkg_rev" --timeout="600s"
     assert_branch_exists "proposed/$cluster-metallb-sandbox-config/v1" "nephio/mgmt-staging"
     assert_commit_msg_in_branch "Intermediate commit" "proposed/$cluster-metallb-sandbox-config/v1" "nephio/mgmt-staging"
 
     # Approval
     porchctl rpkg approve -n default "$pkg_rev"
-    porch_wait_log_entry "Update.*/${pkg_rev}.*/approval"
-    assert_lifecycle_equals "$pkg_rev" "Published"
+    kubectl wait --for jsonpath='{.spec.lifecycle}'=Published packagerevisions "$pkg_rev" --timeout="600s"
 }
 
 declare -A clusters
