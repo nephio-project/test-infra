@@ -36,7 +36,6 @@ source "${LIBDIR}/porch.sh"
 # shellcheck source=e2e/lib/_assertions.sh
 source "${LIBDIR}/_assertions.sh"
 
-
 declare -A clusters
 clusters=(
     ["core"]="172.18.16.0/20"

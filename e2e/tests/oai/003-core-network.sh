@@ -38,7 +38,7 @@ function _wait_for_pfcp_session {
 
     info "waiting for PFCP session to be established"
     timeout=600
-    until kubectl logs "$(kubectl get pods -n oai-core --kubeconfig "$kubeconfig" -l workload.nephio.org/oai=upf -o jsonpath='{.items[*].metadata.name}')" -n oai-core -c upf-edge --kubeconfig "$kubeconfig" | grep -q 'Received SX HEARTBEAT REQUEST'; do
+    until kubectl logs -l workload.nephio.org/oai=upf -n oai-core -c upf-edge --kubeconfig "$kubeconfig" --tail -1 | grep -q 'Received SX HEARTBEAT REQUEST'; do
         if [[ $timeout -lt 0 ]]; then
             kubectl logs -l workload.nephio.org/oai=upf -n oai-core -c upf-edge --kubeconfig "$kubeconfig" --tail 50
             error "Timed out waiting for PFCP session"
