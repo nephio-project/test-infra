@@ -74,28 +74,14 @@ fact_caching = jsonfile
 fact_caching_connection = /tmp
 EOT
 
-if [ "${DEPLOYMENT_TYPE:-r1}" == "one-summit" ]; then
-    [[ -d "$HOME/workshop" ]] || git clone --depth 1 https://github.com/nephio-project/one-summit-22-workshop.git "$HOME/workshop"
-    mkdir -p "$HOME/workshop/nephio-ansible-install/inventory"
-    cp "$HOME/nephio.yaml" "$HOME/workshop/nephio-ansible-install/inventory/"
-    pushd "$HOME/workshop/nephio-ansible-install" >/dev/null
-    for playbook in install-prereq create-gitea create-gitea-repos deploy-clusters configure-nephio; do
-        if [[ ${DEBUG:-false} != "true" ]]; then
-            ansible-playbook "playbooks/$playbook.yaml"
-        else
-            ansible-playbook -vvv "playbooks/$playbook.yaml"
-        fi
-    done
-    popd >/dev/null
-else
-    # Management cluster creation
-    ansible_cmd="$(command -v ansible-playbook) -i 127.0.0.1, playbooks/cluster.yml "
-    [[ ${DEBUG:-false} != "true" ]] || ansible_cmd+="-vvv "
-    if [ -n "${ANSIBLE_CMD_EXTRA_VAR_LIST:-}" ]; then
-        ansible_cmd+=" --extra-vars=\"${ANSIBLE_CMD_EXTRA_VAR_LIST}\""
-    fi
-    echo "$ansible_cmd"
-    eval "$ansible_cmd" | tee ~/cluster.log
+# Management cluster creation
+ansible_cmd="$(command -v ansible-playbook) -i 127.0.0.1, playbooks/cluster.yml "
+[[ ${DEBUG:-false} != "true" ]] || ansible_cmd+="-vvv "
+if [ -n "${ANSIBLE_CMD_EXTRA_VAR_LIST:-}" ]; then
+    ansible_cmd+=" --extra-vars=\"${ANSIBLE_CMD_EXTRA_VAR_LIST}\""
 fi
+echo "$ansible_cmd"
+eval "$ansible_cmd" | tee ~/cluster.log
+
 
 echo "Done installing Nephio Sandbox Environment"
