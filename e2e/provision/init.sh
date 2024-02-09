@@ -29,7 +29,7 @@ function get_status {
     fi
     if command -v kubectl >/dev/null; then
         KUBECONFIG=$HOME/.kube/config
-        for kubeconfig in $(sudo find /tmp/ -name "kubeconfig-*"); do
+        for kubeconfig in /tmp/*-kubeconfig; do
             KUBECONFIG+=":$kubeconfig"
         done
         export KUBECONFIG

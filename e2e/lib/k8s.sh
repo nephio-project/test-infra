@@ -118,11 +118,12 @@ function k8s_wait_ready_replicas {
 # k8s_get_capi_kubeconfig() - Gets the Kubeconfig file for a given Cluster API cluster
 function k8s_get_capi_kubeconfig {
     local cluster=$1
+    local file="/tmp/${cluster}-kubeconfig"
 
-    # mktemp is supported on both ubuntu and fedora
-    local file=$(mktemp --suffix "_kubeconfig-$cluster")
-    k8s_wait_exists "secret" "${cluster}-kubeconfig" >/dev/null 2>&1
-    kubectl --kubeconfig "$HOME/.kube/config" get secret "${cluster}-kubeconfig" -o jsonpath='{.data.value}' | base64 -d >"$file"
+    if [ ! -f "$file" ]; then
+        k8s_wait_exists "secret" "${cluster}-kubeconfig" >/dev/null 2>&1
+        kubectl --kubeconfig "$HOME/.kube/config" get secret "${cluster}-kubeconfig" -o jsonpath='{.data.value}' | base64 -d >"$file"
+    fi
     echo "$file"
 }
 
