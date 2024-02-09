@@ -141,8 +141,6 @@ presubmits:
               mountPath: "/etc/satoken"
             - name: ssh-key-vol
               mountPath: "/etc/ssh-key"
-            - name: nephio-e2e-yaml
-              mountPath: "/etc/nephio"
           resources:
             requests:
               cpu: 2
@@ -186,8 +184,6 @@ presubmits:
               mountPath: "/etc/satoken"
             - name: ssh-key-vol
               mountPath: "/etc/ssh-key"
-            - name: nephio-e2e-yaml
-              mountPath: "/etc/nephio"
           resources:
             requests:
               cpu: 2
@@ -230,8 +226,6 @@ presubmits:
               mountPath: "/etc/satoken"
             - name: ssh-key-vol
               mountPath: "/etc/ssh-key"
-            - name: nephio-e2e-yaml
-              mountPath: "/etc/nephio"
           resources:
             requests:
               cpu: 2
