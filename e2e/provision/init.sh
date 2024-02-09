@@ -37,7 +37,7 @@ function get_status {
         export KUBECONFIG
         for context in $(kubectl config get-contexts --no-headers --output name); do
             echo "Kubernetes Events ($context):"
-            kubectl get events --sort-by='.lastTimestamp' -A --context "$context"
+            kubectl get events --sort-by='.lastTimestamp' -A --context "$context" --field-selector type!=Normal
             echo "Kubernetes Resources ($context):"
             kubectl get all -A -o wide --context "$context"
         done
