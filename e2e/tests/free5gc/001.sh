@@ -61,7 +61,6 @@ kpt fn eval --image "gcr.io/kpt-fn/set-labels:v0.2.0" regional -- "nephio.org/si
 assert_contains "$(cat regional/workload-cluster.yaml)" "nephio.org/region: us-west1" "Workload cluster doesn't have region label"
 
 porchctl rpkg push -n default "$regional_pkg_rev" regional
-porch_wait_log_entry "Update.*packagerevisionresources/${regional_pkg_rev},"
 
 # Proposal
 porchctl rpkg propose -n default "$regional_pkg_rev"

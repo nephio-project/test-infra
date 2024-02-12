@@ -51,7 +51,6 @@ function _define_ip_address_pool {
 
     # Push changes
     porchctl rpkg push -n default "$pkg_rev" "$cluster-metallb-sandbox-config"
-    porch_wait_log_entry "Update.*packagerevisionresources/${pkg_rev},"
 
     # Propose
     porchctl rpkg propose -n default "$pkg_rev"
