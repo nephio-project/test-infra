@@ -141,8 +141,6 @@ presubmits:
               mountPath: "/etc/satoken"
             - name: ssh-key-vol
               mountPath: "/etc/ssh-key"
-            - name: nephio-e2e-yaml
-              mountPath: "/etc/nephio"
           resources:
             requests:
               cpu: 2
@@ -163,12 +161,6 @@ presubmits:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
-        - name: nephio-e2e-yaml
-          secret:
-            secretName: nephio-e2e-yaml
-            items:
-              - key: nephio.yaml
-                path: nephio.yaml
   - name: e2e-free5gc-fedora-34
     annotations:
     labels:
@@ -192,8 +184,6 @@ presubmits:
               mountPath: "/etc/satoken"
             - name: ssh-key-vol
               mountPath: "/etc/ssh-key"
-            - name: nephio-e2e-yaml
-              mountPath: "/etc/nephio"
           resources:
             requests:
               cpu: 2
@@ -214,12 +204,6 @@ presubmits:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
-        - name: nephio-e2e-yaml
-          secret:
-            secretName: nephio-e2e-yaml
-            items:
-              - key: nephio.yaml
-                path: nephio.yaml
   - name: e2e-oai-ubuntu-jammy
     annotations:
     labels:
@@ -242,8 +226,6 @@ presubmits:
               mountPath: "/etc/satoken"
             - name: ssh-key-vol
               mountPath: "/etc/ssh-key"
-            - name: nephio-e2e-yaml
-              mountPath: "/etc/nephio"
           resources:
             requests:
               cpu: 2
@@ -264,13 +246,6 @@ presubmits:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
-        - name: nephio-e2e-yaml
-          secret:
-            secretName: nephio-e2e-yaml
-            items:
-              - key: nephio.yaml
-                path: nephio.yaml
-
 postsubmits:
   - name: build-push-image-gotests
     cluster: default

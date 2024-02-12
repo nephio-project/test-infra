@@ -107,8 +107,6 @@ find "$REPO_DIR" -name '*.sh' -exec chmod +x {} \;
 cp "$REPO_DIR/e2e/provision/bash_config.sh" "$HOME/.bash_aliases"
 chown "$NEPHIO_USER:$NEPHIO_USER" "$HOME/.bash_aliases"
 
-sed -e "s/vagrant/$NEPHIO_USER/" <"$REPO_DIR/e2e/provision/nephio.yaml" >"$HOME/nephio.yaml"
-
 # Sandbox Creation
 int_start=$(date +%s)
 cd "$REPO_DIR/e2e/provision"

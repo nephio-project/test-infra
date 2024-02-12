@@ -22,7 +22,6 @@ resource "random_string" "vm-name" {
 
 locals {
   vm-name    = "e2e-vm-${random_string.vm-name.result}"
-  nephioyaml = "/home/${var.ansible_user}/nephio.yaml"
 }
 
 resource "google_compute_instance" "lab_instances" {
@@ -70,17 +69,6 @@ resource "google_compute_instance" "e2e_instances" {
   provisioner "file" {
     source      = "../../../test-infra"
     destination = "/home/${var.ansible_user}/test-infra"
-    connection {
-      host        = self.network_interface[0].access_config[0].nat_ip
-      type        = "ssh"
-      private_key = file(var.ssh_prv_key)
-      user        = var.ansible_user
-      agent       = false
-    }
-  }
-  provisioner "file" {
-    source      = "/etc/nephio/nephio.yaml"
-    destination = local.nephioyaml
     connection {
       host        = self.network_interface[0].access_config[0].nat_ip
       type        = "ssh"
