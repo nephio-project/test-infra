@@ -1434,8 +1434,6 @@ periodics:
               mountPath: "/etc/satoken"
             - name: ssh-key-vol
               mountPath: "/etc/ssh-key"
-            - name: nephio-e2e-yaml
-              mountPath: "/etc/nephio"
           resources:
             requests:
               cpu: 2
@@ -1456,12 +1454,6 @@ periodics:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
-        - name: nephio-e2e-yaml
-          secret:
-            secretName: nephio-e2e-yaml
-            items:
-              - key: nephio.yaml
-                path: nephio.yaml
   - name: e2e-daily-fedora-34-free5gc
     annotations:
     labels:
@@ -1489,8 +1481,6 @@ periodics:
               mountPath: "/etc/satoken"
             - name: ssh-key-vol
               mountPath: "/etc/ssh-key"
-            - name: nephio-e2e-yaml
-              mountPath: "/etc/nephio"
           resources:
             requests:
               cpu: 2
@@ -1511,12 +1501,6 @@ periodics:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
-        - name: nephio-e2e-yaml
-          secret:
-            secretName: nephio-e2e-yaml
-            items:
-              - key: nephio.yaml
-                path: nephio.yaml
   - name: e2e-daily-ubuntu-jammy-oai
     annotations:
     labels:
@@ -1544,8 +1528,6 @@ periodics:
               mountPath: "/etc/satoken"
             - name: ssh-key-vol
               mountPath: "/etc/ssh-key"
-            - name: nephio-e2e-yaml
-              mountPath: "/etc/nephio"
           resources:
             requests:
               cpu: 2
@@ -1566,9 +1548,3 @@ periodics:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
-        - name: nephio-e2e-yaml
-          secret:
-            secretName: nephio-e2e-yaml
-            items:
-              - key: nephio.yaml
-                path: nephio.yaml
