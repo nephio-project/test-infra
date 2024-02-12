@@ -35,7 +35,7 @@ k8s_apply "$TESTDIR/004-free5gc-operator.yaml"
 kubeconfig="$HOME/.kube/config"
 for cluster in $(kubectl get cl -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --kubeconfig "$kubeconfig"); do
     k8s_wait_exists "packagevariant" "free5gc-operator-$cluster-free5gc-operator"
-    porch_wait_log_entry "refs/heads/proposed/free5gc-operator/packagevariant-1 :refs/heads/drafts/free5gc-operator/packagevariant-1"
+    porch_wait_published_packagerev "free5gc-operator" "$cluster"
     kpt_wait_pkg "$cluster" "free5gc-operator"
     k8s_wait_ready_replicas "deployment" "free5gc-operator" "$(k8s_get_capi_kubeconfig "$cluster")" "free5gc"
 done

@@ -11,28 +11,6 @@
 # shellcheck source=e2e/lib/_utils.sh
 source "${E2EDIR:-$HOME/test-infra/e2e}/lib/_utils.sh"
 
-# porch_wait_log_entry() - Waits for the entry log in Porch server
-function porch_wait_log_entry {
-    local pattern="$1"
-    local timeout=${2:-600}
-    lapse=$timeout
-
-    info "looking for $pattern log entry in porch server($(kubectl get pods -n porch-system -l app=porch-server -o jsonpath='{.items[*].metadata.name}'))"
-    local found=""
-    while [[ $lapse -gt 0 ]]; do
-        found=$(kubectl logs -n porch-system -l app=porch-server --tail -1 | { grep "$pattern" || :; })
-        if [[ $found ]]; then
-            [ $((timeout * 2 / 3)) -lt $lapse ] || warn "$pattern took $lapse seconds to be found in the log"
-            return
-        fi
-        lapse=$((lapse - 5))
-        sleep 5
-    done
-
-    kubectl logs -n porch-system -l app=porch-server --tail -1
-    error "Timed out waiting for $pattern"
-}
-
 # porch_wait_published_packagerev() - Waits for a kpt package revision gets published
 function porch_wait_published_packagerev {
     local pkg_name="$1"
