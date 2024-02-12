@@ -74,10 +74,9 @@ for nf in du cuup cucp; do
     k8s_wait_ready "packagevariant" "oai-$nf"
 done
 
-for nf in du cuup; do
-    kpt_wait_pkg "edge" "oai-ran-$nf" "nephio" "1800"
-done
 kpt_wait_pkg "regional" "oai-ran-cucp" "nephio" "1800"
+kpt_wait_pkg "edge" "oai-ran-cuup"
+kpt_wait_pkg "edge" "oai-ran-du"
 
 _regional_kubeconfig="$(k8s_get_capi_kubeconfig "regional")"
 _edge_kubeconfig="$(k8s_get_capi_kubeconfig "edge")"
