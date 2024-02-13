@@ -37,7 +37,7 @@ function porch_wait_published_packagerev {
     done
 
     if [[ -z $found ]]; then
-        kubectl get packagerevisions -o jsonpath="{range .items[?(@.spec.packageName==\"$pkg_name\")]}{.metadata.name}{\"\\n\\\"}{end}"
+        kubectl get packagerevisions -o jsonpath="{range .items[?(@.spec.packageName==\"$pkg_name\")]}{.metadata.name}{\"\\n\"}{end}"
         error "Timed out waiting for revisions on $pkg_name package"
     fi
     kubectl wait --for jsonpath='{.spec.lifecycle}'=Published packagerevisions $found --timeout=10m
