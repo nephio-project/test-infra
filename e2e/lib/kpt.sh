@@ -51,7 +51,7 @@ function kpt_wait_pkg {
     local timeout=${4:-600}
     lapse=$timeout
 
-    _wait_for_user_repo "$repo" "$user"
+    _wait_for_user_repo "$repo" "$user" "$timeout"
     info "looking for $pkg kpt package on $user/$repo repository"
     local found="False"
     while [[ $lapse -gt 0 ]]; do
