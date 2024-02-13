@@ -61,11 +61,15 @@ k8s_wait_ready "packagevariant" "oai-upf-edge"
 
 for nf in nrf udm udr ausf amf; do
     kpt_wait_pkg "core" "oai-$nf"
+    k8s_wait_exists "nfdeployment" "$nf-core" "$_core_kubeconfig" "oai-core"
     k8s_wait_ready_replicas "deployment" "$nf-core" "$_core_kubeconfig" "oai-core"
 done
 kpt_wait_pkg "edge" "oai-upf"
+k8s_wait_exists "nfdeployment" "upf-edge" "$_edge_kubeconfig" "oai-core"
 k8s_wait_ready_replicas "deployment" "upf-edge" "$_edge_kubeconfig" "oai-core"
+
 kpt_wait_pkg "core" "oai-smf" "nephio" "1800"
+k8s_wait_exists "nfdeployment" "smf-core" "$_core_kubeconfig" "oai-core"
 k8s_wait_ready_replicas "deployment" "smf-core" "$_core_kubeconfig" "oai-core"
 
 # Check if the PFCP session between UPF and SMF is established

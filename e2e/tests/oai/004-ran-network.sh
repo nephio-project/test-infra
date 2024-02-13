@@ -81,6 +81,10 @@ kpt_wait_pkg "edge" "oai-ran-du"
 _regional_kubeconfig="$(k8s_get_capi_kubeconfig "regional")"
 _edge_kubeconfig="$(k8s_get_capi_kubeconfig "edge")"
 
+k8s_wait_exists "nfdeployment" "cucp-regional" "$_regional_kubeconfig" "oai-ran-cucp"
+k8s_wait_exists "nfdeployment" "cuup-edge" "$_edge_kubeconfig" "oai-ran-cuup"
+k8s_wait_exists "nfdeployment" "du-edge" "$_edge_kubeconfig" "oai-ran-du"
+
 k8s_wait_ready_replicas "deployment" "oai-gnb-cu-cp" "$_regional_kubeconfig" "oai-ran-cucp"
 k8s_wait_ready_replicas "deployment" "oai-gnb-cu-up" "$_edge_kubeconfig" "oai-ran-cuup"
 k8s_wait_ready_replicas "deployment" "oai-gnb-du" "$_edge_kubeconfig" "oai-ran-du"
