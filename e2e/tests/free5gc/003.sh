@@ -36,20 +36,17 @@ source "${LIBDIR}/_assertions.sh"
 pkg_rev=$(porchctl rpkg clone -n default "https://github.com/nephio-project/catalog.git/workloads/free5gc/free5gc-cp@$REVISION" --repository regional free5gc-cp | cut -f 1 -d ' ')
 k8s_wait_exists "packagerev" "$pkg_rev"
 
-porch_wait_log_entry "Creating packagerev default/regional-"
-assert_lifecycle_equals "$pkg_rev" "Draft"
+kubectl wait --for jsonpath='{.spec.lifecycle}'=Draft packagerevisions "$pkg_rev" --timeout="600s"
 assert_branch_exists "drafts/free5gc-cp/v1" "nephio/regional"
 assert_commit_msg_in_branch "Intermediate commit" "drafts/free5gc-cp/v1" "nephio/regional"
 
 porchctl rpkg propose -n default "$pkg_rev"
-porch_wait_log_entry "Update.*packagerevisions/${pkg_rev},"
-assert_lifecycle_equals "$pkg_rev" "Proposed"
+kubectl wait --for jsonpath='{.spec.lifecycle}'=Proposed packagerevisions "$pkg_rev" --timeout="600s"
 assert_branch_exists "proposed/free5gc-cp/v1" "nephio/regional"
 assert_commit_msg_in_branch "Intermediate commit" "proposed/free5gc-cp/v1" "nephio/regional"
 
 porchctl rpkg approve -n default "$pkg_rev"
-porch_wait_log_entry "Update.*/${pkg_rev}.*/approval"
-assert_lifecycle_equals "$pkg_rev" "Published"
+kubectl wait --for jsonpath='{.spec.lifecycle}'=Published packagerevisions "$pkg_rev" --timeout="600s"
 
 kpt_wait_pkg "regional" "free5gc-cp"
 k8s_wait_ready_replicas "statefulset" "mongodb" "$(k8s_get_capi_kubeconfig "regional")" "free5gc-cp"

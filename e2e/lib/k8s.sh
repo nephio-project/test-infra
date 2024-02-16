@@ -30,27 +30,25 @@ function k8s_wait_exists {
     local kubeconfig=${3:-"$HOME/.kube/config"}
     local resource_namespace=${4:-default}
     local timeout=${5:-600}
+    lapse=$timeout
 
     # should validate the params...
     [ -f $kubeconfig ] || error "Kubeconfig file doesn't exist"
 
     info "looking for $resource_type $resource_namespace/$resource_name using $kubeconfig"
     local found=""
-    while [[ -z $found && $timeout -gt 0 ]]; do
+    while [[ $lapse -gt 0 ]]; do
         found=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath='{.metadata.name}' --ignore-not-found)
-        timeout=$((timeout - 5))
-        if [[ -z $found && $timeout -gt 0 ]]; then
-            sleep 5
+        if [[ $found ]]; then
+            [ $((timeout * 2 / 3)) -lt $lapse ] || warn "$resource_namespace/$resource_name $resource_type took $lapse seconds to exist"
+            return
         fi
+        lapse=$((lapse - 5))
+        sleep 5
     done
-    debug "timeout: $timeout"
 
-    if [[ $found != "$resource_name" ]]; then
-        kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type
-        error "Timed out waiting for $resource_type $resource_namespace/$resource_name"
-    fi
-
-    info "Found $resource_type $resource_namespace/$resource_name"
+    kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type
+    error "Timed out waiting for $resource_type $resource_namespace/$resource_name"
 }
 
 # k8s_wait_ready() - Waits for the readiness of a given kubernetes resource
@@ -60,6 +58,7 @@ function k8s_wait_ready {
     local kubeconfig=${3:-"$HOME/.kube/config"}
     local resource_namespace=${4:-default}
     local timeout=${5:-600}
+    lapse=$timeout
 
     # should validate the params...
     [ -f $kubeconfig ] || error "Kubeconfig file doesn't exist"
@@ -68,31 +67,28 @@ function k8s_wait_ready {
 
     info "checking readiness of $resource_type $resource_namespace/$resource_name using $kubeconfig"
     local ready=""
-    while [[ $ready != "True" && $timeout -gt 0 ]]; do
+    while [[ $lapse -gt 0 ]]; do
         ready=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' || echo)
-        timeout=$((timeout - 5))
-        if [[ $ready != "True" && $timeout -gt 0 ]]; then
-            sleep 5
+        if [[ $ready == "True" ]]; then
+            [ $((timeout * 2 / 3)) -lt $lapse ] || warn "$resource_namespace/$resource_name $resource_type took $lapse seconds to be ready"
+            return
         fi
+        lapse=$((lapse - 5))
+        sleep 5
     done
-    debug "status: $ready"
-    debug "timeout: $timeout"
 
-    if [[ $ready != "True" ]]; then
-        kubectl --kubeconfig $kubeconfig -n $resource_namespace describe $resource_type $resource_name
-        error "Timed out waiting for $resource_type $resource_namespace/$resource_name to be ready"
-    fi
-
-    info "$resource_type $resource_namespace/$resource_name is ready"
+    kubectl --kubeconfig $kubeconfig -n $resource_namespace describe $resource_type $resource_name
+    error "Timed out waiting for $resource_type $resource_namespace/$resource_name to be ready"
 }
 
-# k8s_wait_ready_replicas() - Waits for the readiness of a minimun number of replicas
+# k8s_wait_ready_replicas() - Waits for the readiness of a minimum number of replicas
 function k8s_wait_ready_replicas {
     local resource_type=$1
     local resource_name=$2
     local kubeconfig=${3:-"$HOME/.kube/config"}
     local resource_namespace=${4:-default}
     local timeout=${5:-600}
+    lapse=$timeout
     local min_ready=${6:-1}
     local status_field=${7:-readyReplicas}
     status_field=readyReplicas
@@ -105,32 +101,29 @@ function k8s_wait_ready_replicas {
 
     info "checking readiness of $resource_type $resource_namespace/$resource_name using $kubeconfig"
     local ready=""
-    while [[ $ready -lt $min_ready && $timeout -gt 0 ]]; do
+    while [[ $lapse -gt 0 ]]; do
         ready=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath="{.status.$status_field}" || echo)
-        timeout=$((timeout - 5))
-        if [[ $ready -lt $min_ready && $timeout -gt 0 ]]; then
-            sleep 5
+        if [[ $ready -ge $min_ready ]]; then
+            [ $((timeout * 2 / 3)) -lt $lapse ] || warn "$resource_namespace/$resource_name $resource_type took $lapse seconds to have minimum number of replicas"
+            return
         fi
+        lapse=$((lapse - 5))
+        sleep 5
     done
-    debug "status: $ready (want $min_ready)"
-    debug "timeout: $timeout"
 
-    if [[ $ready -lt $min_ready ]]; then
-        kubectl --kubeconfig $kubeconfig -n $resource_namespace describe $resource_type $resource_name
-        error "Timed out waiting for $resource_type $resource_namespace/$resource_name to be ready"
-    fi
-
-    info "$resource_type $resource_namespace/$resource_name is ready"
+    kubectl --kubeconfig $kubeconfig -n $resource_namespace describe $resource_type $resource_name
+    error "Timed out waiting for $resource_type $resource_namespace/$resource_name to be ready"
 }
 
 # k8s_get_capi_kubeconfig() - Gets the Kubeconfig file for a given Cluster API cluster
 function k8s_get_capi_kubeconfig {
     local cluster=$1
+    local file="/tmp/${cluster}-kubeconfig"
 
-    # mktemp is supported on both ubuntu and fedora
-    local file=$(mktemp --suffix "_kubeconfig-$cluster")
-    k8s_wait_exists "secret" "${cluster}-kubeconfig" >/dev/null 2>&1
-    kubectl --kubeconfig "$HOME/.kube/config" get secret "${cluster}-kubeconfig" -o jsonpath='{.data.value}' | base64 -d >"$file"
+    if [ ! -f "$file" ]; then
+        k8s_wait_exists "secret" "${cluster}-kubeconfig" >/dev/null 2>&1
+        kubectl --kubeconfig "$HOME/.kube/config" get secret "${cluster}-kubeconfig" -o jsonpath='{.data.value}' | base64 -d >"$file"
+    fi
     echo "$file"
 }
 

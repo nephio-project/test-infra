@@ -19,19 +19,6 @@ fi
 # shellcheck source=e2e/lib/kpt.sh
 source "${E2EDIR:-$HOME/test-infra/e2e}/lib/kpt.sh"
 
-# assert_non_empty() - This assertion checks if the expected value is not empty
-function assert_non_empty {
-    local input=$1
-    local error_msg=$2
-
-    if [[ $DEBUG == "true" ]]; then
-        debug "NonEmpty Assertion - value: $1"
-    fi
-    if [ -z "$input" ]; then
-        error "$error_msg"
-    fi
-}
-
 # assert_are_equal() - This assertion checks if the inputs are equal
 function assert_are_equal {
     local input=$1

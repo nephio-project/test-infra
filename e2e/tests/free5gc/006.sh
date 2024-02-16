@@ -39,7 +39,6 @@ cluster_kubeconfig=$(k8s_get_capi_kubeconfig "regional")
 # check the NFs
 for nf in amf smf; do
     k8s_wait_exists "packagevariant" "regional-free5gc-$nf-regional-free5gc-$nf"
-    porch_wait_log_entry "\"$nf-example\" updated to \"free5gc-cp\""
     porch_wait_published_packagerev "free5gc-$nf" "regional"
     kpt_wait_pkg "regional" "free5gc-$nf"
     k8s_wait_ready_replicas "deployment" "$nf-regional" "$cluster_kubeconfig" "free5gc-cp"

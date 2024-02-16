@@ -83,5 +83,4 @@ fi
 echo "$ansible_cmd"
 eval "$ansible_cmd" | tee ~/cluster.log
 
-
 echo "Done installing Nephio Sandbox Environment"

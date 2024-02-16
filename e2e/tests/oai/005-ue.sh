@@ -35,7 +35,7 @@ function _wait_for_ue {
     info "waiting for $msg to be finished"
     timeout=600
     temp_file=$(mktemp)
-    kubectl logs "$(kubectl get pods -n oai-ue --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-nr-ue -o jsonpath='{.items[*].metadata.name}')" -n oai-ue -c nr-ue --kubeconfig "$kubeconfig" >temp_file
+    kubectl logs -l app.kubernetes.io/name=oai-nr-ue --tail -1 -n oai-ue -c nr-ue --kubeconfig "$kubeconfig" >temp_file
     while
         grep -q "$log_msg" temp_file
         status=$?
@@ -47,7 +47,7 @@ function _wait_for_ue {
         fi
         timeout=$((timeout - 5))
         sleep 5
-        kubectl logs "$(kubectl get pods -n oai-ue --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-nr-ue -o jsonpath='{.items[*].metadata.name}')" -n oai-ue -c nr-ue --kubeconfig "$kubeconfig" >temp_file
+        kubectl logs -l app.kubernetes.io/name=oai-nr-ue --tail -1 -n oai-ue -c nr-ue --kubeconfig "$kubeconfig" >temp_file
     done
     debug "timeout: $timeout"
     rm "${temp_file}"

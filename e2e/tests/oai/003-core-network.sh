@@ -38,7 +38,7 @@ function _wait_for_pfcp_session {
 
     info "waiting for PFCP session to be established"
     timeout=600
-    until kubectl logs "$(kubectl get pods -n oai-core --kubeconfig "$kubeconfig" -l workload.nephio.org/oai=upf -o jsonpath='{.items[*].metadata.name}')" -n oai-core -c upf-edge --kubeconfig "$kubeconfig" | grep -q 'Received SX HEARTBEAT REQUEST'; do
+    until kubectl logs -l workload.nephio.org/oai=upf -n oai-core -c upf-edge --kubeconfig "$kubeconfig" --tail -1 | grep -q 'Received SX HEARTBEAT REQUEST'; do
         if [[ $timeout -lt 0 ]]; then
             kubectl logs -l workload.nephio.org/oai=upf -n oai-core -c upf-edge --kubeconfig "$kubeconfig" --tail 50
             error "Timed out waiting for PFCP session"
@@ -49,6 +49,9 @@ function _wait_for_pfcp_session {
     debug "timeout: $timeout"
 }
 
+_core_kubeconfig="$(k8s_get_capi_kubeconfig "core")"
+_edge_kubeconfig="$(k8s_get_capi_kubeconfig "edge")"
+
 k8s_apply "$TESTDIR/003-core-network.yaml"
 
 for nf in nrf udm udr ausf amf smf; do
@@ -56,17 +59,18 @@ for nf in nrf udm udr ausf amf smf; do
 done
 k8s_wait_ready "packagevariant" "oai-upf-edge"
 
-for nf in nrf udm udr ausf amf smf; do
-    kpt_wait_pkg "core" "oai-$nf" "nephio" "1800"
-done
-kpt_wait_pkg "edge" "oai-upf"
-
-_core_kubeconfig="$(k8s_get_capi_kubeconfig "core")"
-_edge_kubeconfig="$(k8s_get_capi_kubeconfig "edge")"
-for nf in nrf udm udr ausf amf smf; do
+for nf in nrf udm udr ausf amf; do
+    kpt_wait_pkg "core" "oai-$nf"
+    k8s_wait_exists "nfdeployment" "$nf-core" "$_core_kubeconfig" "oai-core"
     k8s_wait_ready_replicas "deployment" "$nf-core" "$_core_kubeconfig" "oai-core"
 done
+kpt_wait_pkg "edge" "oai-upf"
+k8s_wait_exists "nfdeployment" "upf-edge" "$_edge_kubeconfig" "oai-core"
 k8s_wait_ready_replicas "deployment" "upf-edge" "$_edge_kubeconfig" "oai-core"
+
+kpt_wait_pkg "core" "oai-smf" "nephio" "1800"
+k8s_wait_exists "nfdeployment" "smf-core" "$_core_kubeconfig" "oai-core"
+k8s_wait_ready_replicas "deployment" "smf-core" "$_core_kubeconfig" "oai-core"
 
 # Check if the PFCP session between UPF and SMF is established
 _wait_for_pfcp_session "$_edge_kubeconfig"

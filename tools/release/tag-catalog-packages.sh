@@ -27,7 +27,7 @@ set -e
 #   git push --tags
 #
 # If you're updating existing tags, add "--force".
-# 
+#
 # Note that because tagging does not follow the usual merge process, you want to be
 # very careful about updating or deleting existing tags on GitHub! Reconstructing
 # deleted tags can be challenging.
@@ -48,18 +48,18 @@ set -e
 NEPHIO_VERSION=${NEPHIO_VERSION:-v2.0.0}
 NEPHIO_REMOTE=${NEPHIO_REMOTE:-origin}
 
-function tag () {
-	# Local
-	git tag --force "$1"
+function tag() {
+    # Local
+    git tag --force "$1"
 }
 
 # Unused right now, but here if you want to modify the script to delete tags
-function untag () {
-	# Local
-	git tag --delete "$1" || true
+function untag() {
+    # Local
+    git tag --delete "$1" || true
 
-	# Remote
-	git push --delete "$NEPHIO_REMOTE" "$1" || true
+    # Remote
+    git push --delete "$NEPHIO_REMOTE" "$1" || true
 }
 
 # Overall release tag

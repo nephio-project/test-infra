@@ -36,7 +36,7 @@ function _wait_for_ran {
     timeout=600
 
     temp_file=$(mktemp)
-    kubectl logs "$(kubectl get pods -n oai-ran-cucp --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-gnb-cu-cp -o jsonpath='{.items[*].metadata.name}')" -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" >temp_file
+    kubectl logs -l app.kubernetes.io/name=oai-gnb-cu-cp --tail -1 -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" >temp_file
     while
         grep -q "$wait_msg" temp_file
         status=$?
@@ -48,25 +48,14 @@ function _wait_for_ran {
         fi
         timeout=$((timeout - 5))
         sleep 5
-        kubectl logs "$(kubectl get pods -n oai-ran-cucp --kubeconfig "$kubeconfig" -l app.kubernetes.io/name=oai-gnb-cu-cp -o jsonpath='{.items[*].metadata.name}')" -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" >temp_file
+        kubectl logs -l app.kubernetes.io/name=oai-gnb-cu-cp --tail -1 -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" >temp_file
     done
     debug "timeout: $timeout"
     rm "${temp_file}"
 }
 
-function _wait_for_n2_link {
-    _wait_for_ran "$1" "Received NGAP_REGISTER_GNB_CNF: associated AMF" "N2"
-}
-
-function _wait_for_e1_link {
-    # Connection between CU-CP and CU-UP
-    _wait_for_ran "$1" "e1ap_send_SETUP_RESPONSE" "E1"
-}
-
-function _wait_for_f1_link {
-    # Connection between DU and CU-CP
-    _wait_for_ran "$1" "Cell Configuration ok" "F1"
-}
+_regional_kubeconfig="$(k8s_get_capi_kubeconfig "regional")"
+_edge_kubeconfig="$(k8s_get_capi_kubeconfig "edge")"
 
 k8s_apply "$TESTDIR/004-ran-network.yaml"
 
@@ -74,21 +63,21 @@ for nf in du cuup cucp; do
     k8s_wait_ready "packagevariant" "oai-$nf"
 done
 
-for nf in du cuup; do
-    kpt_wait_pkg "edge" "oai-ran-$nf" "nephio" "1800"
-done
 kpt_wait_pkg "regional" "oai-ran-cucp" "nephio" "1800"
-
-_regional_kubeconfig="$(k8s_get_capi_kubeconfig "regional")"
-_edge_kubeconfig="$(k8s_get_capi_kubeconfig "edge")"
-
+k8s_wait_exists "nfdeployment" "cucp-regional" "$_regional_kubeconfig" "oai-ran-cucp"
 k8s_wait_ready_replicas "deployment" "oai-gnb-cu-cp" "$_regional_kubeconfig" "oai-ran-cucp"
+
+kpt_wait_pkg "edge" "oai-ran-cuup"
+k8s_wait_exists "nfdeployment" "cuup-edge" "$_edge_kubeconfig" "oai-ran-cuup"
 k8s_wait_ready_replicas "deployment" "oai-gnb-cu-up" "$_edge_kubeconfig" "oai-ran-cuup"
+
+kpt_wait_pkg "edge" "oai-ran-du"
+k8s_wait_exists "nfdeployment" "du-edge" "$_edge_kubeconfig" "oai-ran-du"
 k8s_wait_ready_replicas "deployment" "oai-gnb-du" "$_edge_kubeconfig" "oai-ran-du"
 
 # Check if the NGAPSetup Request Response is okay between AMF and CU-CP
-_wait_for_n2_link "$_regional_kubeconfig"
-# Check if the E1Setup Request Response is okay between AMF and CU-CP
-_wait_for_e1_link "$_regional_kubeconfig"
-# Check if the F1Setup Request Response is okay between AMF and CU-CP
-_wait_for_f1_link "$_regional_kubeconfig"
+_wait_for_ran "$_regional_kubeconfig" "Received NGAP_REGISTER_GNB_CNF: associated AMF" "N2"
+# Check if the E1Setup Request Response is okay between CU-CP and CU-UP
+_wait_for_ran "$_regional_kubeconfig" "e1ap_send_SETUP_RESPONSE" "E1"
+# Check if the F1Setup Request Response is okay between DU and CU-CP
+_wait_for_ran "$_regional_kubeconfig" "Cell Configuration ok" "F1"
