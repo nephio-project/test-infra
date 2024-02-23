@@ -1,0 +1,51 @@
+name: Nephio Packer GCP Build
+
+on:
+  push:
+    branches: [add_packer_build]
+    paths-ignore: ['**/README.md', 'prow/*', 'tools/*', 'images/*']
+
+env:
+  PRODUCT_VERSION: "1.8.6"
+
+jobs:
+  packer-nephio-pre-backed-image:
+    name: Build Nephio pre-baked image
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./e2e/packer/gcp
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+        
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+            workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
+            service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
+
+      - name: Setup `packer`
+        uses: hashicorp/setup-packer@main
+        id: setup
+        with:
+          version: ${{ env.PRODUCT_VERSION }}
+
+      - name: Run `packer init`
+        id: init
+        run: "packer init ./nephio-packer.pkr.hcl"
+
+      - name: Run `packer validate`
+        id: validate
+        run: "packer validate -syntax-only -evaluate-datasources ./nephio-packer.pkr.hcl"
+
+      - name: Run `packer build`
+        id: build
+        run: "packer build -force -var 'project_id=${{ vars.GCP_PROJECT_ID }}' -var-file=varibles.pkrvars.hcl ./nephio-packer.pkr.hcl"  
+
+      
