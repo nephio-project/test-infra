@@ -92,21 +92,19 @@ if ! sudo -u "$NEPHIO_USER" sudo -n "true"; then
     exit 1
 fi
 
+if [[ $(id -u) -ne 0 ]]; then
+    echo ""
+    echo "This script must to be executed by the root user."
+    echo ""
+    exit 1
+fi
 
-#if [[ $(id -u) -eq 0 ]]; then
-#    echo ""
-#    echo "This script needs to be executed without using sudo command."
-#    echo ""
-#    exit 1
-#fi
-#
-#if [[ $(runuser -u "$NEPHIO_USER" -- id -u) -eq 0 ]]; then
-#    echo ""
-#    echo "This script needs to be executed without using sudo command."
-#    echo ""
-#    exit 1
-#fi
-
+if [[ $(sudo -u "$NEPHIO_USER" id -u) -eq 0 ]]; then
+    echo ""
+    echo "NEPHIO_USER cannot be root (user '$(sudo -u "$NEPHIO_USER" id -nu)')."
+    echo ""
+    exit 1
+fi
 
 if ! command -v git >/dev/null; then
     source /etc/os-release || source /usr/lib/os-release
