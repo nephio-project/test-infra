@@ -70,3 +70,6 @@ if [[ $failed -gt 0 ]]; then
     echo "FAILED $failed tests"
     exit 1
 fi
+if [ "$(docker container inspect -f '{{.State.Running}}' docker_registry_proxy)" = "true" ]; then
+    echo "Docker registry cache hits: $(docker logs docker_registry_proxy | grep '"upstream_cache_status":"HIT"' | wc -l)"
+fi

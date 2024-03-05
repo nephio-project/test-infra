@@ -25,6 +25,10 @@
   ansible.builtin.include_tasks: create-mgmt.yml
   when: kind.enabled
 
+- name: Create Local Docker Registry
+  ansible.builtin.include_tasks: create-local_registry.yml
+  when: registry.enabled
+
 - name: Apply kpt packages
   ansible.builtin.include_tasks:
     file: apply-pkgs.yml

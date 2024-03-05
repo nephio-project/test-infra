@@ -29,6 +29,9 @@ k8s:
 kind:
   enabled: true
 
+registry:
+  enabled: true
+
 nephio_catalog_repo_uri: https://github.com/nephio-project/catalog.git
 nephio_catalog_revision: main
 

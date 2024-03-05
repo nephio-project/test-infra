@@ -25,6 +25,18 @@ function capi_cluster_ready {
         k8s_wait_ready "machineset" "$machineset"
     done
 
+    # Use Docker local registry to reduce external traffic
+    if [ "$(docker container inspect -f '{{.State.Running}}' docker_registry_proxy)" = "true" ]; then
+        _kubeconfig=$(k8s_get_capi_kubeconfig "$cluster")
+        pids=""
+        for node in $(kubectl get nodes -l node-role.kubernetes.io/control-plane!= -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --kubeconfig "$_kubeconfig"); do
+            docker exec "$node" sh -c "curl http://$(hostname -i):3128/setup/systemd | sed s/docker\.service/containerd\.service/g \
+  | sed '/Environment/ s/$/ \"NO_PROXY=127.0.0.0\/8,10.0.0.0\/8,172.16.0.0\/12,192.168.0.0\/16\"/' | bash" &
+            pids="$pids $!"
+        done
+        wait $pids
+    fi
+
     # Wait for package variants
     for pv in cluster kindnet local-path-provisioner multus repo vlanindex; do
         k8s_wait_exists "packagevariants" "${cluster}-$pv"
