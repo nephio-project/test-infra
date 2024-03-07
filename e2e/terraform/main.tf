@@ -30,11 +30,3 @@ variable "fail_fast" {
   default     = "false"
   type        = string
 }
-
-module "github_action_gcp_resource" {
-  source      = ".//modules/gh_action_resource"
-  project_id  = "pure-faculty-367518"
-  wif_pool_id = "gh-action-wif-pool"
-  github_org  = "nephio-project"
-  github_repo = "test-infra"
-}
