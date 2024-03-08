@@ -1570,6 +1570,8 @@ periodics:
             - |
               set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/packer/gcp"; packer init . && packer build .
           volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
             - name: ssh-key-vol
               mountPath: "/etc/ssh-key"
           resources:
@@ -1577,6 +1579,12 @@ periodics:
               cpu: 2
               memory: 2Gi
       volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
         - name: ssh-key-vol
           secret:
             secretName: ssh-key-e2e
