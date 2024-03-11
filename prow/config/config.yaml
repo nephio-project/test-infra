@@ -1548,3 +1548,49 @@ periodics:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
+  - name: pre-bake-daily-ubuntu-jammy
+    annotations:
+    labels:
+    cron: "0 15 * * 1-6"
+    skip_report: false
+    decorate: true
+    cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: test-infra
+        base_ref: main
+        path_alias: nephio_repo/test-infra
+    spec:
+      containers:
+        - image: "hashicorp/packer:1.10"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - |
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/packer/gcp"; packer init . && packer build .
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+            - name: ssh-key-vol
+              mountPath: "/etc/ssh-key"
+          resources:
+            requests:
+              cpu: 2
+              memory: 2Gi
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+        - name: ssh-key-vol
+          secret:
+            secretName: ssh-key-e2e
+            defaultMode: 256
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: id_rsa.pub
+                path: id_rsa.pub
