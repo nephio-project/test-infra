@@ -66,8 +66,6 @@ function _define_ip_address_pool {
 declare -A clusters
 clusters=(
     ["core"]="172.18.16.0/20"
-    ["regional"]="172.18.32.0/20"
-    ["edge"]="172.18.48.0/20"
 )
 
 # Define MetalLB IP ranges
