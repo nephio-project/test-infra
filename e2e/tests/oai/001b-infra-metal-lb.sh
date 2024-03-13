@@ -63,14 +63,4 @@ function _define_ip_address_pool {
     kubectl wait --for jsonpath='{.spec.lifecycle}'=Published packagerevisions "$pkg_rev" --timeout="600s"
 }
 
-declare -A clusters
-clusters=(
-    ["core"]="172.18.16.0/20"
-    ["regional"]="172.18.32.0/20"
-    ["edge"]="172.18.48.0/20"
-)
-
-# Define MetalLB IP ranges
-for cluster in "${!clusters[@]}"; do
-    _define_ip_address_pool "$cluster" "${clusters[$cluster]}"
-done
+_define_ip_address_pool "core" "172.18.16.0/20"

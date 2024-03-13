@@ -58,6 +58,11 @@ for cluster in $(kubectl get cl -o jsonpath='{range .items[*]}{.metadata.name}{"
     capi_cluster_ready "$cluster"
 done
 
+# Wait for node readiness as an additional check
+for node in $(kubectl get node -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --kubeconfig="$kubeconfig"); do
+    k8s_wait_ready "node" "$node" "$kubeconfig"
+done
+
 # Inter-connect worker nodes
 "$E2EDIR/provision/hacks/inter-connect_workers.sh"
 
