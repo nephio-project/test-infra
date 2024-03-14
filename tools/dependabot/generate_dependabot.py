@@ -11,6 +11,15 @@ import os
 
 def generate_dependabot_config(root_dir):
     output = """
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2024 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+#
 # This file is generated, do not edit it manually
 version: 2
 updates:
