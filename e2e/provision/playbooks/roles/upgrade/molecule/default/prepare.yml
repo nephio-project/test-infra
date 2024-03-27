@@ -47,7 +47,7 @@
       changed_when: false
     - name: Create k8s cluster
       become: true
-      ansible.builtin.command: kind create cluster --image kindest/node:v1.27.1 --kubeconfig=/tmp/kubeconfig
+      ansible.builtin.command: kind create cluster --image kindest/node:v1.29.2 --kubeconfig=/tmp/kubeconfig
       when: not 'kind' in kind_get_cluster.stdout
       changed_when: false
     - name: Create .kube directory
