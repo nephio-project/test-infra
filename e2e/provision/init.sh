@@ -27,6 +27,11 @@ function get_status {
         printf "Memory free(Kb):"
         awk -v low="$(grep low /proc/zoneinfo | awk '{k+=$2}END{print k}')" '{a[$1]=$2}  END{ print a["MemFree:"]+a["Active(file):"]+a["Inactive(file):"]+a["SReclaimable:"]-(12*low);}' /proc/meminfo
     fi
+    if command -v docker >/dev/null; then
+        echo "Docker statistics:"
+        docker stats --no-stream
+        docker ps --size
+    fi
     if command -v kubectl >/dev/null; then
         echo "Draft Porch Package Revisions"
         kubectl get packagerevision -o jsonpath='{range .items[?(@.spec.lifecycle=="Draft")]}{.metadata.name}{"\n"}{end}' || :
