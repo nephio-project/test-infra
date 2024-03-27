@@ -1,0 +1,44 @@
+- name: install kubelet kubeadm kubectl on {{ ansible_os_family }} system
+  become: true
+  block:
+    - name: install curl and apt-transport-https packages
+      ansible.builtin.package:
+        name:
+          - apt-transport-https
+          - curl
+          - libseccomp2
+        state: present
+
+    - name: obtain apt-key
+      ansible.builtin.apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+
+    - name: Add specified repository into sources list using specified filename
+      ansible.builtin.apt_repository:
+        repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+        state: present
+        filename: kubernetes.list
+
+    - name: install packages kubelet kubeadm and kubectl
+      ansible.builtin.package:
+        name:
+          - kubelet={{k8s_ver}}-00
+          - kubeadm={{k8s_ver}}-00
+          - kubectl={{k8s_ver}}-00
+        state: present
+
+    - name: Hold kubeadm
+      ansible.builtin.dpkg_selections:
+        name: kubeadm
+        selection: hold
+
+    - name: Hold kubelet
+      ansible.builtin.dpkg_selections:
+        name: kubelet
+        selection: hold
+
+    - name: Hold kubectl
+      ansible.builtin.dpkg_selections:
+        name: kubectl
+        selection: hold
