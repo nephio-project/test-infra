@@ -27,6 +27,11 @@ function get_status {
         printf "Memory free(Kb):"
         awk -v low="$(grep low /proc/zoneinfo | awk '{k+=$2}END{print k}')" '{a[$1]=$2}  END{ print a["MemFree:"]+a["Active(file):"]+a["Inactive(file):"]+a["SReclaimable:"]-(12*low);}' /proc/meminfo
     fi
+    if command -v docker >/dev/null; then
+        echo "Docker statistics:"
+        docker stats --no-stream
+        docker ps --size
+    fi
     if command -v kubectl >/dev/null; then
         echo "Draft Porch Package Revisions"
         kubectl get packagerevision -o jsonpath='{range .items[?(@.spec.lifecycle=="Draft")]}{.metadata.name}{"\n"}{end}' || :
@@ -55,7 +60,6 @@ export DEBUG=${NEPHIO_DEBUG:-$(get_metadata nephio-setup-debug "false")}
 
 [[ $DEBUG != "true" ]] || set -o xtrace
 
-DEPLOYMENT_TYPE=${NEPHIO_DEPLOYMENT_TYPE:-$(get_metadata nephio-setup-type "r1")}
 RUN_E2E=${NEPHIO_RUN_E2E:-$(get_metadata nephio-run-e2e "false")}
 REPO=${NEPHIO_REPO:-$(get_metadata nephio-test-infra-repo "https://github.com/nephio-project/test-infra.git")}
 BRANCH=${NEPHIO_BRANCH:-$(get_metadata nephio-test-infra-branch "main")}
@@ -68,7 +72,7 @@ DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME:-""}
 DOCKERHUB_TOKEN=${DOCKERHUB_TOKEN:-""}
 FAIL_FAST=${FAIL_FAST:-$(get_metadata fail_fast "false")}
 
-echo "$DEBUG, $DEPLOYMENT_TYPE, $RUN_E2E, $REPO, $BRANCH, $NEPHIO_USER, $HOME, $REPO_DIR, $DOCKERHUB_USERNAME, $DOCKERHUB_TOKEN"
+echo "$DEBUG, $RUN_E2E, $REPO, $BRANCH, $NEPHIO_USER, $HOME, $REPO_DIR, $DOCKERHUB_USERNAME, $DOCKERHUB_TOKEN"
 trap get_status ERR
 
 # Validate root permissions for current user and NEPHIO_USER
@@ -147,7 +151,7 @@ chown "$NEPHIO_USER:$NEPHIO_USER" "$HOME/.bash_aliases"
 # Sandbox Creation
 int_start=$(date +%s)
 cd "$REPO_DIR/e2e/provision"
-export DEBUG DEPLOYMENT_TYPE DOCKERHUB_USERNAME DOCKERHUB_TOKEN FAIL_FAST
+export DEBUG DOCKERHUB_USERNAME DOCKERHUB_TOKEN FAIL_FAST
 runuser -u "$NEPHIO_USER" ./install_sandbox.sh
 printf "%s secs\n" "$(($(date +%s) - int_start))"
 

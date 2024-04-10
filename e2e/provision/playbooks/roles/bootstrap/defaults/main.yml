@@ -24,7 +24,7 @@ gtp5g_tarball_url: "https://github.com/free5gc/gtp5g/archive/refs/tags/{{ gtp5g_
 
 k8s:
   context: kind-kind
-  version: v1.27.1
+  version: v1.29.2
 
 kind:
   enabled: true
