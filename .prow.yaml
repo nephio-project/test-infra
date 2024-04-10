@@ -249,7 +249,7 @@ presubmits:
   - name: e2e-oai-fedora-34
     annotations:
     labels:
-    run_if_changed: '^e2e/|.prow.yaml'
+    run_if_changed: '^e2e/'
     skip_report: false
     optional: true
     decorate: true
