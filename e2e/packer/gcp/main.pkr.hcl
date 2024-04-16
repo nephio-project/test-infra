@@ -64,7 +64,7 @@ source "googlecompute" "nephio-packer" {
   use_os_login            = "false"
   disk_size               = 50
   image_name              = "nephio-pre-baked-${local.image_version}-${var.source_image_family}-${local.datestamp}"
-  credentials_file        = "/etc/satoken"
+  credentials_file        = "/etc/satoken/satoken"
 }
 
 build {
