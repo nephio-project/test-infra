@@ -1594,3 +1594,50 @@ periodics:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
+  - name: e2e-daily-oai-fedora-34
+    annotations:
+    labels:
+    cron: "0 15 * * 1-6"
+    skip_report: false
+    decorate: true
+    cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: test-infra
+        base_ref: main
+        path_alias: nephio_repo/test-infra
+    spec:
+      containers:
+        - image: "nephio/e2e:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - |
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-34 -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-fedora-34 -var="e2e_type=oai" -auto-approve
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+            - name: ssh-key-vol
+              mountPath: "/etc/ssh-key"
+          resources:
+            requests:
+              cpu: 2
+              memory: 2Gi
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+        - name: ssh-key-vol
+          secret:
+            secretName: ssh-key-e2e
+            defaultMode: 256
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: id_rsa.pub
+                path: id_rsa.pub
