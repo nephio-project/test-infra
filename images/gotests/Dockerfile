@@ -1,4 +1,4 @@
-FROM golang:1.21.3-bullseye as builder
+FROM golang:1.22.2-bullseye as builder
 ARG ctrl_tools_ver=0.12.0
 WORKDIR /go/src/
 ADD https://github.com/kubernetes-sigs/controller-tools/archive/refs/tags/v$ctrl_tools_ver.tar.gz ./
@@ -11,7 +11,7 @@ RUN git clone https://github.com/kubernetes/test-infra.git
 WORKDIR /go/src/test-infra/robots/coverage
 RUN go build -o /tmp/ ./...
 
-FROM golang:1.21.3-bullseye
+FROM golang:1.22.2-bullseye
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN apt-get update && \
   apt-get install -y --no-install-recommends \
