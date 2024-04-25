@@ -1,5 +1,5 @@
 FROM golang:1.22.2-bullseye as builder
-ARG ctrl_tools_ver=0.12.0
+ARG ctrl_tools_ver=0.15.0
 WORKDIR /go/src/
 ADD https://github.com/kubernetes-sigs/controller-tools/archive/refs/tags/v$ctrl_tools_ver.tar.gz ./
 RUN tar -xzf v$ctrl_tools_ver.tar.gz
@@ -17,8 +17,8 @@ RUN apt-get update && \
   apt-get install -y --no-install-recommends \
   make=4.3-4.1 && \
   rm -rf /var/lib/apt/lists/* && \
-  wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.53.3 && \
-  wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s v2.16.0 && \
+  wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.57.2 && \
+  wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s v2.19.0 && \
   go install github.com/google/addlicense@v1.1.1 && \
   go install github.com/uw-labs/lichen@v0.1.7 && \
   go install github.com/matm/gocov-html/cmd/gocov-html@v1.4.0 && \
