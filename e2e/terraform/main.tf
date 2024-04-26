@@ -19,6 +19,14 @@ module "gcp-fedora-34" {
   nephio_e2e_fail_fast = var.fail_fast
 }
 
+module "gcp-fedora-38" {
+  source               = ".//modules/gcp"
+  vmimage              = "fedora-cloud/fedora-cloud-38"
+  ansible_user         = "fedora"
+  nephio_e2e_type      = var.e2e_type
+  nephio_e2e_fail_fast = var.fail_fast
+}
+
 variable "e2e_type" {
   description = "The End-to-End testing type"
   default     = "free5gc"
