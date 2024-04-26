@@ -19,7 +19,7 @@ host_reqs:
 container_engine: docker
 
 gtp5g_dest: /opt/gtp5g
-gtp5g_version: v0.8.3
+gtp5g_version: v0.8.8
 gtp5g_tarball_url: "https://github.com/free5gc/gtp5g/archive/refs/tags/{{ gtp5g_version }}.tar.gz"
 
 k8s:
