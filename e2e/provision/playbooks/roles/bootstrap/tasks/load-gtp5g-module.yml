@@ -17,6 +17,11 @@
         - "{{ ansible_os_family | lower }}.yml"
       skip: true
 
+- name: Ensure gtp5g kernel constraints
+  ansible.builtin.assert:
+    that: 'ansible_facts.kernel == "5.0.0-23-generic" or {{ ansible_facts.kernel | replace("-generic", "") is version("5.4", ">=") }}'
+    fail_msg: "{{ ansible_facts.kernel }} version not supported by gtp5g module"
+
 - name: Install compilation packages and kernel development tools on {{ ansible_os_family }}
   become: true
   ansible.builtin.package:

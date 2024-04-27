@@ -32,6 +32,11 @@ function get_status {
         docker stats --no-stream
         docker ps --size
     fi
+    if [ -f /tmp/e2e_dmesg_base.log ]; then
+        echo "Kernel diagnostic messages:"
+        sudo dmesg >/tmp/e2e_dmesg_current.log
+        diff /tmp/e2e_dmesg_base.log /tmp/e2e_dmesg_current.log
+    fi
     if command -v kubectl >/dev/null; then
         echo "Draft Porch Package Revisions"
         kubectl get packagerevision -o jsonpath='{range .items[?(@.spec.lifecycle=="Draft")]}{.metadata.name}{"\n"}{end}' || :

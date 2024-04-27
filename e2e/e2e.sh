@@ -23,11 +23,13 @@ source "$LIBDIR/testing.sh"
 
 failed=$((0))
 test_summary=""
+sudo dmesg >/tmp/e2e_dmesg_base.log
 for t in $TESTDIR/*.sh; do
     if ! run_test "$t"; then
         failed=$((failed + 1))
         [[ ${FAIL_FAST:-false} != "true" ]] || break
     fi
+    sudo dmesg >/tmp/e2e_dmesg_base.log
 done
 echo "TEST SUMMARY"
 echo "------------"
