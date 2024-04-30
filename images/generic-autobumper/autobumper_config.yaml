@@ -1,0 +1,14 @@
+gitHubToken: "/etc/github/token"
+skipPullRequest: false
+gitHubOrg: "nephio-project"
+gitHubRepo: "test-infra"
+remoteName: "test-infra"
+includedConfigPaths:
+  - "prow/config"
+  - "prow/cluster"
+targetVersion: "latest"
+prefixes:
+- name: "k8s-prow images"
+  prefix: "gcr.io/k8s-prow/"
+  repo: "https://github.com/nephio-project/test-infra"
+  summarise: false
