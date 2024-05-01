@@ -1,11 +1,18 @@
 terraform {
   required_providers {
     random = "~> 3.5"
-    google = "~> 4.80"
+    google = "~> 5.27"
   }
 }
 
 provider "google" {
+  credentials = file(var.credentials)
+  project     = var.project
+  region      = var.region
+  zone        = var.zone
+}
+
+provider "google-beta" {
   credentials = file(var.credentials)
   project     = var.project
   region      = var.region
@@ -21,7 +28,7 @@ resource "random_string" "vm-name" {
 }
 
 locals {
-  vm-name    = "e2e-vm-${random_string.vm-name.result}"
+  vm-name = "e2e-vm-${random_string.vm-name.result}"
 }
 
 resource "google_compute_instance" "lab_instances" {
@@ -48,6 +55,7 @@ resource "google_compute_instance" "lab_instances" {
 }
 
 resource "google_compute_instance" "e2e_instances" {
+  provider                  = google-beta
   count                     = var.nephio_e2e_nodes
   name                      = local.vm-name
   machine_type              = var.instance
@@ -102,5 +110,15 @@ resource "google_compute_instance" "e2e_instances" {
       "chmod +x init.sh",
       "sudo -E FAIL_FAST=${var.nephio_e2e_fail_fast} E2ETYPE=${var.nephio_e2e_type} NEPHIO_REPO_DIR=/home/${var.ansible_user}/test-infra NEPHIO_DEBUG=true NEPHIO_RUN_E2E=true NEPHIO_USER=${var.ansible_user} ./init.sh"
     ]
+  }
+  scheduling {
+    max_run_duration {
+      seconds = 2 * 60 * 60
+    }
+    instance_termination_action = "DELETE"
+    on_host_maintenance         = "TERMINATE"
+    preemptible                 = true
+    automatic_restart           = false
+    provisioning_model          = "SPOT"
   }
 }
