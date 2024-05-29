@@ -118,6 +118,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/free5gc-operator:${PULL_BASE_REF}
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -155,6 +177,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/free5gc-operator:latest
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -193,6 +237,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/kpt-backstage-plugins:${PULL_BASE_REF}
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -230,6 +296,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/kpt-backstage-plugins:latest
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -267,6 +355,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/ueransim-deploy-fn:${PULL_BASE_REF}
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -303,6 +413,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/ueransim-deploy-fn:latest
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -339,6 +471,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/configinject-fn:${PULL_BASE_REF}
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -375,6 +529,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/configinject-fn:latest
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -411,6 +587,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/dnn-fn:${PULL_BASE_REF}
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -447,6 +645,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/dnn-fn:latest
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -483,6 +703,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/gen-configmap-fn:${PULL_BASE_REF}
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -519,6 +761,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/gen-configmap-fn:latest
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -555,6 +819,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/interface-fn:${PULL_BASE_REF}
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -591,6 +877,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/interface-fn:latest
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -628,6 +936,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/ipam-fn:${PULL_BASE_REF}
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -664,6 +994,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/ipam-fn:latest
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -701,6 +1053,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/nad-fn:${PULL_BASE_REF}
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -737,6 +1111,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/nad-fn:latest
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -774,6 +1170,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/nfdeploy-fn:${PULL_BASE_REF}
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -810,6 +1228,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/nfdeploy-fn:latest
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -847,6 +1287,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/vlan-fn:${PULL_BASE_REF}
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -883,6 +1345,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/vlan-fn:latest
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -919,6 +1403,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/nephio-operator:${PULL_BASE_REF}
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -955,6 +1461,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/nephio-operator:latest
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -992,6 +1520,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/oai-ran-controller:${PULL_BASE_REF}
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -1028,6 +1578,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/oai-ran-controller:latest
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -1069,6 +1641,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/porch-server:${PULL_BASE_REF}
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -1110,6 +1704,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/porch-controllers:${PULL_BASE_REF}
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -1151,6 +1767,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/porch-function-runner:${PULL_BASE_REF}
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -1192,6 +1830,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/porch-wrapper-server:${PULL_BASE_REF}
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -1199,8 +1859,6 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
-
-
 
 presubmits:
   nephio-project/nephio-test-prow-project:

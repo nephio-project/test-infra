@@ -290,6 +290,64 @@ presubmits:
               - key: id_rsa.pub
                 path: id_rsa.pub
 postsubmits:
+  - name: build-push-image-releaser
+    cluster: default
+    run_if_changed: 'images/releaser/.*'
+    branches:
+      - "main"
+    annotations:
+      description: Build and Push Image to DockerHub every commit
+    decorate: true
+    decoration_config:
+      censor_secrets: true
+    max_concurrency: 0
+    spec:
+      containers:
+        - name: kaniko
+          image: gcr.io/kaniko-project/executor:debug
+          command:
+            - "/bin/sh"
+            - "-c"
+            - |
+              executor --context=${PWD}/images/releaser \
+                --dockerfile=Dockerfile --destination=nephio/releaser:${PULL_BASE_REF} \
+          volumeMounts:
+            - name: kaniko-secret
+              mountPath: /kaniko/.docker/
+          resources:
+            requests:
+              cpu: 2
+              memory: 1Gi
+        - name: nephio-image-signer
+          image: nephio/releaser:latest
+          args:
+            - nephio/releaser:latest
+          resources:
+            requests:
+              cpu: 1
+              memory: 64Mi
+            limits:
+              cpu: 1
+              memory: 128Mi
+          env:
+            - name: COSIGN_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cosign-private-key
+                  key: COSIGN_PRIVATE_KEY
+            - name: COSIGN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cosign-private-key-passwd
+                  key: COSIGN_PASSWORD
+      volumes:
+        - name: kaniko-secret
+          secret:
+            secretName: regcred
+            items:
+              - key: .dockerconfigjson
+                path: config.json
+
   - name: build-push-image-gotests
     cluster: default
     run_if_changed: 'images/gotests/.*'
@@ -319,6 +377,28 @@ postsubmits:
           requests:
             cpu: 2
             memory: 2Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/gotests:latest
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -355,6 +435,28 @@ postsubmits:
           requests:
             cpu: 2
             memory: 2Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/e2e:latest
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -391,6 +493,28 @@ postsubmits:
           requests:
             cpu: 2
             memory: 2Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/label_sync:latest
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -427,42 +551,28 @@ postsubmits:
           requests:
             cpu: 2
             memory: 1Gi
-      volumes:
-        - name: kaniko-secret
-          secret:
-            secretName: regcred
-            items:
-              - key: .dockerconfigjson
-                path: config.json
-  - name: build-push-image-releaser
-    cluster: default
-    run_if_changed: 'images/releaser/.*'
-    branches:
-    - "main"
-    annotations:
-      description: Build and Push Image to DockerHub every commit
-    decorate: true
-    decoration_config:
-      censor_secrets: true
-    max_concurrency: 0
-    spec:
-      containers:
-      - name: kaniko
-        image: gcr.io/kaniko-project/executor:debug
-        command:
-        - "/bin/sh"
-        - "-c"
-        - |
-          executor --context=${PWD}/images/releaser \
-            --dockerfile=Dockerfile --destination=nephio/releaser:${BUILD_ID} \
-            --destination=nephio/releaser:latest
-        volumeMounts:
-          - name: kaniko-secret
-            mountPath: /kaniko/.docker/
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/generic-autobumper:latest
         resources:
           requests:
-            cpu: 2
-            memory: 1Gi
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -500,6 +610,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/linter:latest
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -536,6 +668,28 @@ postsubmits:
           requests:
             cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:latest
+        args:
+          - nephio/molecule:latest
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
