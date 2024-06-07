@@ -59,8 +59,11 @@ function _define_ip_address_pool {
     assert_commit_msg_in_branch "Intermediate commit" "proposed/$cluster-metallb-sandbox-config/v1" "nephio/mgmt-staging"
 
     # Approval
+    info "approving package $pkg_rev update"
     porchctl rpkg approve -n default "$pkg_rev"
+    info "approved package $pkg_rev update"
     kubectl wait --for jsonpath='{.spec.lifecycle}'=Published packagerevisions "$pkg_rev" --timeout="600s"
+    info "published package $pkg_rev update"
 }
 
 _define_ip_address_pool "core" "172.18.16.0/20"

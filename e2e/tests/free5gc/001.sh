@@ -70,8 +70,12 @@ assert_commit_msg_in_branch "Intermediate commit" "proposed/regional/v1"
 assert_workload_resource_contains "proposed/regional/v1" "nephio.org/site-type: regional" "Workload cluster has not been transformed properly to proposed"
 
 # Approval
+info "approving package $regional_pkg_rev"
 porchctl rpkg approve -n default "$regional_pkg_rev"
+info "approved package $regional_pkg_rev"
 kubectl wait --for jsonpath='{.spec.lifecycle}'=Published packagerevisions "$regional_pkg_rev" --timeout="600s"
+info "published package $regional_pkg_rev"
+
 assert_workload_resource_contains "main" "nephio.org/site-type: regional" "Workload cluster has not been successfully merged into main branch"
 
 k8s_wait_exists "workloadcluster" "regional"

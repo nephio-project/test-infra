@@ -72,8 +72,11 @@ info "Proposing $upf_pkg_rev update"
 porchctl rpkg propose -n default "$upf_pkg_rev"
 k8s_wait_exists "packagerev" "$upf_pkg_rev"
 
-info "Approving $upf_pkg_rev update"
+info "approving package $upf_pkg_rev update"
 porchctl rpkg approve -n default "$upf_pkg_rev"
+info "approved package $upf_pkg_rev update"
+kubectl wait --for jsonpath='{.spec.lifecycle}'=Published packagerevisions "$upf_pkg_rev" --timeout="600s"
+info "published package $upf_pkg_rev update"
 
 # Get current UPF pod state after scaling
 k8s_wait_ready_replicas "deployment" "upf-edge01" "$cluster_kubeconfig" "free5gc-upf"
