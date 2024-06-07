@@ -32,6 +32,7 @@ function _wait_for_user_repo {
     while [[ $lapse -gt 0 ]]; do
         found=$(curl_gitea_api "repos/$user/$repo" 'import json; import sys; print("full_name" in json.loads(sys.stdin.read()))')
         if [[ $found == "True" ]]; then
+            info "found $repo repository of $user user"
             [ $((timeout * 2 / 3)) -lt $lapse ] || warn "$user user took $lapse seconds to exist in $repo repository"
             return
         fi
@@ -57,6 +58,7 @@ function kpt_wait_pkg {
     while [[ $lapse -gt 0 ]]; do
         found=$(curl_gitea_api "repos/$user/$repo/contents" "import json; import sys; print('$pkg' in [dir['path'] for dir in json.loads(sys.stdin.read()) if dir['type'] == 'dir' ])")
         if [[ $found == "True" ]]; then
+            info "found $pkg kpt package on $user/$repo repository"
             [ $((timeout * 2 / 3)) -lt $lapse ] || warn "$pkg kpt package took $lapse seconds to exist"
             return
         fi

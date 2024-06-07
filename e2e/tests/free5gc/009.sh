@@ -100,8 +100,12 @@ while [[ $retries -gt 0 ]]; do
     fi
 
     if [[ $modified == false ]]; then
-        info "Approving update"
+        info "approving package $smf_pkg_rev update"
         output=$(porchctl rpkg approve -n default "$smf_pkg_rev" 2>&1)
+        info "approved package $smf_pkg_rev update"
+        kubectl wait --for jsonpath='{.spec.lifecycle}'=Published packagerevisions "$smf_pkg_rev" --timeout="600s"
+        info "published package $smf_pkg_rev update"
+
         if [[ $output =~ "modified" ]]; then
             modified=true
         fi

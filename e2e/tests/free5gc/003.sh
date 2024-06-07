@@ -45,8 +45,11 @@ kubectl wait --for jsonpath='{.spec.lifecycle}'=Proposed packagerevisions "$pkg_
 assert_branch_exists "proposed/free5gc-cp/v1" "nephio/regional"
 assert_commit_msg_in_branch "Intermediate commit" "proposed/free5gc-cp/v1" "nephio/regional"
 
+info "approving package $pkg_rev"
 porchctl rpkg approve -n default "$pkg_rev"
+info "approved package $pkg_rev"
 kubectl wait --for jsonpath='{.spec.lifecycle}'=Published packagerevisions "$pkg_rev" --timeout="600s"
+info "published package $pkg_rev"
 
 kpt_wait_pkg "regional" "free5gc-cp"
 k8s_wait_ready_replicas "statefulset" "mongodb" "$(k8s_get_capi_kubeconfig "regional")" "free5gc-cp"
