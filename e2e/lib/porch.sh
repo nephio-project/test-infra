@@ -29,6 +29,7 @@ function porch_wait_published_packagerev {
             fi
         done
         if [[ $found ]]; then
+            info "found package published revision on $pkg_name"
             [ $((timeout * 2 / 3)) -lt $lapse ] || warn "$pkg_name package took $lapse seconds to be published"
             break
         fi

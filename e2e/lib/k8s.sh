@@ -40,6 +40,7 @@ function k8s_wait_exists {
     while [[ $lapse -gt 0 ]]; do
         found=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath='{.metadata.name}' --ignore-not-found)
         if [[ $found ]]; then
+            info "found $resource_type $resource_namespace/$resource_name using $kubeconfig"
             [ $((timeout * 2 / 3)) -lt $lapse ] || warn "$resource_namespace/$resource_name $resource_type took $lapse seconds to exist"
             return
         fi
@@ -70,6 +71,7 @@ function k8s_wait_ready {
     while [[ $lapse -gt 0 ]]; do
         ready=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' || echo)
         if [[ $ready == "True" ]]; then
+            info "status ready on $resource_type $resource_namespace/$resource_name using $kubeconfig"
             [ $((timeout * 2 / 3)) -lt $lapse ] || warn "$resource_namespace/$resource_name $resource_type took $lapse seconds to be ready"
             return
         fi
@@ -104,6 +106,7 @@ function k8s_wait_ready_replicas {
     while [[ $lapse -gt 0 ]]; do
         ready=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath="{.status.$status_field}" || echo)
         if [[ $ready -ge $min_ready ]]; then
+            info "status ready on $resource_type $resource_namespace/$resource_name using $kubeconfig"
             [ $((timeout * 2 / 3)) -lt $lapse ] || warn "$resource_namespace/$resource_name $resource_type took $lapse seconds to have minimum number of replicas"
             return
         fi
@@ -136,7 +139,10 @@ function k8s_exec {
 
     info "executing command $command on $resource_name in namespace $resource_namespace using $kubeconfig"
     kubectl --kubeconfig $kubeconfig -n $resource_namespace exec $resource_name -- /bin/bash -c "$command"
-    return $?
+    result=$?
+    info "executed command $command on $resource_name in namespace $resource_namespace using $kubeconfig"
+
+    return $result
 }
 
 function _k8s_absolute_unit {
