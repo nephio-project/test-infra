@@ -26,9 +26,17 @@
   when: kind.enabled
 
 - name: Apply kpt packages
-  ansible.builtin.include_tasks: apply-pkgs.yml
+  ansible.builtin.include_tasks:
+    file: apply-pkgs.yml
+    apply:
+      tags:
+        - nonkind_k8s
+  tags:
+    - always
 
 - name: Create docker hub secret
+  tags:
+    - nonkind_k8s
   when:
     - lookup('ansible.builtin.env', 'DOCKERHUB_USERNAME') | length > 0
     - lookup('ansible.builtin.env', 'DOCKERHUB_TOKEN') | length > 0

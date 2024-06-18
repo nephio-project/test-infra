@@ -72,14 +72,22 @@ REPO=${NEPHIO_REPO:-$(get_metadata nephio-test-infra-repo "https://github.com/ne
 BRANCH=${NEPHIO_BRANCH:-$(get_metadata nephio-test-infra-branch "main")}
 NEPHIO_USER=${NEPHIO_USER:-$(get_metadata nephio-user "${USER:-ubuntu}")}
 NEPHIO_CATALOG_REPO_URI=${NEPHIO_CATALOG_REPO_URI:-$(get_metadata nephio-catalog-repo-uri "https://github.com/nephio-project/catalog.git")}
-export ANSIBLE_CMD_EXTRA_VAR_LIST="nephio_catalog_repo_uri='$NEPHIO_CATALOG_REPO_URI'"
+K8S_CONTEXT=${K8S_CONTEXT:-"kind-kind"}
+K8S_VERSION=${K8S_VERSION:-"v1.29.2"}
+export ANSIBLE_CMD_EXTRA_VAR_LIST='{ "nephio_catalog_repo_uri": "'${NEPHIO_CATALOG_REPO_URI}'", "k8s": { "context" : "'${K8S_CONTEXT}'", "version" : "'$K8S_VERSION'" } }'
 HOME=${NEPHIO_HOME:-/home/$NEPHIO_USER}
 REPO_DIR=${NEPHIO_REPO_DIR:-$HOME/test-infra}
 DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME:-""}
 DOCKERHUB_TOKEN=${DOCKERHUB_TOKEN:-""}
 FAIL_FAST=${FAIL_FAST:-$(get_metadata fail_fast "false")}
 
-echo "$DEBUG, $RUN_E2E, $REPO, $BRANCH, $NEPHIO_USER, $HOME, $REPO_DIR, $DOCKERHUB_USERNAME, $DOCKERHUB_TOKEN"
+if [ ${K8S_CONTEXT} == "kind-kind" ]; then
+    export ANSIBLE_TAG=all
+else
+    export ANSIBLE_TAG=nonkind_k8s
+fi
+
+echo "$DEBUG, $RUN_E2E, $REPO, $BRANCH, $NEPHIO_USER, $HOME, $REPO_DIR, $DOCKERHUB_USERNAME, $DOCKERHUB_TOKEN, $ANSIBLE_TAG, $ANSIBLE_CMD_EXTRA_VAR_LIST"
 trap get_status ERR
 
 # Validate root permissions for current user and NEPHIO_USER
