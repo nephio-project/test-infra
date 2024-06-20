@@ -30,7 +30,7 @@ kind:
   enabled: true
 
 nephio_catalog_repo_uri: https://github.com/nephio-project/catalog.git
-nephio_catalog_revision: v2.0.0
+nephio_catalog_revision: main
 
 gitea:
   enabled: true
