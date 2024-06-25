@@ -14,20 +14,20 @@ roles:
   - name: andrewrothstein.podman
     version: v2.1.1
   - name: andrewrothstein.kind
-    version: v1.2.10
+    version: v1.2.11
   - name: andrewrothstein.kubectl
-    version: v1.3.4
+    version: v1.3.7
   - name: andrewrothstein.kpt
     version: 0.0.3
   - name: darkwizard242.cni
-    version: 2.4.0
+    version: 2.5.0
 
 collections:
   - name: community.general
-    version: 8.5.0
+    version: 9.1.0
   - name: kubernetes.core
-    version: 3.0.1
+    version: 5.0.0
   - name: community.docker
-    version: 3.8.1
+    version: 3.10.4
   - name: ansible.posix
     version: 1.5.4
