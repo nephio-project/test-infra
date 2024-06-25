@@ -130,7 +130,7 @@
       become_user: root
       ansible.builtin.unarchive:
         remote_src: true
-        src: https://github.com/nephio-project/porch/releases/download/v2.0.0/porchctl_2.0.0_linux_amd64.tar.gz
+        src: https://github.com/nephio-project/porch/releases/download/main/porchctl.tgz
         dest: /usr/local/bin/
         creates: /usr/local/bin/porchctl
   roles:
