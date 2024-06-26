@@ -41,6 +41,8 @@
       become: true
       ansible.builtin.pip:
         name: kubernetes==26.1.0
+      tags:
+        - nonkind_k8s
     - name: Install Docker Engine
       become: true
       when: (container_engine is not defined) or (container_engine == "docker")
@@ -89,6 +91,11 @@
     - name: Install kpt command-line
       ansible.builtin.include_role:
         name: andrewrothstein.kpt
+        apply:
+          tags:
+            - nonkind_k8s
+      tags:
+        - always
       vars:
         kpt_ver: '1.0.0-beta.49'
         kpt_checksums:
@@ -135,11 +142,18 @@
         creates: /usr/local/bin/porchctl
   roles:
     - bootstrap
-    - install
+    - role: install
+      tags:
+        - always
   tasks:
     - name: Deploy repositories
       ansible.builtin.include_role:
         name: kpt
+        apply:
+          tags:
+            - nonkind_k8s
+      tags:
+        - always
       loop:
         - {pkg: distros/sandbox/repository, dest: /tmp/repository/mgmt}
         - {pkg: nephio/optional/rootsync, dest: /tmp/rootsync/mgmt}
@@ -162,6 +176,8 @@
       until: job_result.finished
       retries: 90
       delay: 10
+      tags:
+        - nonkind_k8s
     - name: Wait for repositories
       kubernetes.core.k8s:
         context: "{{ k8s.context }}"
@@ -178,3 +194,5 @@
       loop:
         - mgmt
         - mgmt-staging
+      tags:
+        - nonkind_k8s
