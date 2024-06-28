@@ -311,6 +311,7 @@ postsubmits:
             - |
               executor --context=${PWD}/images/releaser \
                 --dockerfile=Dockerfile --destination=nephio/releaser:${PULL_BASE_REF} \
+                --destination=nephio/releaser:latest
           volumeMounts:
             - name: kaniko-secret
               mountPath: /kaniko/.docker/
