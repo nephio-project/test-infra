@@ -1,0 +1,9 @@
+containerd_ver: 1.6.19
+runc_ver: 1.1.1
+cni_plugins_ver: 1.1.1
+pod_network_cidr: 10.244.0.0/16
+# comment out multus_ver if clusters (e.g; management clusters) do not need multus installed
+multus_ver: 3.9.2
+k8s_ver: 1.25
+ctrlplane_ep_ip_filter: 10.128
+network_plugin_url: https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
