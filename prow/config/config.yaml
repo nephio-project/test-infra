@@ -1642,7 +1642,7 @@ postsubmits:
             cpu: 1
             memory: 1Gi
       - name: nephio-image-signer
-        image: nephio/releaser:
+        image: nephio/releaser:latest
         command:
           - "/usr/local/bin/release"
         args:
