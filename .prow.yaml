@@ -321,6 +321,8 @@ postsubmits:
               memory: 1Gi
         - name: nephio-image-signer
           image: nephio/releaser:latest
+          command:
+            - "/usr/local/bin/release"
           args:
             - nephio/releaser:latest
           resources:
