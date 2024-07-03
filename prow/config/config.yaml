@@ -1624,7 +1624,7 @@ postsubmits:
     - org: nephio-project
       repo: porch
       base_ref: main
-      path_alias: "porch_build/porch"
+      path_alias: "porch_build"
     spec:
       containers:
       - name: kaniko
@@ -1633,7 +1633,7 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=/home/prow/go/src/porch_build/ --dockerfile=porch/build/Dockerfile --destination=nephio/porch-server:${PULL_BASE_REF}
+          executor --context=/home/prow/go/src/porch_build/ --dockerfile=build/Dockerfile --destination=nephio/porch-server:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -1642,7 +1642,9 @@ postsubmits:
             cpu: 1
             memory: 1Gi
       - name: nephio-image-signer
-        image: nephio/releaser:latest
+        image: nephio/releaser:
+        command:
+          - "/usr/local/bin/release"
         args:
           - nephio/porch-server:${PULL_BASE_REF}
         resources:
@@ -1687,7 +1689,7 @@ postsubmits:
     - org: nephio-project
       repo: porch
       base_ref: main
-      path_alias: "porch_build/porch"
+      path_alias: "porch_build"
     spec:
       containers:
       - name: kaniko
@@ -1696,7 +1698,7 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=/home/prow/go/src/porch_build/ --dockerfile=porch/controllers/Dockerfile --destination=nephio/porch-controllers:${PULL_BASE_REF}
+          executor --context=/home/prow/go/src/porch_build/ --dockerfile=controllers/Dockerfile --destination=nephio/porch-controllers:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -1706,6 +1708,8 @@ postsubmits:
             memory: 1Gi
       - name: nephio-image-signer
         image: nephio/releaser:latest
+        command:
+          - "/usr/local/bin/release"
         args:
           - nephio/porch-controllers:${PULL_BASE_REF}
         resources:
@@ -1750,7 +1754,7 @@ postsubmits:
     - org: nephio-project
       repo: porch
       base_ref: main
-      path_alias: "porch_build/porch"
+      path_alias: "porch_build"
     spec:
       containers:
       - name: kaniko
@@ -1759,7 +1763,7 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=/home/prow/go/src/porch_build/ --dockerfile=porch/func/Dockerfile --destination=nephio/porch-function-runner:${PULL_BASE_REF}
+          executor --context=/home/prow/go/src/porch_build/ --dockerfile=func/Dockerfile --destination=nephio/porch-function-runner:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -1769,6 +1773,8 @@ postsubmits:
             memory: 1Gi
       - name: nephio-image-signer
         image: nephio/releaser:latest
+        command:
+          - "/usr/local/bin/release"
         args:
           - nephio/porch-function-runner:${PULL_BASE_REF}
         resources:
@@ -1813,7 +1819,7 @@ postsubmits:
     - org: nephio-project
       repo: porch
       base_ref: main
-      path_alias: "porch_build/porch"
+      path_alias: "porch_build"
     spec:
       containers:
       - name: kaniko
@@ -1822,7 +1828,7 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=/home/prow/go/src/porch_build/ --dockerfile=porch/func/Dockerfile-wrapperserver --destination=nephio/porch-wrapper-server:${PULL_BASE_REF}
+          executor --context=/home/prow/go/src/porch_build/ --dockerfile=func/Dockerfile-wrapperserver --destination=nephio/porch-wrapper-server:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -1832,6 +1838,8 @@ postsubmits:
             memory: 1Gi
       - name: nephio-image-signer
         image: nephio/releaser:latest
+        command:
+          - "/usr/local/bin/release"
         args:
           - nephio/porch-wrapper-server:${PULL_BASE_REF}
         resources:
