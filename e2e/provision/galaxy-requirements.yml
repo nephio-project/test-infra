@@ -24,7 +24,7 @@ roles:
 
 collections:
   - name: community.general
-    version: 9.1.0
+    version: 8.6.2
   - name: kubernetes.core
     version: 5.0.0
   - name: community.docker
