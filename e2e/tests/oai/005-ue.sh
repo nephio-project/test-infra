@@ -37,7 +37,7 @@ function _wait_for_ue {
     temp_file=$(mktemp)
     kubectl logs -l app.kubernetes.io/name=oai-nr-ue --tail -1 -n oai-ue -c nr-ue --kubeconfig "$kubeconfig" >temp_file
     while
-        grep -q "$log_msg" temp_file
+        grep "$log_msg" temp_file
         status=$?
         [ $status != 0 ]
     do

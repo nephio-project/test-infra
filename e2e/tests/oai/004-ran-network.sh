@@ -38,7 +38,7 @@ function _wait_for_ran {
     temp_file=$(mktemp)
     kubectl logs -l app.kubernetes.io/name=oai-gnb-cu-cp --tail -1 -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" >temp_file
     while
-        grep -q "$wait_msg" temp_file
+        grep "$wait_msg" temp_file
         status=$?
         [[ $status != 0 ]]
     do
@@ -78,6 +78,6 @@ k8s_wait_ready_replicas "deployment" "oai-gnb-du" "$_edge_kubeconfig" "oai-ran-d
 # Check if the NGAPSetup Request Response is okay between AMF and CU-CP
 _wait_for_ran "$_regional_kubeconfig" "Received NGAP_REGISTER_GNB_CNF: associated AMF" "N2"
 # Check if the E1Setup Request Response is okay between CU-CP and CU-UP
-_wait_for_ran "$_regional_kubeconfig" "e1ap_send_SETUP_RESPONSE" "E1"
+_wait_for_ran "$_regional_kubeconfig" "Accepting new CU-UP ID" "E1"
 # Check if the F1Setup Request Response is okay between DU and CU-CP
-_wait_for_ran "$_regional_kubeconfig" "Cell Configuration ok" "F1"
+_wait_for_ran "$_regional_kubeconfig" "DU uses RRC version" "F1"
