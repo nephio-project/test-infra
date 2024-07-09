@@ -17,7 +17,7 @@ gitea:
     password: secret
 
 nephio_catalog_repo_uri: https://github.com/nephio-project/catalog.git
-nephio_catalog_branch: main
+nephio_catalog_branch: v3.0.0
 
 nephio_stock_repos:
   - name: catalog-distros-sandbox
