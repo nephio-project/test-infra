@@ -66,22 +66,22 @@ nephio:
     packages:
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: nephio/core/porch
-        version: main
+        version: v3.0.0
         async: 480
         poll: 5
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: nephio/core/nephio-operator
-        version: main
+        version: v3.0.0
         async: 480
         poll: 5
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: nephio/core/configsync
-        version: main
+        version: v3.0.0
         async: 240
         poll: 5
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: nephio/optional/network-config
-        version: main
+        version: v3.0.0
         async: 480
         poll: 0
 
@@ -92,4 +92,4 @@ nephio_webui:
     package:
       repo_uri: "{{ nephio_catalog_repo_uri }}"
       pkg: nephio/optional/webui
-      version: main
+      version: v3.0.0
