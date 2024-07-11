@@ -74,7 +74,7 @@ curl -s -X GET -H 'Token: admin' "http://${ip}:${port}/api/subscriber"
 # Deploy UERANSIM to edge01
 k8s_apply "$TESTDIR/007-edge01-ueransim.yaml"
 k8s_wait_ready "packagevariant" "edge01-ueransim"
-porch_wait_published_packagerev "ueransim" "edge01"
+porch_wait_published_packagerev "ueransim" "edge01" "$PACKAGE_REVISION"
 edge01_kubeconfig=$(k8s_get_capi_kubeconfig "edge01")
 k8s_wait_ready_replicas "deployment" "ueransimgnb-edge01" "$edge01_kubeconfig" "ueransim"
 k8s_wait_ready_replicas "deployment" "ueransimue-edge01" "$edge01_kubeconfig" "ueransim"
