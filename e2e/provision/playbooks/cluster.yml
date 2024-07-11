@@ -85,6 +85,7 @@
             fs.inotify.max_user_instances: 512
             kernel.keys.maxkeys: 500000
             kernel.keys.maxbytes: 1000000
+            vm.mmap_rnd_bits: 28
     - name: Install kubectl command-line
       ansible.builtin.include_role:
         name: andrewrothstein.kubectl
