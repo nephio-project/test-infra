@@ -75,7 +75,7 @@ fact_caching_connection = /tmp
 EOT
 
 # Management cluster creation
-ansible_cmd="$(command -v ansible-playbook) -i 127.0.0.1, playbooks/cluster.yml --tags ${ANSIBLE_TAG} "
+ansible_cmd="$(command -v ansible-playbook) -i 127.0.0.1, playbooks/cluster.yml --tags ${ANSIBLE_TAG:-all} "
 [[ ${DEBUG:-false} != "true" ]] || ansible_cmd+="-vvv "
 if [ -n "${ANSIBLE_CMD_EXTRA_VAR_LIST:-}" ]; then
     ansible_cmd+=" --extra-vars=\"${ANSIBLE_CMD_EXTRA_VAR_LIST}\""
