@@ -63,7 +63,7 @@ for nf in du cuup cucp; do
     k8s_wait_ready "packagevariant" "oai-$nf"
 done
 
-kpt_wait_pkg "regional" "oai-ran-cucp" "nephio" "1800"
+kpt_wait_pkg "regional" "oai-ran-cucp" "nephio" "3600"
 k8s_wait_exists "nfdeployment" "cucp-regional" "$_regional_kubeconfig" "oai-ran-cucp"
 k8s_wait_ready_replicas "deployment" "oai-gnb-cu-cp" "$_regional_kubeconfig" "oai-ran-cucp"
 
