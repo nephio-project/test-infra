@@ -63,15 +63,15 @@ for nf in du cuup cucp; do
     k8s_wait_ready "packagevariant" "oai-$nf"
 done
 
-kpt_wait_pkg "regional" "oai-ran-cucp" "nephio" "3600"
+kpt_wait_pkg "regional" "oai-ran-cucp" "nephio" "1800"
 k8s_wait_exists "nfdeployment" "cucp-regional" "$_regional_kubeconfig" "oai-ran-cucp"
 k8s_wait_ready_replicas "deployment" "oai-gnb-cu-cp" "$_regional_kubeconfig" "oai-ran-cucp"
 
-kpt_wait_pkg "edge" "oai-ran-cuup"
+kpt_wait_pkg "edge" "oai-ran-cuup" "nephio" "1800"
 k8s_wait_exists "nfdeployment" "cuup-edge" "$_edge_kubeconfig" "oai-ran-cuup"
 k8s_wait_ready_replicas "deployment" "oai-gnb-cu-up" "$_edge_kubeconfig" "oai-ran-cuup"
 
-kpt_wait_pkg "edge" "oai-ran-du"
+kpt_wait_pkg "edge" "oai-ran-du" "nephio" "1800"
 k8s_wait_exists "nfdeployment" "du-edge" "$_edge_kubeconfig" "oai-ran-du"
 k8s_wait_ready_replicas "deployment" "oai-gnb-du" "$_edge_kubeconfig" "oai-ran-du"
 
