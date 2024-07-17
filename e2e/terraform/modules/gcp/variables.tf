@@ -6,13 +6,13 @@ variable "project" {
 
 variable "region" {
   description = "GCP region to deploy CI instances"
-  default     = "us-central1"
+  default     = "europe-west9"
   type        = string
 }
 
 variable "zone" {
   description = "GCP zone to deploy CI instances"
-  default     = "us-central1-c"
+  default     = "europe-west9-a"
   type        = string
 }
 

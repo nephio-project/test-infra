@@ -67,3 +67,4 @@ function _define_ip_address_pool {
 }
 
 _define_ip_address_pool "core" "172.18.16.0/20"
+_define_ip_address_pool "edge" "172.18.48.0/20"

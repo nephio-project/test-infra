@@ -85,6 +85,7 @@
             fs.inotify.max_user_instances: 512
             kernel.keys.maxkeys: 500000
             kernel.keys.maxbytes: 1000000
+            vm.mmap_rnd_bits: 28
     - name: Install kubectl command-line
       ansible.builtin.include_role:
         name: andrewrothstein.kubectl
@@ -137,7 +138,7 @@
       become_user: root
       ansible.builtin.unarchive:
         remote_src: true
-        src: https://github.com/nephio-project/porch/releases/download/main/porchctl.tgz
+        src: https://github.com/nephio-project/porch/releases/download/v3.0.0/porchctl_3.0.0_linux_amd64.tar.gz
         dest: /usr/local/bin/
         creates: /usr/local/bin/porchctl
   roles:
@@ -162,7 +163,7 @@
         repo_uri: "{{ nephio_catalog_repo_uri }}"
         local_dest_directory: "{{ item.dest }}"
         pkg: "{{ item.pkg }}"
-        version: main
+        version: v3.0.0
         for_deployment: true
         context: "{{ k8s.context }}"
         kpt_async: 900
