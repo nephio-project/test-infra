@@ -17,7 +17,7 @@ gitea:
     password: secret
 
 nephio_catalog_repo_uri: https://github.com/nephio-project/catalog.git
-nephio_catalog_branch: v3.0.0
+nephio_catalog_branch: main
 
 nephio_stock_repos:
   - name: catalog-distros-sandbox
@@ -43,7 +43,7 @@ nephio_stock_repos:
   - name: oai-core-packages
     repo: https://github.com/OPENAIRINTERFACE/oai-packages.git
     directory: /
-    branch: r3
+    branch: main
   - name: catalog-workloads-oai-ran
     repo: "{{ nephio_catalog_repo_uri }}"
     directory: /workloads/oai
@@ -66,22 +66,22 @@ nephio:
     packages:
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: nephio/core/porch
-        version: origin/v3.0.0
+        version: main
         async: 480
         poll: 5
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: nephio/core/nephio-operator
-        version: origin/v3.0.0
+        version: main
         async: 480
         poll: 5
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: nephio/core/configsync
-        version: origin/v3.0.0
+        version: main
         async: 240
         poll: 5
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: nephio/optional/network-config
-        version: origin/v3.0.0
+        version: main
         async: 480
         poll: 0
 
@@ -92,4 +92,4 @@ nephio_webui:
     package:
       repo_uri: "{{ nephio_catalog_repo_uri }}"
       pkg: nephio/optional/webui
-      version: origin/v3.0.0
+      version: main
