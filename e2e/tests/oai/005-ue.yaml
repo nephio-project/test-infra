@@ -16,7 +16,7 @@ spec:
   upstream:
     repo: catalog-workloads-oai-ran
     package: pkg-example-ue-bp
-    revision: v3.0.0
+    revision: main
   downstream:
     repo: edge
     package: oai-ran-ue
