@@ -11,6 +11,12 @@ RUN git clone https://github.com/kubernetes/test-infra.git
 WORKDIR /go/src/test-infra/robots/coverage
 RUN go build -o /tmp/ ./...
 
+WORKDIR /go/src/
+RUN git clone -b detection_upgrade https://github.com/radoslawc/lichen.git
+WORKDIR /go/src/lichen
+RUN go build -o /tmp/lichen
+
+
 FROM golang:1.22.2-bullseye
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN apt-get update && \
@@ -20,7 +26,6 @@ RUN apt-get update && \
   wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.57.2 && \
   wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s v2.19.0 && \
   go install github.com/google/addlicense@v1.1.1 && \
-  go install github.com/uw-labs/lichen@v0.1.7 && \
   go install github.com/matm/gocov-html/cmd/gocov-html@v1.4.0 && \
   go install github.com/axw/gocov/gocov@v1.1.0
 
@@ -28,6 +33,7 @@ COPY --from=builder /tmp/controller-gen /go/bin
 COPY --from=builder /tmp/helpgen /go/bin
 COPY --from=builder /tmp/type-scaffold /go/bin
 COPY --from=builder /tmp/coverage /go/bin/coverage-robot
+COPY --from=builder /tmp/lichen /go/bin/lichen
 
 COPY lichen.sh checklicense.sh coverage.sh /usr/local/bin/
 COPY lichen.yaml /etc/
