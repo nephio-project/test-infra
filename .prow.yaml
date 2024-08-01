@@ -310,7 +310,7 @@ postsubmits:
             - "-c"
             - |
               executor --context=${PWD}/images/releaser \
-                --dockerfile=Dockerfile --destination=nephio/releaser:${PULL_BASE_REF} \
+                --dockerfile=Dockerfile --destination=nephio/releaser:${BUILD_ID} \
                 --destination=nephio/releaser:latest
           volumeMounts:
             - name: kaniko-secret
@@ -320,11 +320,15 @@ postsubmits:
               cpu: 2
               memory: 1Gi
         - name: nephio-image-signer
-          image: nephio/releaser:latest
+          image: nephio/releaser:v0.0.2
           command:
-            - "/usr/local/bin/release"
-          args:
-            - nephio/releaser:latest
+            - "/bin/sh"
+            - "-c"
+            - |
+              /usr/local/bin/release docker.io nephio releaser ${BUILD_ID}
+          volumeMounts:
+            - name: cosign-secret
+              mountPath: /root/.docker/
           resources:
             requests:
               cpu: 1
@@ -349,6 +353,12 @@ postsubmits:
             secretName: regcred
             items:
               - key: .dockerconfigjson
+                path: config.json
+        - name: cosign-secret
+          secret:
+            secretName: cosign-login
+            items:
+              - key: configjson
                 path: config.json
 
   - name: build-push-image-gotests
@@ -381,9 +391,15 @@ postsubmits:
             cpu: 2
             memory: 2Gi
       - name: nephio-image-signer
-        image: nephio/releaser:latest
-        args:
-          - nephio/gotests:latest
+        image: nephio/releaser:v0.0.2
+        command:
+          - "/bin/sh"
+          - "-c"
+          - |
+            /usr/local/bin/release docker.io nephio gotests ${BUILD_ID}
+        volumeMounts:
+          - name: cosign-secret
+            mountPath: /root/.docker/
         resources:
           requests:
             cpu: 1
@@ -409,6 +425,13 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
+        - name: cosign-secret
+          secret:
+            secretName: cosign-login
+            items:
+              - key: configjson
+                path: config.json
+
   - name: build-push-image-e2e
     cluster: default
     run_if_changed: 'images/e2e/.*'
@@ -439,9 +462,15 @@ postsubmits:
             cpu: 2
             memory: 2Gi
       - name: nephio-image-signer
-        image: nephio/releaser:latest
-        args:
-          - nephio/e2e:latest
+        image: nephio/releaser:v0.0.2
+        command:
+          - "/bin/sh"
+          - "-c"
+          - |
+            /usr/local/bin/release docker.io nephio e2e ${BUILD_ID}
+        volumeMounts:
+          - name: cosign-secret
+            mountPath: /root/.docker/
         resources:
           requests:
             cpu: 1
@@ -467,6 +496,13 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
+        - name: cosign-secret
+          secret:
+            secretName: cosign-login
+            items:
+              - key: configjson
+                path: config.json
+
   - name: build-push-image-label_sync
     cluster: default
     run_if_changed: 'images/label_sync/.*'
@@ -497,9 +533,15 @@ postsubmits:
             cpu: 2
             memory: 2Gi
       - name: nephio-image-signer
-        image: nephio/releaser:latest
-        args:
-          - nephio/label_sync:latest
+        image: nephio/releaser:v0.0.2
+        command:
+          - "/bin/sh"
+          - "-c"
+          - |
+            /usr/local/bin/release docker.io nephio label_sync ${BUILD_ID}
+        volumeMounts:
+          - name: cosign-secret
+            mountPath: /root/.docker/
         resources:
           requests:
             cpu: 1
@@ -525,6 +567,13 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
+        - name: cosign-secret
+          secret:
+            secretName: cosign-login
+            items:
+              - key: configjson
+                path: config.json
+
   - name: build-push-image-generic-autobumper
     cluster: default
     run_if_changed: 'images/generic-autobumper/.*'
@@ -555,9 +604,15 @@ postsubmits:
             cpu: 2
             memory: 1Gi
       - name: nephio-image-signer
-        image: nephio/releaser:latest
-        args:
-          - nephio/generic-autobumper:latest
+        image: nephio/releaser:v0.0.2
+        command:
+          - "/bin/sh"
+          - "-c"
+          - |
+            /usr/local/bin/release docker.io nephio generic-autobumper ${BUILD_ID}
+        volumeMounts:
+          - name: cosign-secret
+            mountPath: /root/.docker/
         resources:
           requests:
             cpu: 1
@@ -582,6 +637,12 @@ postsubmits:
             secretName: regcred
             items:
               - key: .dockerconfigjson
+                path: config.json
+        - name: cosign-secret
+          secret:
+            secretName: cosign-login
+            items:
+              - key: configjson
                 path: config.json
 
   - name: build-push-image-linter
@@ -614,9 +675,15 @@ postsubmits:
             cpu: 1
             memory: 1Gi
       - name: nephio-image-signer
-        image: nephio/releaser:latest
-        args:
-          - nephio/linter:latest
+        image: nephio/releaser:v0.0.2
+        command:
+          - "/bin/sh"
+          - "-c"
+          - |
+            /usr/local/bin/release docker.io nephio linter ${BUILD_ID}
+        volumeMounts:
+          - name: cosign-secret
+            mountPath: /root/.docker/
         resources:
           requests:
             cpu: 1
@@ -642,6 +709,13 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
+        - name: cosign-secret
+          secret:
+            secretName: cosign-login
+            items:
+              - key: configjson
+                path: config.json
+
   - name: build-push-image-molecule
     cluster: default
     run_if_changed: 'images/molecule/.*'
@@ -672,9 +746,15 @@ postsubmits:
             cpu: 1
             memory: 1Gi
       - name: nephio-image-signer
-        image: nephio/releaser:latest
-        args:
-          - nephio/molecule:latest
+        image: nephio/releaser:v0.0.2
+        command:
+          - "/bin/sh"
+          - "-c"
+          - |
+            /usr/local/bin/release docker.io nephio molecule ${BUILD_ID}
+        volumeMounts:
+          - name: cosign-secret
+            mountPath: /root/.docker/
         resources:
           requests:
             cpu: 1
@@ -700,4 +780,9 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
-
+        - name: cosign-secret
+          secret:
+            secretName: cosign-login
+            items:
+              - key: configjson
+                path: config.json
