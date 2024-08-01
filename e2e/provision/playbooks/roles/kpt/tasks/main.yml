@@ -74,6 +74,9 @@
     version: "{{ version }}"
     context: "{{ context }}"
     command: live-init
+    inventory_id: "{{ inventory_id | default(omit) }}"
+    name: "{{ resourcegroup_name | default(omit) }}"
+    namespace: "{{ resourcegroup_ns | default(omit) }}"
   register: kpt_live_init
   when: not kpt_resourcegroup.stat.exists
 
