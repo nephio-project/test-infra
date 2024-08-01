@@ -10,7 +10,7 @@ COPY --from=builder /go/bin/cosign /usr/local/bin/cosign
 COPY release.sh /usr/local/bin/release
 
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
-RUN apk --no-cache update && apk add --no-cache curl=8.5.0-r0 bash=5.2.21-r0 && \
+RUN apk --no-cache update && apk add --no-cache curl=8.9.0-r0 bash=5.2.21-r0 && \
     curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.51.2 && \
     curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin && \
     curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin && \
