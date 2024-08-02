@@ -69,6 +69,9 @@ nephio:
         version: main
         async: 480
         poll: 5
+        inventory_id: nephio
+        resourcegroup_name: porch
+        resourcegroup_ns: porch-system
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: nephio/core/nephio-operator
         version: main

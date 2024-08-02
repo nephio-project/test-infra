@@ -23,6 +23,9 @@
     context: "{{ k8s.context }}"
     kpt_async: "{{ item.async }}"
     kpt_poll: "{{ item.poll }}"
+    inventory_id: "{{ item.inventory_id | default(omit) }}"
+    resourcegroup_name: "{{ item.resourcegroup_name | default(omit) }}"
+    resourcegroup_ns: "{{ item.resourcegroup_ns | default(omit) }}"
 
 - name: Wait for packages to be applied
   ansible.builtin.async_status:
