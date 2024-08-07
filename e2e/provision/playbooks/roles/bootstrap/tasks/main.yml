@@ -34,18 +34,6 @@
   tags:
     - always
 
-- name: Delete docker hub secret
-  tags:
-    - nonkind_k8s
-  when:
-    - lookup('ansible.builtin.env', 'DOCKERHUB_USERNAME') | length > 0
-    - lookup('ansible.builtin.env', 'DOCKERHUB_TOKEN') | length > 0
-  block:
-    - name: Delete docker-registry secret
-      ansible.builtin.command: >
-        kubectl delete secret dockerhub -n {{ gitea.k8s.namespace }} --ignore-not-found=true
-      changed_when: false
-
 - name: Create docker hub secret
   tags:
     - nonkind_k8s
@@ -56,6 +44,10 @@
     username: "{{ lookup('ansible.builtin.env', 'DOCKERHUB_USERNAME') }}"
     token: "{{ lookup('ansible.builtin.env', 'DOCKERHUB_TOKEN') }}"
   block:
+    - name: Delete docker-registry secret
+      ansible.builtin.command: >
+        kubectl delete secret dockerhub -n {{ gitea.k8s.namespace }} --ignore-not-found=true
+      changed_when: false
     - name: Create docker-registry secret
       ansible.builtin.command: >
         kubectl create secret docker-registry dockerhub --docker-username={{ username }}
