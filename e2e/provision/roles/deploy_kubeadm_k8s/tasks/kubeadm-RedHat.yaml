@@ -10,11 +10,11 @@
       ansible.builtin.yum_repository:
         name: Kubernetes
         description: Kubernetes Repository
-        baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
+        baseurl: https://pkgs.k8s.io/core:/stable:/v{{ k8s_ver }}/rpm/
         enabled: yes
         gpgcheck: yes
         repo_gpgcheck: yes
-        gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+        gpgkey: https://pkgs.k8s.io/core:/stable:/v{{ k8s_ver }}/rpm/repodata/repomd.xml.key
         #exclude: kubelet kubeadm kubectl
 
     - name: put SELinux in permissive mode
@@ -25,9 +25,9 @@
     - name: install kubelet kubeadm kubectl
       ansible.builtin.dnf:
         name:
-          - kubelet <= {{ k8s_ver }}
-          - kubeadm <= {{ k8s_ver }}
-          - kubectl <= {{ k8s_ver }}
+          - kubelet
+          - kubeadm
+          - kubectl
         state: present
 
     - name: disable swap 1/2
