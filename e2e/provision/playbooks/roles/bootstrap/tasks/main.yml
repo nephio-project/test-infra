@@ -45,7 +45,7 @@
     token: "{{ lookup('ansible.builtin.env', 'DOCKERHUB_TOKEN') }}"
   block:
     - name: Delete docker-registry secret
-      k8s:
+      kubernetes.core.k8s:
         kind: Secret
         namespace: "{{ gitea.k8s.namespace }}"
         name: dockerhub
