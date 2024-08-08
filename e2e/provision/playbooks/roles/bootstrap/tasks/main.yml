@@ -45,9 +45,11 @@
     token: "{{ lookup('ansible.builtin.env', 'DOCKERHUB_TOKEN') }}"
   block:
     - name: Delete docker-registry secret
-      ansible.builtin.command: >
-        kubectl delete secret dockerhub -n {{ gitea.k8s.namespace }} --ignore-not-found=true
-      changed_when: false
+      k8s:
+        kind: Secret
+        namespace: "{{ gitea.k8s.namespace }}"
+        name: dockerhub
+        state: absent
     - name: Create docker-registry secret
       ansible.builtin.command: >
         kubectl create secret docker-registry dockerhub --docker-username={{ username }}
