@@ -21,3 +21,7 @@ fedora_34:
   reload: true
   project_id: fedora-cloud
   family: fedora-cloud-34
+fedora_38:
+  name: fedora/38-cloud-base
+  project_id: fedora-cloud
+  family: fedora-cloud-38
