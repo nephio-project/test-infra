@@ -18,5 +18,6 @@ spec:
         package: free5gc-amf
       annotations:
         approval.nephio.org/policy: initial
+        approval.nephio.org/delay: 3m
       injectors:
       - nameExpr: target.name
