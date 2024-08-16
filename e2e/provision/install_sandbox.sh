@@ -19,13 +19,14 @@ export HOME=${HOME:-/home/ubuntu/}
 source /etc/os-release || source /usr/lib/os-release
 case ${ID,,} in
 ubuntu | debian)
+    # Removed the damaged list
+    sudo rm -vrf /var/lib/apt/lists/*
     sudo apt-get update
     sudo -E DEBIAN_FRONTEND=noninteractive apt-get remove -q -y python3-openssl
     sudo -E NEEDRESTART_SUSPEND=1 DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confnew" --allow-downgrades --allow-remove-essential --allow-change-held-packages -fuy install -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" python3-pip
     ;;
 rhel | centos | fedora | rocky)
-    PKG_MANAGER=$(command -v dnf || command -v yum)
-    sudo $PKG_MANAGER install python3-pip -y
+    sudo "$(command -v dnf || command -v yum)" install python3-pip -y
     ;;
 *)
     echo "OS not supported"
@@ -73,26 +74,13 @@ fact_caching = jsonfile
 fact_caching_connection = /tmp
 EOT
 
-if [ "${DEPLOYMENT_TYPE:-r1}" == "one-summit" ]; then
-    [[ -d "$HOME/workshop" ]] || git clone --depth 1 https://github.com/nephio-project/one-summit-22-workshop.git "$HOME/workshop"
-    mkdir -p "$HOME/workshop/nephio-ansible-install/inventory"
-    cp "$HOME/nephio.yaml" "$HOME/workshop/nephio-ansible-install/inventory/"
-    pushd "$HOME/workshop/nephio-ansible-install" >/dev/null
-    for playbook in install-prereq create-gitea create-gitea-repos deploy-clusters configure-nephio; do
-        if [[ ${DEBUG:-false} != "true" ]]; then
-            ansible-playbook "playbooks/$playbook.yaml"
-        else
-            ansible-playbook -vvv "playbooks/$playbook.yaml"
-        fi
-    done
-    popd >/dev/null
-else
-    # Management cluster creation
-    if [[ ${DEBUG:-false} != "true" ]]; then
-        ansible-playbook -i 127.0.0.1, playbooks/cluster.yml
-    else
-        ansible-playbook -vvv -i 127.0.0.1, playbooks/cluster.yml
-    fi
+# Management cluster creation
+ansible_cmd="$(command -v ansible-playbook) -i 127.0.0.1, playbooks/cluster.yml --tags ${ANSIBLE_TAG:-all} "
+[[ ${DEBUG:-false} != "true" ]] || ansible_cmd+="-vvv "
+if [ -n "${ANSIBLE_CMD_EXTRA_VAR_LIST:-}" ]; then
+    ansible_cmd+=" --extra-vars=\"${ANSIBLE_CMD_EXTRA_VAR_LIST}\""
 fi
+echo "$ansible_cmd"
+eval "$ansible_cmd" | tee ~/cluster.log
 
 echo "Done installing Nephio Sandbox Environment"

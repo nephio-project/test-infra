@@ -13,18 +13,53 @@ set -o errexit
 set -o nounset
 [[ ${DEBUG:-false} != "true" ]] || set -o xtrace
 
-export HOME=${HOME:-/home/ubuntu/}
-export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
-export TESTDIR=${TESTDIR:-$E2EDIR/tests}
+start_at_test=""
+finish_before_test=""
 
-source "$E2EDIR/lib/testing.sh"
+while getopts s:f: flag
+do
+    case "${flag}" in
+        s) start_at_test=${OPTARG};;
+        f) finish_before_test=${OPTARG};;
+        *) ;;
+    esac
+done
+
+export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
+
+# shellcheck source=e2e/defaults.env
+source "$E2EDIR/defaults.env"
+
+# shellcheck source=e2e/lib/testing.sh
+source "$LIBDIR/testing.sh"
 
 failed=$((0))
 test_summary=""
-for t in $TESTDIR/*.sh; do
-    if ! testing_run_test "$t"; then
-        failed=$((failed + 1))
+sudo dmesg >/tmp/e2e_dmesg_base.log
+for t in "$TESTDIR"/*.sh; do
+    if [ -n "$start_at_test" ]
+    then
+        if [ "$t" == "$start_at_test" ]
+        then
+            start_at_test=""
+        else
+            continue
+        fi
     fi
+
+    if [ -n "$finish_before_test" ]
+    then
+        if [ "$t" == "$finish_before_test" ]
+        then
+            break
+        fi
+    fi
+
+    if ! run_test "$t"; then
+        failed=$((failed + 1))
+        [[ ${FAIL_FAST:-false} != "true" ]] || break
+    fi
+    sudo dmesg >/tmp/e2e_dmesg_base.log
 done
 echo "TEST SUMMARY"
 echo "------------"

@@ -7,7 +7,6 @@ plugins:
     - help
     - heart
     - hold
-    - invalidcommitmsg
     - label
     - lgtm
     - trigger
@@ -20,9 +19,32 @@ plugins:
   nephio-project/test-infra:
     plugins:
     - config-updater
+  nephio-experimental:
+    plugins:
+    - approve
+    - assign
+    - blunderbuss
+    - help
+    - heart
+    - hold
+    - label
+    - lgtm
+    - trigger
+    - verify-owners
+    - wip
+    - retitle
+    - override
+    - lifecycle
+    - cla
+    - welcome
 
 external_plugins:
   nephio-project:
+  - name: needs-rebase
+    events:
+      - issue_comment
+      - pull_request
+  nephio-experimental:
   - name: needs-rebase
     events:
       - issue_comment
@@ -48,9 +70,15 @@ approve:
     - nephio-project/free5gc-packages
     - nephio-project/free5gc
     - nephio-project/edge-status-aggregator
+    - nephio-project/test-infra
+    - nephio-experimental
     require_self_approval: true
     lgtm_acts_as_approve: false
     
 override:
   allow_top_level_owners: true
 
+welcome:
+- repos:
+  - nephio-experimental
+  message_template: "Welcome @{{.AuthorLogin}}! <br><br>Please refer to [Nephio Experimental information](https://nephio.org/experimental). <br><br>You can interact with this PR trough bot using those [commands](https://prow.nephio.io/command-help). Not all of them might be enabled, it is okay to experiment. <br><br>The results of CI jobs can be found [here](https://prow.nephio.io/) <br><br>You may want to refer to our [test-infra wiki](https://github.com/nephio-project/test-infra/wiki) for more info. <br><br> For tips and tricks in the contribution process you may want visit [Nephio Wiki](https://wiki.nephio.org/). <br><br>"

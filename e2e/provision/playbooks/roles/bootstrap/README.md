@@ -12,39 +12,40 @@ This role installs and configures the tool set required to deploy a Nephio Manag
 
 Available variables are listed below, along with default values (see defaults/main.yml):
 
-| Variable                        | Required | Default       | Choices                   | Comments                                                                          |
-|---------------------------------|----------|---------------|---------------------------|-----------------------------------------------------------------------------------|
-| host_min_vcpu                   | no       | 8             |                           | Minimum vCPUs required                                                            |
-| host_min_cpu_ram                | no       | 16            |                           | Minimum RAM required (GB)                                                         |
-| host_min_root_disk_space        | no       | 50            |                           | Minimum disk space required (GB)                                                  |
-| container_engine                | no       | docker        | docker                    | Container engine utilized for the management cluster creation                     |
-| gtp5g_dest                      | no       | /opt/gtp5g    |                           | Destination path for GTP5G source code                                            |
-| gtp5g_version                   | no       | v0.6.8        |                           | GTP5G source code version                                                         |
-| gtp5g_tarball_url               | no       |               |                           | GTP5G tarball URI                                                                 |
-| k8s.context                     | no       | kind-kind     |                           | Kubernetes context to create gitea resources                                      |
-| k8s.version                     | no       | v1.27.1       |                           | Kubernetes version used for the management cluster                                |
-| kind.enabled                    | no       | true          | true, false               | Enable/Disable Kubernetes Cluster creation                                        |
-| nephio_pkg_version              | no       | v1.0.1        |                           | Default version for all kpt packages                                              |
-| gitea.enabled                   | no       | true          | true, false               | Enable/Disable gitea services                                                     |
-| gitea.k8s.namespace             | no       | gitea         |                           | Kubernetes namespace for gitea resources                                          |
-| gitea.k8s.postgres_password     | no       | c2VjcmV0      |                           | `postgres-password` secret value for gitea database service                       |
-| gitea.k8s.db_password           | no       | c2VjcmV0      |                           | `password` secret value for gitea service                                         |
-| gitea.k8s.username              | no       | nephio        |                           | Gitea admin user name                                                             |
-| gitea.k8s.password              | no       | secret        |                           | Gitea admin password                                                              |
-| gitea.k8s.namespaces            | no       |               |                           | List of Kubernetes namespaces to watch for gitea deployment rersources            |
-| gitea.kpt.packages              | no       |               |                           | List of gitea kpt packages                                                        |
-| resource_backend.enabled        | no       | true          | true, false               | Enable/Disable resource-backend services                                          |
-| resource_backend.k8s.namespaces | no       |               |                           | List of Kubernetes namespaces to watch for resource-backend deployment rersources |
-| resource_backend.kpt.packages   | no       |               |                           | List of resource-backend kpt packages                                             |
-| cert_manager.enabled            | no       | true          | true, false               | Enable/Disable cert-manager services                                              |
-| cert_manager.k8s.namespaces     | no       |               |                           | List of Kubernetes namespaces to watch for cert-manager deployment rersources     |
-| cert_manager.kpt.packages       | no       |               |                           | List of cert-manager kpt packages                                                 |
-| cluster_api.enabled             | no       | true          | true, false               | Enable/Disable cluster-api services                                               |
-| cluster_api.k8s.namespaces      | no       |               |                           | List of Kubernetes namespaces to watch for cluster-api deployment rersources      |
-| cluster_api.kpt.packages        | no       |               |                           | List of cluster-api kpt packages                                                  |
-| metallb.enabled                 | no       | true          | true, false               | Enable/Disable MetalLB services                                                   |
-| metallb.k8s.namespaces          | no       |               |                           | List of Kubernetes namespaces to watch for MetalLB deployment rersources          |
-| metallb.kpt.packages            | no       |               |                           | List of MetalLB kpt packages                                                      |
+| Variable                        | Required | Default                                                       | Choices                   | Comments                                                                          |
+|---------------------------------|----------|---------------------------------------------------------------|---------------------------|-----------------------------------------------------------------------------------|
+| host_reqs.sanbox.vcpu           | no       | 6                                                             |                           | Minimum vCPUs required for Sandbox installation                                   |
+| host_reqs.sanbox.memory         | no       | 6                                                             |                           | Minimum RAM required (GB ) for Sandbox installation                               |
+| host_reqs.end_to_end.vcpu       | no       | 16                                                            |                           | Minimum vCPUs required for executing End-to-End testing                           |
+| host_reqs.end_to_end.memory     | no       | 32                                                            |                           | Minimum RAM required (GB ) for executing End-to-End testing                       |
+| container_engine                | no       | docker                                                        | docker                    | Container engine utilized for the management cluster creation                     |
+| gtp5g_dest                      | no       | /opt/gtp5g                                                    |                           | Destination path for GTP5G source code                                            |
+| gtp5g_version                   | no       | v0.6.8                                                        |                           | GTP5G source code version                                                         |
+| gtp5g_tarball_url               | no       |                                                               |                           | GTP5G tarball URI                                                                 |
+| k8s.context                     | no       | kind-kind                                                     |                           | Kubernetes context to create gitea resources                                      |
+| k8s.version                     | no       | v1.29.2                                                       |                           | Kubernetes version used for the management cluster                                |
+| kind.enabled                    | no       | true                                                          | true, false               | Enable/Disable Kubernetes Cluster creation                                        |
+| nephio_catalog_repo_uri         | no       | https://github.com/nephio-project/catalog.git                 |                           | Default kpt catalog packages repository                                           |
+| gitea.enabled                   | no       | true                                                          | true, false               | Enable/Disable gitea services                                                     |
+| gitea.k8s.namespace             | no       | gitea                                                         |                           | Kubernetes namespace for gitea resources                                          |
+| gitea.k8s.postgres_password     | no       | c2VjcmV0                                                      |                           | `postgres-password` secret value for gitea database service                       |
+| gitea.k8s.db_password           | no       | c2VjcmV0                                                      |                           | `password` secret value for gitea service                                         |
+| gitea.k8s.username              | no       | nephio                                                        |                           | Gitea admin user name                                                             |
+| gitea.k8s.password              | no       | secret                                                        |                           | Gitea admin password                                                              |
+| gitea.k8s.namespaces            | no       |                                                               |                           | List of Kubernetes namespaces to watch for gitea deployment rersources            |
+| gitea.kpt.packages              | no       |                                                               |                           | List of gitea kpt packages                                                        |
+| resource_backend.enabled        | no       | true                                                          | true, false               | Enable/Disable resource-backend services                                          |
+| resource_backend.k8s.namespaces | no       |                                                               |                           | List of Kubernetes namespaces to watch for resource-backend deployment rersources |
+| resource_backend.kpt.packages   | no       |                                                               |                           | List of resource-backend kpt packages                                             |
+| cert_manager.enabled            | no       | true                                                          | true, false               | Enable/Disable cert-manager services                                              |
+| cert_manager.k8s.namespaces     | no       |                                                               |                           | List of Kubernetes namespaces to watch for cert-manager deployment rersources     |
+| cert_manager.kpt.packages       | no       |                                                               |                           | List of cert-manager kpt packages                                                 |
+| cluster_api.enabled             | no       | true                                                          | true, false               | Enable/Disable cluster-api services                                               |
+| cluster_api.k8s.namespaces      | no       |                                                               |                           | List of Kubernetes namespaces to watch for cluster-api deployment rersources      |
+| cluster_api.kpt.packages        | no       |                                                               |                           | List of cluster-api kpt packages                                                  |
+| metallb.enabled                 | no       | true                                                          | true, false               | Enable/Disable MetalLB services                                                   |
+| metallb.k8s.namespaces          | no       |                                                               |                           | List of Kubernetes namespaces to watch for MetalLB deployment rersources          |
+| metallb.kpt.packages            | no       |                                                               |                           | List of MetalLB kpt packages                                                      |
 
 ## Dependencies
 
@@ -74,7 +75,7 @@ The `install` Ansible role depends on the outcome generated by this role.
       become_user: root
       ansible.builtin.unarchive:
         remote_src: true
-        src: https://github.com/GoogleContainerTools/kpt/releases/download/v1.0.0-beta.38/kpt_linux_amd64-1.0.0-beta.38.tar.gz
+        src: https://github.com/GoogleContainerTools/kpt/releases/download/v1.0.0-beta.49/kpt_linux_amd64-1.0.0-beta.49.tar.gz
         dest: /usr/local/bin/
         creates: /usr/local/bin/kpt
     - name: Install KinD command-line

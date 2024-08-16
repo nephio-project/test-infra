@@ -10,24 +10,24 @@
 
 roles:
   - name: andrewrothstein.docker_engine
-    version: v0.2.2
+    version: v0.3.0
   - name: andrewrothstein.podman
-    version: v2.0.2
+    version: v2.1.1
   - name: andrewrothstein.kind
-    version: v1.2.6
+    version: v1.2.11
   - name: andrewrothstein.kubectl
-    version: v1.2.12
+    version: v1.3.7
   - name: andrewrothstein.kpt
     version: 0.0.3
   - name: darkwizard242.cni
-    version: 2.3.0
+    version: 2.5.0
 
 collections:
   - name: community.general
-    version: 7.2.0
+    version: 8.6.2
   - name: kubernetes.core
     version: 2.4.0
   - name: community.docker
-    version: 3.4.8
+    version: 3.10.4
   - name: ansible.posix
-    version: 1.5.2
+    version: 1.5.4

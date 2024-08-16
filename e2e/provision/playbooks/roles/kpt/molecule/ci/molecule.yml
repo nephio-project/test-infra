@@ -1,0 +1,57 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+dependency:
+  name: galaxy
+  options:
+    role-file: ../../../galaxy-requirements.yml
+    requirements-file: ../../../galaxy-requirements.yml
+driver:
+  name: gce
+  project_id: pure-faculty-367518
+  region: us-central1
+  auth_kind: serviceaccount
+  username: $USER
+  service_account_file: $GOOGLE_JSON_KEY_LOCATION
+  external_access: true
+  instance_os_type: linux
+lint: |
+  set -e
+  PATH=${PATH}
+  yamllint -c ../../../.yaml-lint.yml .
+  ansible-lint -v -c ../../../.ansible-lint
+platforms:
+  - name: int-focal-vm-$POSFIX_NAME
+    zone: us-central1-c
+    machine_type: e2-standard-16
+    image: projects/ubuntu-os-cloud/global/images/family/ubuntu-2004-lts
+    tags:
+      items:
+        - allow-ssh
+provisioner:
+  name: ansible
+  playbooks:
+    prepare: ${MOLECULE_PROJECT_DIRECTORY}/molecule/default/prepare.yml
+    converge: ${MOLECULE_PROJECT_DIRECTORY}/molecule/default/converge.yml
+  env:
+    ANSIBLE_LIBRARY: ${MOLECULE_PROJECT_DIRECTORY}/../../../playbooks/library
+  inventory:
+    group_vars:
+      all:
+        local_dest_directory: /tmp/kpt-molecule-test/nginx
+        pkg: package-examples/nginx
+        repo_uri: https://github.com/GoogleContainerTools/kpt
+        version: v0.9
+        context: kind-kind
+        kpt_async: 600
+        kpt_poll: 5
+verifier:
+  name: testinfra
+  directory: ${MOLECULE_PROJECT_DIRECTORY}/molecule/default/tests

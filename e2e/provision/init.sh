@@ -27,15 +27,29 @@ function get_status {
         printf "Memory free(Kb):"
         awk -v low="$(grep low /proc/zoneinfo | awk '{k+=$2}END{print k}')" '{a[$1]=$2}  END{ print a["MemFree:"]+a["Active(file):"]+a["Inactive(file):"]+a["SReclaimable:"]-(12*low);}' /proc/meminfo
     fi
+    printf "Disk usage: "
+    sudo df -h
+    if command -v docker >/dev/null; then
+        echo "Docker statistics:"
+        docker stats --no-stream
+        docker ps --size
+    fi
+    if [ -f /tmp/e2e_dmesg_base.log ]; then
+        echo "Kernel diagnostic messages:"
+        sudo dmesg >/tmp/e2e_dmesg_current.log
+        diff /tmp/e2e_dmesg_base.log /tmp/e2e_dmesg_current.log
+    fi
     if command -v kubectl >/dev/null; then
+        echo "Draft Porch Package Revisions"
+        kubectl get packagerevision -o jsonpath='{range .items[?(@.spec.lifecycle=="Draft")]}{.metadata.name}{"\n"}{end}' || :
         KUBECONFIG=$HOME/.kube/config
-        for kubeconfig in $(sudo find /tmp/ -name "kubeconfig-*"); do
+        for kubeconfig in /tmp/*-kubeconfig; do
             KUBECONFIG+=":$kubeconfig"
         done
         export KUBECONFIG
         for context in $(kubectl config get-contexts --no-headers --output name); do
             echo "Kubernetes Events ($context):"
-            kubectl get events --sort-by='.lastTimestamp' -A --context "$context"
+            kubectl get events --sort-by='.lastTimestamp' -A --context "$context" --field-selector type!=Normal
             echo "Kubernetes Resources ($context):"
             kubectl get all -A -o wide --context "$context"
         done
@@ -53,21 +67,70 @@ export DEBUG=${NEPHIO_DEBUG:-$(get_metadata nephio-setup-debug "false")}
 
 [[ $DEBUG != "true" ]] || set -o xtrace
 
-DEPLOYMENT_TYPE=${NEPHIO_DEPLOYMENT_TYPE:-$(get_metadata nephio-setup-type "r1")}
 RUN_E2E=${NEPHIO_RUN_E2E:-$(get_metadata nephio-run-e2e "false")}
 REPO=${NEPHIO_REPO:-$(get_metadata nephio-test-infra-repo "https://github.com/nephio-project/test-infra.git")}
 BRANCH=${NEPHIO_BRANCH:-$(get_metadata nephio-test-infra-branch "main")}
-NEPHIO_USER=${NEPHIO_USER:-$(get_metadata nephio-user "ubuntu")}
+NEPHIO_USER=${NEPHIO_USER:-$(get_metadata nephio-user "${USER:-ubuntu}")}
+NEPHIO_CATALOG_REPO_URI=${NEPHIO_CATALOG_REPO_URI:-$(get_metadata nephio-catalog-repo-uri "https://github.com/nephio-project/catalog.git")}
+K8S_CONTEXT=${K8S_CONTEXT:-"kind-kind"}
+K8S_VERSION=${K8S_VERSION:-"v1.29.2"}
+export ANSIBLE_CMD_EXTRA_VAR_LIST='{ "nephio_catalog_repo_uri": "'${NEPHIO_CATALOG_REPO_URI}'", "k8s": { "context" : "'${K8S_CONTEXT}'", "version" : "'$K8S_VERSION'" } }'
 HOME=${NEPHIO_HOME:-/home/$NEPHIO_USER}
 REPO_DIR=${NEPHIO_REPO_DIR:-$HOME/test-infra}
+DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME:-""}
+DOCKERHUB_TOKEN=${DOCKERHUB_TOKEN:-""}
+FAIL_FAST=${FAIL_FAST:-$(get_metadata fail_fast "false")}
 
-echo "$DEBUG, $DEPLOYMENT_TYPE, $RUN_E2E, $REPO, $BRANCH, $NEPHIO_USER, $HOME, $REPO_DIR"
+if [ ${K8S_CONTEXT} == "kind-kind" ]; then
+    export ANSIBLE_TAG=all
+else
+    export ANSIBLE_TAG=nonkind_k8s
+fi
+
+echo "$DEBUG, $RUN_E2E, $REPO, $BRANCH, $NEPHIO_USER, $HOME, $REPO_DIR, $DOCKERHUB_USERNAME, $DOCKERHUB_TOKEN, $ANSIBLE_TAG, $ANSIBLE_CMD_EXTRA_VAR_LIST"
 trap get_status ERR
+
+# Validate root permissions for current user and NEPHIO_USER
+if ! sudo -n "true"; then
+    echo ""
+    echo "Passwordless sudo is needed for '$(id -nu)' user."
+    echo "Please fix your /etc/sudoers file. You likely want an"
+    echo "entry like the following one..."
+    echo ""
+    echo "$(id -nu) ALL=(ALL) NOPASSWD: ALL"
+    exit 1
+fi
+
+if ! sudo -u "$NEPHIO_USER" sudo -n "true"; then
+    echo ""
+    echo "Passwordless sudo is needed for '$(sudo -u "$NEPHIO_USER" id -nu)' user."
+    echo "Please fix your /etc/sudoers file. You likely want an"
+    echo "entry like the following one..."
+    echo ""
+    echo "$(sudo -u "$NEPHIO_USER" id -nu) ALL=(ALL) NOPASSWD: ALL"
+    exit 1
+fi
+
+if [[ $(id -u) -ne 0 ]]; then
+    echo ""
+    echo "This script must to be executed by the root user."
+    echo ""
+    exit 1
+fi
+
+if [[ $(sudo -u "$NEPHIO_USER" id -u) -eq 0 ]]; then
+    echo ""
+    echo "NEPHIO_USER cannot be root (user '$(sudo -u "$NEPHIO_USER" id -nu)')."
+    echo ""
+    exit 1
+fi
 
 if ! command -v git >/dev/null; then
     source /etc/os-release || source /usr/lib/os-release
     case ${ID,,} in
     ubuntu | debian)
+        # Removed the damaged list
+        rm -rvf /var/lib/apt/lists/*
         apt-get update
         apt-get install -y git
         ;;
@@ -100,12 +163,10 @@ find "$REPO_DIR" -name '*.sh' -exec chmod +x {} \;
 cp "$REPO_DIR/e2e/provision/bash_config.sh" "$HOME/.bash_aliases"
 chown "$NEPHIO_USER:$NEPHIO_USER" "$HOME/.bash_aliases"
 
-sed -e "s/vagrant/$NEPHIO_USER/" <"$REPO_DIR/e2e/provision/nephio.yaml" >"$HOME/nephio.yaml"
-
 # Sandbox Creation
 int_start=$(date +%s)
 cd "$REPO_DIR/e2e/provision"
-export DEBUG DEPLOYMENT_TYPE
+export DEBUG DOCKERHUB_USERNAME DOCKERHUB_TOKEN FAIL_FAST
 runuser -u "$NEPHIO_USER" ./install_sandbox.sh
 printf "%s secs\n" "$(($(date +%s) - int_start))"
 

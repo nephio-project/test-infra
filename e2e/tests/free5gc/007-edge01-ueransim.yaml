@@ -1,0 +1,16 @@
+apiVersion: config.porch.kpt.dev/v1alpha1
+kind: PackageVariant
+metadata:
+  name: edge01-ueransim
+spec:
+  upstream:
+    repo: catalog-workloads-tools
+    package: ueransim
+    revision: main
+  downstream:
+    repo: edge01
+    package: ueransim
+  annotations:
+    approval.nephio.org/policy: initial
+  injectors:
+  - name: edge01

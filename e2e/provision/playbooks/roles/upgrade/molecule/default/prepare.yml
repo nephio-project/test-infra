@@ -1,0 +1,71 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- name: Boostrap servers
+  hosts: all
+  pre_tasks:
+    - name: Update Apt cache
+      ansible.builtin.raw: apt-get update --allow-releaseinfo-change
+      become: true
+      changed_when: false
+    - name: Install pip package
+      become: true
+      ansible.builtin.package:
+        name: python3-pip
+        state: present
+      when: ansible_distribution == 'Ubuntu'
+    - name: Install kubernetes python package
+      become: true
+      ansible.builtin.pip:
+        name: kubernetes==26.1.0
+  roles:
+    - andrewrothstein.kind
+    - andrewrothstein.kubectl
+    - role: andrewrothstein.docker_engine
+      become: true
+  tasks:
+    - name: Unarchive /tmp/kpt.tgz into /usr/local/bin/
+      become: true
+      become_user: root
+      ansible.builtin.unarchive:
+        remote_src: true
+        src: https://github.com/GoogleContainerTools/kpt/releases/download/v1.0.0-beta.49/kpt_linux_amd64-1.0.0-beta.49.tar.gz
+        dest: /usr/local/bin/
+        creates: /usr/local/bin/kpt
+    - name: Get k8s clusters
+      become: true
+      ansible.builtin.command: kind get clusters
+      register: kind_get_cluster
+      failed_when: (kind_get_cluster.rc not in [0, 1])
+      changed_when: false
+    - name: Create k8s cluster
+      become: true
+      ansible.builtin.command: kind create cluster --image kindest/node:v1.29.2 --kubeconfig=/tmp/kubeconfig
+      when: not 'kind' in kind_get_cluster.stdout
+      changed_when: false
+    - name: Create .kube directory
+      ansible.builtin.file:
+        path: "{{ ansible_user_dir }}/.kube"
+        state: directory
+        mode: '0755'
+    - name: Copy root kubeconfig file
+      become: true
+      ansible.builtin.copy:
+        remote_src: true
+        src: /tmp/kubeconfig
+        dest: "{{ ansible_user_dir }}/.kube/config"
+        owner: "{{ ansible_user_uid }}"
+        group: "{{ ansible_user_gid }}"
+        mode: '0644'
+    - name: Install Nephio Components
+      ansible.builtin.include_role:
+        name: install
+      vars:
+        nephio_pkg_version: v1.0.0

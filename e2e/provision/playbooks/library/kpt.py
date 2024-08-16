@@ -225,6 +225,7 @@ options:
           - pkg-get
           - pkg-tree
           - pkg-diff
+          - pkg-update
           - fn-render
           - live-init
           - live-apply
@@ -286,10 +287,10 @@ class KptClient:
         self._module = module
         self._kpt_cmd_path = "/usr/local/bin/kpt"
 
-    def _run(self, cmd, changed=True):
+    def _run(self, cmd, changed=True, cwd=None):
         result = dict(changed=False, rc=0, cmd=" ".join(cmd))
         try:
-            kpt_result = subprocess.run(cmd, capture_output=True, text=True)
+            kpt_result = subprocess.run(cmd, capture_output=True, text=True, cwd=cwd)
             result["changed"] = changed
             result["stdout"] = kpt_result.stdout
             result["stdout_lines"] = kpt_result.stdout.splitlines()
@@ -362,13 +363,31 @@ class KptClient:
                 )
             )
             cmd.append(pkg_path)
-        if diff_type and diff_type["local", "remote", "combined", "3way"]:
+        if diff_type and diff_type in ["local", "remote", "combined", "3way"]:
             cmd.extend(["--diff-type", diff_type])
         if diff_tool:
             cmd.extend(["--diff-tool", diff_tool])
         if diff_tool_opts:
             cmd.extend(["--diff-tool-opts", diff_tool_opts])
         self._run(cmd, False)
+
+    # Apply upstream package updates.
+    def pkg_update(self, pkg_path, version, strategy, **kwargs):
+        cmd = [self._kpt_cmd_path, "pkg", "update"]
+        if pkg_path:
+            cmd.append(
+                "{}{}".format(
+                    pkg_path,
+                    "@" + version if version else "",
+                )
+            )
+        if strategy and strategy in [
+            "resource-merge",
+            "fast-forward",
+            "force-delete-replace",
+        ]:
+            cmd.extend(["--strategy", strategy])
+        self._run(cmd, cwd=os.path.dirname(pkg_path))
 
     # Render a package.
     def fn_render(
@@ -497,6 +516,7 @@ def main():
         "pkg-get": client.pkg_get,
         "pkg-tree": client.pkg_tree,
         "pkg-diff": client.pkg_diff,
+        "pkg-update": client.pkg_update,
         "fn-render": client.fn_render,
         "live-init": client.live_init,
         "live-apply": client.live_apply,

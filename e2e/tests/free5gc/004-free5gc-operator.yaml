@@ -1,0 +1,16 @@
+apiVersion: config.porch.kpt.dev/v1alpha2
+kind: PackageVariantSet
+metadata:
+  name: free5gc-operator
+spec:
+  upstream:
+    repo: catalog-workloads-free5gc
+    package: free5gc-operator
+    revision: main
+  targets:
+  - objectSelector:
+      apiVersion: infra.nephio.org/v1alpha1
+      kind: WorkloadCluster
+    template:
+      annotations:
+        approval.nephio.org/policy: initial

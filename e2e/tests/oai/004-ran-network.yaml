@@ -1,0 +1,61 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2024 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+apiVersion: config.porch.kpt.dev/v1alpha1
+kind: PackageVariant
+metadata:
+  name: oai-cucp
+spec:
+  upstream:
+    repo: catalog-workloads-oai-ran
+    package: pkg-example-cucp-bp
+    revision: main
+  downstream:
+    repo: regional
+    package: oai-ran-cucp
+  annotations:
+    approval.nephio.org/policy: initial
+  injectors:
+  - name: regional
+---
+apiVersion: config.porch.kpt.dev/v1alpha1
+kind: PackageVariant
+metadata:
+  name: oai-du
+spec:
+  upstream:
+    repo: catalog-workloads-oai-ran
+    package: pkg-example-du-bp
+    revision: main
+  downstream:
+    repo: edge
+    package: oai-ran-du
+  annotations:
+    approval.nephio.org/policy: initial
+  injectors:
+  - name: edge
+---
+apiVersion: config.porch.kpt.dev/v1alpha1
+kind: PackageVariant
+metadata:
+  name: oai-cuup
+spec:
+  upstream:
+    repo: catalog-workloads-oai-ran
+    package: pkg-example-cuup-bp
+    revision: main
+  downstream:
+    repo: edge
+    package: oai-ran-cuup
+  annotations:
+    approval.nephio.org/policy: initial
+  injectors:
+  - name: edge
+

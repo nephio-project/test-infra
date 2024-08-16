@@ -15,15 +15,54 @@
     clab:
       version: 0.42.0
       download_url: "https://github.com/srl-labs/containerlab/releases/download"
+    proxy_env:
+      http_proxy: "{{ lookup('ansible.builtin.env', 'http_proxy') }}"
+      https_proxy: "{{ lookup('ansible.builtin.env', 'https_proxy') }}"
+      no_proxy: "{{ lookup('ansible.builtin.env', 'no_proxy') }}"
+      HTTP_PROXY: "{{ lookup('ansible.builtin.env', 'HTTP_PROXY') }}"
+      HTTPS_PROXY: "{{ lookup('ansible.builtin.env', 'HTTPS_PROXY') }}"
+      NO_PROXY: "{{ lookup('ansible.builtin.env', 'NO_PROXY') }}"
+  environment: "{{ proxy_env | dict2items | selectattr('value') | items2dict }}"
+
   pre_tasks:
+    - name: "Print environment variable-based configuration"
+      become: true
+      ansible.builtin.debug:
+        msg:
+          - "DOCKERHUB_USERNAME: {{ lookup('ansible.builtin.env', 'DOCKERHUB_USERNAME') }}"
+          - "DOCKERHUB_TOKEN: {{ lookup('ansible.builtin.env', 'DOCKERHUB_TOKEN') }}"
+          - "DOCKER_REGISTRY_MIRRORS: {{ lookup('ansible.builtin.env', 'DOCKER_REGISTRY_MIRRORS') }}"
+          - "HTTP_PROXY: {{ lookup('ansible.builtin.env', 'HTTP_PROXY') }}, HTTPS_PROXY: {{ lookup('ansible.builtin.env', 'HTTPS_PROXY') }}"
+          - "NO_PROXY: {{ lookup('ansible.builtin.env', 'NO_PROXY') }}"
+          - "http_proxy: {{ lookup('ansible.builtin.env', 'http_proxy') }}, https_proxy: {{ lookup('ansible.builtin.env', 'https_proxy') }}"
+          - "no_proxy: {{ lookup('ansible.builtin.env', 'no_proxy') }}"
+
     - name: Install kubernetes python package
       become: true
       ansible.builtin.pip:
         name: kubernetes==26.1.0
+      tags:
+        - nonkind_k8s
     - name: Install Docker Engine
       become: true
       when: (container_engine is not defined) or (container_engine == "docker")
       block:
+        - name: Add registry mirrors to docker configuration
+          ansible.builtin.set_fact:
+            docker_engine_daemon_json:
+              registry-mirrors: "{{ lookup('ansible.builtin.env', 'DOCKER_REGISTRY_MIRRORS') }}"
+          when: lookup('ansible.builtin.env', 'DOCKER_REGISTRY_MIRRORS')
+
+        - name: Pass HTTP proxy parameters to the Docker daemon
+          ansible.builtin.set_fact:
+            docker_engine_init_exports:
+              http_proxy: "{{ lookup('ansible.builtin.env', 'http_proxy', default=omit) }}"
+              HTTP_PROXY: "{{ lookup('ansible.builtin.env', 'HTTP_PROXY', default=omit) }}"
+              https_proxy: "{{ lookup('ansible.builtin.env', 'https_proxy', default=omit) }}"
+              HTTPS_PROXY: "{{ lookup('ansible.builtin.env', 'HTTPS_PROXY', default=omit) }}"
+              no_proxy: "{{ lookup('ansible.builtin.env', 'no_proxy', default=omit) }}"
+              NO_PROXY: "{{ lookup('ansible.builtin.env', 'NO_PROXY', default=omit) }}"
+
         - name: Install docker binaries
           ansible.builtin.include_role:
             name: andrewrothstein.docker_engine
@@ -46,20 +85,26 @@
             fs.inotify.max_user_instances: 512
             kernel.keys.maxkeys: 500000
             kernel.keys.maxbytes: 1000000
+            vm.mmap_rnd_bits: 28
     - name: Install kubectl command-line
       ansible.builtin.include_role:
         name: andrewrothstein.kubectl
     - name: Install kpt command-line
       ansible.builtin.include_role:
         name: andrewrothstein.kpt
+        apply:
+          tags:
+            - nonkind_k8s
+      tags:
+        - always
       vars:
-        kpt_ver: '1.0.0-beta.38'
+        kpt_ver: '1.0.0-beta.49'
         kpt_checksums:
-          '1.0.0-beta.38':
-            linux_amd64: sha256:e58b13b6069c70a5f0c4154aa2a548b09a9d21b9e9e7c2d935807f9943d92db4
-            linux_arm64: sha256:168fd10c69e446e8e9d408a338e937b51ba4d7bd3bf986691c1e97c52a1e3d7d
-            darwin_amd64: sha256:488943eca09e2a994a2a57d85729e49af241eac69bd0e3e6c1ad76507bcb6357
-            darwin_arm64: sha256:8673953ad01ae806d93b5fffcaf42482ddbace7d0cd81424391b57d6c7ad6665
+          '1.0.0-beta.49':
+            linux_amd64: sha256:8de2996018992ea946c9002aa43c85250a78d9fa3eb1c8da24c7878d7d24b9b7
+            linux_arm64: sha256:18dfb4540eeed32d2bdded612b3aa678cee6fdcdb14813e184c1a54b4ca35b56
+            darwin_amd64: sha256:558c1b082a8f1221b88cf6728178076190adda58db84e129ffb40f1e2a462759
+            darwin_arm64: sha256:bbaa7c6b4c7af0f9cdda694476a9b3b8d9fdd8fba3c0c0ec49f4f26687a2527a
     - name: Download CNI plugins
       ansible.builtin.include_role:
         name: darkwizard242.cni
@@ -72,11 +117,13 @@
       block:
         - name: Install container lab on Ubuntu family OS
           ansible.builtin.apt:
-            deb: "{{ clab.download_url }}/v{{ clab.version }}/containerlab_{{ clab.version }}_linux_{{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}.deb"
+            deb: "{{ clab.download_url }}/v{{ clab.version }}/containerlab_{{ clab.version }}_linux_{{ 'amd64'
+              if ansible_architecture == 'x86_64' else ansible_architecture }}.deb"
           when: ansible_os_family == 'Debian'
         - name: Install container lab on RedHat family OS
-          ansible.builtin.yum:
-            name: "{{ clab.download_url }}/v{{ clab.version }}/containerlab_{{ clab.version }}_linux_{{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}.rpm"
+          ansible.builtin.dnf:
+            name: "{{ clab.download_url }}/v{{ clab.version }}/containerlab_{{ clab.version }}_linux_{{ 'amd64'
+              if ansible_architecture == 'x86_64' else ansible_architecture }}.rpm"
             state: present
             disable_gpg_check: true
           when: ansible_os_family == 'RedHat'
@@ -86,24 +133,39 @@
             state: true
             persistent: true
           when: ansible_os_family == 'RedHat'
+    - name: Unarchive /tmp/porchctl.tgz into /usr/local/bin/
+      become: true
+      become_user: root
+      ansible.builtin.unarchive:
+        remote_src: true
+        src: https://github.com/nephio-project/porch/releases/download/main/porchctl.tgz
+        dest: /usr/local/bin/
+        creates: /usr/local/bin/porchctl
   roles:
     - bootstrap
-    - install
+    - role: install
+      tags:
+        - always
   tasks:
     - name: Deploy repositories
       ansible.builtin.include_role:
         name: kpt
+        apply:
+          tags:
+            - nonkind_k8s
+      tags:
+        - always
       loop:
-        - {pkg: repository, version: v1.0.1, dest: /tmp/repository/mgmt}
-        - {pkg: rootsync, version: v1.0.1, dest: /tmp/rootsync/mgmt}
-        - {pkg: repository, version: v1.0.1, dest: /tmp/repository/mgmt-staging}
+        - {pkg: distros/sandbox/repository, dest: /tmp/repository/mgmt}
+        - {pkg: nephio/optional/rootsync, dest: /tmp/rootsync/mgmt}
+        - {pkg: distros/sandbox/repository, dest: /tmp/repository/mgmt-staging}
       vars:
-        repo_uri: https://github.com/nephio-project/nephio-example-packages
+        repo_uri: "{{ nephio_catalog_repo_uri }}"
         local_dest_directory: "{{ item.dest }}"
         pkg: "{{ item.pkg }}"
-        version: "{{ item.version }}"
+        version: main
         for_deployment: true
-        context: kind-kind
+        context: "{{ k8s.context }}"
         kpt_async: 900
         kpt_poll: 0
     - name: Wait for packages to be applied
@@ -115,9 +177,11 @@
       until: job_result.finished
       retries: 90
       delay: 10
+      tags:
+        - nonkind_k8s
     - name: Wait for repositories
       kubernetes.core.k8s:
-        context: kind-kind
+        context: "{{ k8s.context }}"
         definition:
           apiVersion: config.porch.kpt.dev/v1alpha1
           kind: Repository
@@ -129,6 +193,7 @@
           type: Ready
           status: true
       loop:
-        - nephio-example-packages
         - mgmt
         - mgmt-staging
+      tags:
+        - nonkind_k8s

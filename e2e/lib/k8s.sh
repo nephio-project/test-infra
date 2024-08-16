@@ -9,123 +9,140 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-function k8s_apply {
-    local kubeconfig=$1
-    local file=$2
+# shellcheck source=e2e/lib/_utils.sh
+source "${E2EDIR:-$HOME/test-infra/e2e}/lib/_utils.sh"
 
-    # should validate the params...
+# k8s_apply() - Creates the resources in a given kubernetes cluster
+function k8s_apply {
+    local file=$1
+    local kubeconfig=${2:-"$HOME/.kube/config"}
+
+    [ -f $kubeconfig ] || error "Kubeconfig file doesn't exist"
+    [ -f $file ] || error "Resources file doesn't exist"
 
     kubectl --kubeconfig $kubeconfig apply -f $file
 }
 
+# k8s_wait_exists() - Waits for the creation of a given kubernetes resource
 function k8s_wait_exists {
-    local kubeconfig=$1
-    local timeout=$2
-    local resource_namespace=$3
-    local resource_type=$4
-    local resource_name=$5
+    local resource_type=$1
+    local resource_name=$2
+    local kubeconfig=${3:-"$HOME/.kube/config"}
+    local resource_namespace=${4:-default}
+    local timeout=${5:-600}
+    lapse=$timeout
 
     # should validate the params...
+    [ -f $kubeconfig ] || error "Kubeconfig file doesn't exist"
 
+    info "looking for $resource_type $resource_namespace/$resource_name using $kubeconfig"
     local found=""
-    while [[ -z $found && $timeout -gt 0 ]]; do
-        echo "$timeout: looking for $resource_type $resource_namespace/$resource_name using $kubeconfig"
-        found=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath='{.metadata.name}' || echo)
-        timeout=$((timeout - 5))
-        if [[ -z $found && $timeout -gt 0 ]]; then
-            sleep 5
+    while [[ $lapse -gt 0 ]]; do
+        found=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath='{.metadata.name}' --ignore-not-found)
+        if [[ $found ]]; then
+            info "found $resource_type $resource_namespace/$resource_name using $kubeconfig"
+            [ $((timeout * 2 / 3)) -lt $lapse ] || warn "$resource_namespace/$resource_name $resource_type took $lapse seconds to exist"
+            return
         fi
+        lapse=$((lapse - 5))
+        sleep 5
     done
 
-    if [[ $found != "$resource_name" ]]; then
-        echo "Timed out waiting for $resource_type $resource_namespace/$resource_name"
-        return 1
-    fi
-
-    echo "Found $resource_type $resource_namespace/$resource_name"
-    return 0
+    kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type
+    error "Timed out waiting for $resource_type $resource_namespace/$resource_name"
 }
 
+# k8s_wait_ready() - Waits for the readiness of a given kubernetes resource
 function k8s_wait_ready {
-    local kubeconfig=$1
-    local timeout=$2
-    local resource_namespace=$3
-    local resource_type=$4
-    local resource_name=$5
+    local resource_type=$1
+    local resource_name=$2
+    local kubeconfig=${3:-"$HOME/.kube/config"}
+    local resource_namespace=${4:-default}
+    local timeout=${5:-600}
+    lapse=$timeout
 
     # should validate the params...
+    [ -f $kubeconfig ] || error "Kubeconfig file doesn't exist"
 
+    k8s_wait_exists "$@"
+
+    info "checking readiness of $resource_type $resource_namespace/$resource_name using $kubeconfig"
     local ready=""
-    while [[ $ready != "True" && $timeout -gt 0 ]]; do
-        echo "$timeout: checking readiness of $resource_type $resource_namespace/$resource_name using $kubeconfig"
+    while [[ $lapse -gt 0 ]]; do
         ready=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' || echo)
-        timeout=$((timeout - 5))
-        if [[ $ready != "True" && $timeout -gt 0 ]]; then
-            echo "status: $ready"
-            sleep 5
+        if [[ $ready == "True" ]]; then
+            info "status ready on $resource_type $resource_namespace/$resource_name using $kubeconfig"
+            [ $((timeout * 2 / 3)) -lt $lapse ] || warn "$resource_namespace/$resource_name $resource_type took $lapse seconds to be ready"
+            return
         fi
+        lapse=$((lapse - 5))
+        sleep 5
     done
 
-    if [[ $ready != "True" ]]; then
-        echo "Timed out waiting for $resource_type $resource_namespace/$resource_name to be ready"
-        return 1
-    fi
-
-    echo "$resource_type $resource_namespace/$resource_name is ready"
-    return 0
+    kubectl --kubeconfig $kubeconfig -n $resource_namespace describe $resource_type $resource_name
+    error "Timed out waiting for $resource_type $resource_namespace/$resource_name to be ready"
 }
 
+# k8s_wait_ready_replicas() - Waits for the readiness of a minimum number of replicas
 function k8s_wait_ready_replicas {
-    local kubeconfig=$1
-    local timeout=$2
-    local resource_namespace=$3
-    local resource_type=$4
-    local resource_name=$5
+    local resource_type=$1
+    local resource_name=$2
+    local kubeconfig=${3:-"$HOME/.kube/config"}
+    local resource_namespace=${4:-default}
+    local timeout=${5:-600}
+    lapse=$timeout
     local min_ready=${6:-1}
+    local status_field=${7:-readyReplicas}
+    status_field=readyReplicas
+    [ $resource_type != "daemonset" ] || status_field=numberReady
 
     # should validate the params...
+    [ -f $kubeconfig ] || error "Kubeconfig file doesn't exist"
 
+    k8s_wait_exists "$resource_type" "$resource_name" "$kubeconfig" "$resource_namespace" "$timeout"
+
+    info "checking readiness of $resource_type $resource_namespace/$resource_name using $kubeconfig"
     local ready=""
-    while [[ $ready -lt $min_ready && $timeout -gt 0 ]]; do
-        echo "$timeout: checking readiness of $resource_type $resource_namespace/$resource_name using $kubeconfig"
-        ready=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath='{.status.readyReplicas}' || echo)
-        timeout=$((timeout - 5))
-        if [[ $ready -lt $min_ready && $timeout -gt 0 ]]; then
-            echo "status: $ready (want $min_ready)"
-            sleep 5
+    while [[ $lapse -gt 0 ]]; do
+        ready=$(kubectl --kubeconfig $kubeconfig -n $resource_namespace get $resource_type $resource_name -o jsonpath="{.status.$status_field}" || echo)
+        if [[ $ready -ge $min_ready ]]; then
+            info "status ready on $resource_type $resource_namespace/$resource_name using $kubeconfig"
+            [ $((timeout * 2 / 3)) -lt $lapse ] || warn "$resource_namespace/$resource_name $resource_type took $lapse seconds to have minimum number of replicas"
+            return
         fi
+        lapse=$((lapse - 5))
+        sleep 5
     done
 
-    if [[ $ready -lt $min_ready ]]; then
-        echo "Timed out waiting for $resource_type $resource_namespace/$resource_name to be ready"
-        return 1
-    fi
-
-    echo "$resource_type $resource_namespace/$resource_name is ready"
-    return 0
+    kubectl --kubeconfig $kubeconfig -n $resource_namespace describe $resource_type $resource_name
+    error "Timed out waiting for $resource_type $resource_namespace/$resource_name to be ready"
 }
 
+# k8s_get_capi_kubeconfig() - Gets the Kubeconfig file for a given Cluster API cluster
 function k8s_get_capi_kubeconfig {
-    local kubeconfig=$1
-    local namespace=$2
-    local cluster=$3
+    local cluster=$1
+    local file="/tmp/${cluster}-kubeconfig"
 
-    # mktemp is supported on both ubuntu and fedora
-    local file=$(mktemp --suffix "_kubeconfig-$cluster")
-    k8s_wait_exists "$kubeconfig" 600 "$namespace" "secret" "${cluster}-kubeconfig" >/dev/null 2>&1
-    kubectl --kubeconfig "$kubeconfig" -n "$namespace" get secret "${cluster}-kubeconfig" -o jsonpath='{.data.value}' | base64 -d >"$file"
+    if [ ! -f "$file" ]; then
+        k8s_wait_exists "secret" "${cluster}-kubeconfig" >/dev/null 2>&1
+        kubectl --kubeconfig "$HOME/.kube/config" get secret "${cluster}-kubeconfig" -o jsonpath='{.data.value}' | base64 -d >"$file"
+    fi
     echo "$file"
 }
 
+# k8s_exec() - Execute a command into a pod container
 function k8s_exec {
     local kubeconfig=$1
     local resource_namespace=$2
     local resource_name=$3
     local command=$4
 
-    echo "executing command $command on $resource_name in namespace $resource_namespace using $kubeconfig"
+    info "executing command $command on $resource_name in namespace $resource_namespace using $kubeconfig"
     kubectl --kubeconfig $kubeconfig -n $resource_namespace exec $resource_name -- /bin/bash -c "$command"
-    return $?
+    result=$?
+    info "executed command $command on $resource_name in namespace $resource_namespace using $kubeconfig"
+
+    return $result
 }
 
 function _k8s_absolute_unit {
@@ -139,6 +156,7 @@ function _k8s_absolute_unit {
     fi
 }
 
+# k8s_check_scale() - Validate scaling pod resources
 function k8s_check_scale {
     local NF=$1
     local metric=$2
@@ -149,15 +167,15 @@ function k8s_check_scale {
     local previous_scaled=$(_k8s_absolute_unit $3)
     local success=$(echo "$previous_scaled < $current_scaled" | bc)
 
-    echo "Current : $current_raw ($current_scaled), Previous: $previous_raw ($previous_scaled)"
-    echo "$NF - Comparing the new $metric after scaling"
+    info "Current : $current_raw ($current_scaled), Previous: $previous_raw ($previous_scaled)"
+    info "$NF - Comparing the new $metric after scaling"
     if [ "$success" == "0" ]; then
-        echo "$NF $metric scaling Failed"
-        exit 1
+        error "$NF $metric scaling Failed"
     fi
-    echo "$NF - $metric Pod Scaling Successful"
+    info "$NF - $metric Pod Scaling Successful"
 }
 
+# k8s_get_first_container_requests() - Get request value from the first container found in the pod
 function k8s_get_first_container_requests {
     local kubeconfig=$1
     local namespace=$2
@@ -165,4 +183,28 @@ function k8s_get_first_container_requests {
     local resource_type=$4
 
     kubectl --kubeconfig $kubeconfig get pods $pod_id -n $namespace -o jsonpath="{.spec.containers[0].resources.requests.$resource_type}"
+}
+
+# k8s_get_newest_pod_name() - Get most recent pod name
+function k8s_get_newest_pod_name {
+    local kubeconfig="$1"
+    local label="$2"
+    local namespace="$3"
+    local previous_podname="${4:-}"
+
+    # Wait for the deployment to start with a new pod
+    timeout=600
+    while [[ $timeout -gt 0 ]]; do
+        podname=$(kubectl --kubeconfig "$kubeconfig" get pods -l "$label" -n "$namespace" --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}')
+        if [[ $podname != "$previous_podname" ]]; then
+            echo "$podname"
+            return
+        fi
+        timeout=$((timeout - 5))
+        sleep 5
+    done
+
+    kubectl --kubeconfig "$kubeconfig" get pods -n "$namespace" --show-labels
+    kubectl --kubeconfig "$kubeconfig" get events -n "$namespace"
+    error "Timed out waiting for new pod to deploy"
 }

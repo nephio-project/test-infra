@@ -1,0 +1,112 @@
+{
+  "repository_sets": [
+    {
+      "image_repos": [
+        {
+          "name": "nephio",
+          "tag": "v2.0.0",
+          "title": "R2",
+          "body": "Release notes for version 2.0.0",
+          "draft": false,
+          "prerelease": false,
+          "images": [
+            "nephio/nephio-operator:v2.0.0",
+            "nephio/vlan-fn:v2.0.0",
+            "nephio/nfdeploy-fn:v2.0.0",
+            "nephio/nad-fn:v2.0.0",
+            "nephio/ipam-fn:v2.0.0",
+            "nephio/interface-fn:v2.0.0",
+            "nephio/gen-configmap-fn:v2.0.0",
+            "nephio/dnn-fn:v2.0.0",
+            "nephio/configinject-fn:v2.0.0",
+            "nephio/ueransim-deploy-fn:v2.0.0"
+          ]
+        },
+        {
+          "name": "kpt-backstage-plugins",
+          "tag": "v2.0.0",
+          "title": "R2",
+          "body": "Release notes for version 2.0.0",
+          "draft": false,
+          "prerelease": false,
+          "images": [
+            "nephio/kpt-backstage-plugins:v2.0.0"
+          ]
+        },
+        {
+          "name": "free5gc",
+          "tag": "v2.0.0",
+          "title": "R2",
+          "body": "Release notes for version 2.0.0",
+          "draft": false,
+          "prerelease": false,
+          "images": [
+            "nephio/free5gc-operator:v2.0.0"
+          ]
+        },
+        {
+          "name": "oai",
+          "tag": "v2.0.0",
+          "title": "R2",
+          "body": "Release notes for version 2.0.0",
+          "draft": false,
+          "prerelease": false,
+          "images": [
+            "nephio/oai-ran-controller:v2.0.0"
+          ]          
+        },
+        {
+          "name": "porch",
+          "tag": "v2.0.0",
+          "title": "R2",
+          "body": "Release notes for version 2.0.0",
+          "draft": false,
+          "prerelease": false,
+          "images": [
+            "nephio/porch-server:v2.0.0",
+            "nephio/porch-controllers",
+            "nephio/porch-function-runner",
+            "nephio/porch-wrapper-server"
+          ]    
+        }
+      ]
+    },
+    {
+      "package_repos": [
+        {
+          "name": "catalog",
+          "tag": "v2.0.0",
+          "title": "R2",
+          "body": "Release notes for version 2.0.0",
+          "draft": false,
+          "prerelease": false
+        },
+        {
+          "name": "api",
+          "tag": "v2.0.0",
+          "title": "R2",
+          "body": "Release notes for version 2.0.0",
+          "draft": false,
+          "prerelease": false
+        },
+        {
+          "name": "test-infra",
+          "tag": "v2.0.0",
+          "title": "R2",
+          "body": "Release notes for version 2.0.0",
+          "draft": false,
+          "prerelease": false
+        },
+        {
+          "name": "docs",
+          "tag": "v2.0.0",
+          "title": "R2",
+          "body": "Release notes for version 2.0.0",
+          "draft": false,
+          "prerelease": false
+        }
+      ]
+    }
+  ]
+}
+

@@ -8,30 +8,35 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-host_min_vcpu: 8  # minimum required vCPUs before install
-host_min_cpu_ram: 16  # minimum required CPU RAM before install; value in GB
-host_min_root_disk_space: 50  # minimum required disk space before install; value in GB
+host_reqs:
+  sandbox:
+    vcpu: 6  # minimum vCPUs required for the Sandbox installation
+    memory: 6  # minimum memory required for the Sandbox installation
+  end_to_end:
+    vcpu: 16
+    memory: 32
 
 container_engine: docker
 
 gtp5g_dest: /opt/gtp5g
-gtp5g_version: v0.6.8
+gtp5g_version: v0.8.8
 gtp5g_tarball_url: "https://github.com/free5gc/gtp5g/archive/refs/tags/{{ gtp5g_version }}.tar.gz"
 
 k8s:
   context: kind-kind
-  version: v1.27.1
+  version: v1.29.2
 
 kind:
   enabled: true
 
-nephio_pkg_version: v1.0.1
+nephio_catalog_repo_uri: https://github.com/nephio-project/catalog.git
+nephio_catalog_revision: main
 
 gitea:
   enabled: true
   k8s:
     namespace: gitea
-    postgres_password: c2VjcmV0  # echo "secret" | base64
+    postgres_password: c2VjcmV0  # echo -n "secret" | base64
     db_password: c2VjcmV0
     username: nephio
     password: secret
@@ -39,9 +44,9 @@ gitea:
       - gitea
   kpt:
     packages:
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages
-        pkg: gitea
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: distros/sandbox/gitea
+        version: "{{ nephio_catalog_revision }}"
         async: 780
         poll: 0
 
@@ -52,9 +57,9 @@ resource_backend:
       - backend-system
   kpt:
     packages:
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages
-        pkg: resource-backend
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: nephio/optional/resource-backend
+        version: "{{ nephio_catalog_revision }}"
         async: 780
         poll: 0
 
@@ -65,9 +70,9 @@ cert_manager:
       - cert-manager
   kpt:
     packages:
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages
-        pkg: cert-manager
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: distros/sandbox/cert-manager
+        version: "{{ nephio_catalog_revision }}"
         async: 660
         poll: 0
 
@@ -81,19 +86,19 @@ cluster_api:
       - capd-system
   kpt:
     packages:
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages
-        pkg: cluster-capi
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: infra/capi/cluster-capi
+        version: "{{ nephio_catalog_revision }}"
         async: 900
         poll: 5
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages
-        pkg: cluster-capi-infrastructure-docker
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: infra/capi/cluster-capi-infrastructure-docker
+        version: "{{ nephio_catalog_revision }}"
         async: 780
         poll: 5
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages
-        pkg: cluster-capi-kind-docker-templates
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: infra/capi/cluster-capi-kind-docker-templates
+        version: "{{ nephio_catalog_revision }}"
         async: 1500
         poll: 0
 
@@ -104,13 +109,13 @@ metallb:
       - metallb-system
   kpt:
     packages:
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages
-        pkg: metallb
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: distros/sandbox/metallb
+        version: "{{ nephio_catalog_revision }}"
         async: 1020
         poll: 5
-      - repo_uri: https://github.com/nephio-project/nephio-example-packages
-        pkg: metallb-sandbox-config
-        version: "{{ nephio_pkg_version }}"
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: distros/sandbox/metallb-sandbox-config
+        version: "{{ nephio_catalog_revision }}"
         async: 660
         poll: 0

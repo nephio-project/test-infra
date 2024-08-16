@@ -1,20 +1,20 @@
-FROM golang:1.20.5-bullseye as builder
+FROM golang:1.22-alpine as builder
 
-COPY release.sh /usr/local/bin/
-RUN go install github.com/google/go-containerregistry/cmd/crane@v0.15.2
-ADD https://github.com/oras-project/oras/releases/download/v1.0.0/oras_1.0.0_linux_amd64.tar.gz /tmp/oras
-ADD https://github.com/ko-build/ko/releases/download/v0.14.1/ko_0.14.1_Linux_x86_64.tar.gz /tmp/ko
+RUN go install github.com/google/go-containerregistry/cmd/crane@v0.15.2 && \
+    go install github.com/sigstore/cosign/v2/cmd/cosign@v2.2.4
 
-FROM debian:bullseye-slim
+FROM alpine:3.19
 
 COPY --from=builder /go/bin/crane /usr/local/bin/crane
-COPY --from=builder /tmp/oras /usr/local/bin/oras
-COPY --from=builder /tmp/ko /usr/local/bin/ko
+COPY --from=builder /go/bin/cosign /usr/local/bin/cosign
+COPY release.sh /usr/local/bin/release
 
-ADD https://github.com/sigstore/cosign/releases/download/v2.0.2/cosign-linux-amd64 /usr/local/bin/cosign
-ADD https://github.com/anchore/syft/releases/download/v0.84.0/syft_0.84.0_linux_amd64.deb /tmp/syft.deb
-ADD https://github.com/anchore/grype/releases/download/v0.62.3/grype_0.62.3_linux_amd64.deb /tmp/grype.deb
-ADD https://github.com/aquasecurity/trivy/releases/download/v0.42.1/trivy_0.42.1_Linux-64bit.deb /tmp/trivy.deb
+SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+RUN apk --no-cache update && apk add --no-cache curl=8.9.0-r0 bash=5.2.21-r0 && \
+    curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.51.2 && \
+    curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin && \
+    curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin && \
+    curl -L https://github.com/oras-project/oras/releases/download/v1.1.0/oras_1.1.0_linux_amd64.tar.gz | tar -zx -C /usr/local/bin/ && \
+    apk del curl && chmod +x /usr/local/bin/*
 
-RUN dpkg -i /tmp/*.deb && rm -rf /tmp/*.deb && \
-  chmod +x /usr/local/bin/*
+ENTRYPOINT [ "release" ]

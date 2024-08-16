@@ -1,0 +1,30 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+name: 5g
+prefix: net
+mgmt:
+  network: kind
+topology:
+  kinds:
+    srl:
+      type: ixrd3
+      image: ghcr.io/nokia/srlinux:22.11.2-116
+  nodes:
+    leaf:
+      kind: srl
+{{- range .workers }}
+    {{ . }}:
+      kind: ext-container
+{{- end }}
+  links:
+{{- range $i, $worker := .workers }}
+    - endpoints: ["leaf:e1-{{ $i | add 1 }}", "{{ $worker }}:eth1"]
+{{- end }}

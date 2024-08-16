@@ -1,0 +1,78 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2023 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+apiVersion: config.porch.kpt.dev/v1alpha1
+kind: PackageVariant
+metadata:
+  name: oai-core-clusters-mgmt-core
+spec:
+  upstream:
+    repo: catalog-infra-capi
+    package: nephio-workload-cluster
+    revision: main
+  downstream:
+    repo: mgmt
+    package: core
+  annotations:
+    approval.nephio.org/policy: initial
+  pipeline:
+    mutators:
+    - image: gcr.io/kpt-fn/set-labels:v0.2.0
+      configMap:
+        nephio.org/site-type: core
+        nephio.org/region: us-west1
+---
+apiVersion: config.porch.kpt.dev/v1alpha2
+kind: PackageVariantSet
+metadata:
+  name: oai-regional-clusters
+spec:
+  upstream:
+    repo: catalog-infra-capi
+    package: nephio-workload-cluster
+    revision: main
+  targets:
+  - repositories:
+    - name: mgmt
+      packageNames:
+        - regional
+    template:
+      annotations:
+        approval.nephio.org/policy: initial
+      pipeline:
+        mutators:
+        - image: gcr.io/kpt-fn/set-labels:v0.2.0
+          configMap:
+            nephio.org/site-type: regional
+            nephio.org/region: us-west1
+---
+apiVersion: config.porch.kpt.dev/v1alpha2
+kind: PackageVariantSet
+metadata:
+  name: oai-edge-clusters
+spec:
+  upstream:
+    repo: catalog-infra-capi
+    package: nephio-workload-cluster
+    revision: main
+  targets:
+  - repositories:
+    - name: mgmt
+      packageNames:
+        - edge
+    template:
+      annotations:
+        approval.nephio.org/policy: initial
+      pipeline:
+        mutators:
+        - image: gcr.io/kpt-fn/set-labels:v0.2.0
+          configMap:
+            nephio.org/site-type: edge
+            nephio.org/region: us-west1

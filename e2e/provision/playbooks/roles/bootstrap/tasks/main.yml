@@ -13,6 +13,7 @@
 
 - name: Load gtp5g kernel module
   ansible.builtin.include_tasks: load-gtp5g-module.yml
+  when: lookup('ansible.builtin.env', 'E2ETYPE', default='free5gc') == 'free5gc'
 
 - name: Load sctp kernel module
   ansible.builtin.include_tasks: load-sctp-module.yml
@@ -24,9 +25,46 @@
   ansible.builtin.include_tasks: create-mgmt.yml
   when: kind.enabled
 
-- name: Create Gitea K8s resources
-  ansible.builtin.include_tasks: prep-gitea.yml
-  when: gitea.enabled
-
 - name: Apply kpt packages
-  ansible.builtin.include_tasks: apply-pkgs.yml
+  ansible.builtin.include_tasks:
+    file: apply-pkgs.yml
+    apply:
+      tags:
+        - nonkind_k8s
+  tags:
+    - always
+
+- name: Create docker hub secret
+  tags:
+    - nonkind_k8s
+  when:
+    - lookup('ansible.builtin.env', 'DOCKERHUB_USERNAME') | length > 0
+    - lookup('ansible.builtin.env', 'DOCKERHUB_TOKEN') | length > 0
+  vars:
+    username: "{{ lookup('ansible.builtin.env', 'DOCKERHUB_USERNAME') }}"
+    token: "{{ lookup('ansible.builtin.env', 'DOCKERHUB_TOKEN') }}"
+  block:
+    - name: Delete docker-registry secret
+      kubernetes.core.k8s:
+        kind: Secret
+        namespace: "{{ gitea.k8s.namespace }}"
+        name: dockerhub
+        state: absent
+    - name: Create docker-registry secret
+      ansible.builtin.command: >
+        kubectl create secret docker-registry dockerhub --docker-username={{ username }}
+        --docker-password={{ token }} -n {{ gitea.k8s.namespace }}
+      changed_when: false
+    - name: Create docker-registry service account
+      no_log: true
+      kubernetes.core.k8s:
+        context: "{{ k8s.context }}"
+        state: present
+        definition:
+          apiVersion: v1
+          kind: ServiceAccount
+          imagePullSecrets:
+            - name: dockerhub
+          metadata:
+            name: default
+            namespace: "{{ gitea.k8s.namespace }}"

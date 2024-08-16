@@ -14,7 +14,112 @@ presubmits:
           args:
             - "--plugin-config=prow/config/plugins.yaml"
             - "--config-path=prow/config/config.yaml"
-  - name: e2e
+  - name: provision-linter
+    annotations:
+    labels:
+    run_if_changed: '^e2e/provision'
+    skip_report: false
+    decorate: true
+    cluster: default
+    spec:
+      containers:
+        - image: "nephio/linter:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - set -eE; cd e2e/provision; /usr/local/bin/tox -e lint
+  - name: images-hadolint
+    annotations:
+    labels:
+    run_if_changed: '^images/'
+    skip_report: false
+    decorate: true
+    cluster: default
+    spec:
+      containers:
+        - image: "hadolint/hadolint:v2.12.0-debian"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - set -eE; for dockerfile in images/*/Dockerfile; do hadolint $dockerfile -t warning; done
+  - name: bootstrap-integration
+    annotations:
+    labels:
+    run_if_changed: '^e2e/provision/playbooks/roles/bootstrap'
+    skip_report: false
+    decorate: true
+    cluster: default
+    spec:
+      containers:
+        - image: "nephio/molecule:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - set -eE; cd e2e/provision; /usr/local/bin/tox -e bootstrap -- --scenario-name ci --driver-name gce
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+  - name: kpt-integration
+    annotations:
+    labels:
+    run_if_changed: '^e2e/provision/playbooks/roles/kpt'
+    skip_report: false
+    decorate: true
+    cluster: default
+    spec:
+      containers:
+        - image: "nephio/molecule:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - set -eE; cd e2e/provision; /usr/local/bin/tox -e kpt -- --scenario-name ci --driver-name gce
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+  - name: install-integration
+    annotations:
+    labels:
+    run_if_changed: '^e2e/provision/playbooks/roles/install'
+    skip_report: false
+    decorate: true
+    cluster: default
+    spec:
+      containers:
+        - image: "nephio/molecule:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - set -eE; cd e2e/provision; /usr/local/bin/tox -e install -- --scenario-name ci --driver-name gce
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+  - name: e2e-free5gc-ubuntu-focal
     annotations:
     labels:
     run_if_changed: '^e2e/'
@@ -23,21 +128,19 @@ presubmits:
     cluster: default
     spec:
       containers:
-        - image: "nephio/e2e:1"
+        - image: "nephio/e2e:latest"
           command:
             - "/bin/sh"
           args:
             - "-c"
             - |
-              set -eE; cd e2e/terraform; trap 'terraform destroy -auto-approve' EXIT;
-              terraform init && timeout 75m terraform apply -auto-approve
+              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-focal -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-focal -var="fail_fast=true" -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
             - name: ssh-key-vol
               mountPath: "/etc/ssh-key"
-            - name: nephio-e2e-yaml
-              mountPath: "/etc/nephio"
           resources:
             requests:
               cpu: 2
@@ -58,13 +161,206 @@ presubmits:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
-        - name: nephio-e2e-yaml
+  - name: e2e-free5gc-fedora-34
+    annotations:
+    labels:
+    run_if_changed: '^e2e/'
+    skip_report: false
+    optional: true
+    decorate: true
+    cluster: default
+    spec:
+      containers:
+        - image: "nephio/e2e:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - |
+              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-34 -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-fedora-34 -var="fail_fast=true" -auto-approve
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+            - name: ssh-key-vol
+              mountPath: "/etc/ssh-key"
+          resources:
+            requests:
+              cpu: 2
+              memory: 2Gi
+      volumes:
+        - name: satoken
           secret:
-            secretName: nephio-e2e-yaml
+            secretName: satoken
             items:
-              - key: nephio.yaml
-                path: nephio.yaml
+              - key: satoken
+                path: satoken
+        - name: ssh-key-vol
+          secret:
+            secretName: ssh-key-e2e
+            defaultMode: 256
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: id_rsa.pub
+                path: id_rsa.pub
+  - name: e2e-oai-ubuntu-jammy
+    annotations:
+    labels:
+    run_if_changed: '^e2e/'
+    skip_report: false
+    decorate: true
+    cluster: default
+    spec:
+      containers:
+        - image: "nephio/e2e:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - |
+              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -var="e2e_type=oai" -var="fail_fast=true" -auto-approve
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+            - name: ssh-key-vol
+              mountPath: "/etc/ssh-key"
+          resources:
+            requests:
+              cpu: 2
+              memory: 2Gi
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+        - name: ssh-key-vol
+          secret:
+            secretName: ssh-key-e2e
+            defaultMode: 256
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: id_rsa.pub
+                path: id_rsa.pub
+  - name: e2e-oai-fedora-34
+    annotations:
+    labels:
+    run_if_changed: '^e2e/'
+    skip_report: false
+    optional: true
+    decorate: true
+    cluster: default
+    spec:
+      containers:
+        - image: "nephio/e2e:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - |
+              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-34 -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-fedora-34 -var="e2e_type=oai" -var="fail_fast=true" -auto-approve
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+            - name: ssh-key-vol
+              mountPath: "/etc/ssh-key"
+          resources:
+            requests:
+              cpu: 2
+              memory: 2Gi
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+        - name: ssh-key-vol
+          secret:
+            secretName: ssh-key-e2e
+            defaultMode: 256
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: id_rsa.pub
+                path: id_rsa.pub
 postsubmits:
+  - name: build-push-image-releaser
+    cluster: default
+    run_if_changed: 'images/releaser/.*'
+    branches:
+      - "main"
+    annotations:
+      description: Build and Push Image to DockerHub every commit
+    decorate: true
+    decoration_config:
+      censor_secrets: true
+    max_concurrency: 0
+    spec:
+      containers:
+        - name: kaniko
+          image: gcr.io/kaniko-project/executor:debug
+          command:
+            - "/bin/sh"
+            - "-c"
+            - |
+              executor --context=${PWD}/images/releaser \
+                --dockerfile=Dockerfile --destination=nephio/releaser:${BUILD_ID} \
+                --destination=nephio/releaser:latest
+          volumeMounts:
+            - name: kaniko-secret
+              mountPath: /kaniko/.docker/
+          resources:
+            requests:
+              cpu: 2
+              memory: 1Gi
+        - name: nephio-image-signer
+          image: nephio/releaser:v0.0.2
+          command:
+            - "/bin/sh"
+            - "-c"
+            - |
+              /usr/local/bin/release docker.io nephio releaser ${BUILD_ID}
+          volumeMounts:
+            - name: cosign-secret
+              mountPath: /root/.docker/
+          resources:
+            requests:
+              cpu: 1
+              memory: 64Mi
+            limits:
+              cpu: 1
+              memory: 128Mi
+          env:
+            - name: COSIGN_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cosign-private-key
+                  key: COSIGN_PRIVATE_KEY
+            - name: COSIGN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cosign-private-key-passwd
+                  key: COSIGN_PASSWORD
+      volumes:
+        - name: kaniko-secret
+          secret:
+            secretName: regcred
+            items:
+              - key: .dockerconfigjson
+                path: config.json
+        - name: cosign-secret
+          secret:
+            secretName: cosign-login
+            items:
+              - key: configjson
+                path: config.json
+
   - name: build-push-image-gotests
     cluster: default
     run_if_changed: 'images/gotests/.*'
@@ -94,6 +390,34 @@ postsubmits:
           requests:
             cpu: 2
             memory: 2Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:v0.0.2
+        command:
+          - "/bin/sh"
+          - "-c"
+          - |
+            /usr/local/bin/release docker.io nephio gotests ${BUILD_ID}
+        volumeMounts:
+          - name: cosign-secret
+            mountPath: /root/.docker/
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -101,6 +425,13 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
+        - name: cosign-secret
+          secret:
+            secretName: cosign-login
+            items:
+              - key: configjson
+                path: config.json
+
   - name: build-push-image-e2e
     cluster: default
     run_if_changed: 'images/e2e/.*'
@@ -130,6 +461,34 @@ postsubmits:
           requests:
             cpu: 2
             memory: 2Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:v0.0.2
+        command:
+          - "/bin/sh"
+          - "-c"
+          - |
+            /usr/local/bin/release docker.io nephio e2e ${BUILD_ID}
+        volumeMounts:
+          - name: cosign-secret
+            mountPath: /root/.docker/
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -137,6 +496,13 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
+        - name: cosign-secret
+          secret:
+            secretName: cosign-login
+            items:
+              - key: configjson
+                path: config.json
+
   - name: build-push-image-label_sync
     cluster: default
     run_if_changed: 'images/label_sync/.*'
@@ -166,6 +532,34 @@ postsubmits:
           requests:
             cpu: 2
             memory: 2Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:v0.0.2
+        command:
+          - "/bin/sh"
+          - "-c"
+          - |
+            /usr/local/bin/release docker.io nephio label_sync ${BUILD_ID}
+        volumeMounts:
+          - name: cosign-secret
+            mountPath: /root/.docker/
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -173,6 +567,13 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
+        - name: cosign-secret
+          secret:
+            secretName: cosign-login
+            items:
+              - key: configjson
+                path: config.json
+
   - name: build-push-image-generic-autobumper
     cluster: default
     run_if_changed: 'images/generic-autobumper/.*'
@@ -202,6 +603,34 @@ postsubmits:
           requests:
             cpu: 2
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:v0.0.2
+        command:
+          - "/bin/sh"
+          - "-c"
+          - |
+            /usr/local/bin/release docker.io nephio generic-autobumper ${BUILD_ID}
+        volumeMounts:
+          - name: cosign-secret
+            mountPath: /root/.docker/
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -209,9 +638,16 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
-  - name: build-push-image-releaser
+        - name: cosign-secret
+          secret:
+            secretName: cosign-login
+            items:
+              - key: configjson
+                path: config.json
+
+  - name: build-push-image-linter
     cluster: default
-    run_if_changed: 'images/releaser/.*'
+    run_if_changed: 'images/linter/.*'
     branches:
     - "main"
     annotations:
@@ -228,16 +664,44 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=${PWD}/images/releaser \
-            --dockerfile=Dockerfile --destination=nephio/releaser:${BUILD_ID} \
-            --destination=nephio/releaser:latest
+          executor --context=${PWD}/images/linter \
+            --dockerfile=Dockerfile --destination=nephio/linter:${BUILD_ID} \
+            --destination=nephio/linter:latest
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
         resources:
           requests:
-            cpu: 2
+            cpu: 1
             memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:v0.0.2
+        command:
+          - "/bin/sh"
+          - "-c"
+          - |
+            /usr/local/bin/release docker.io nephio linter ${BUILD_ID}
+        volumeMounts:
+          - name: cosign-secret
+            mountPath: /root/.docker/
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
         - name: kaniko-secret
           secret:
@@ -245,55 +709,80 @@ postsubmits:
             items:
               - key: .dockerconfigjson
                 path: config.json
+        - name: cosign-secret
+          secret:
+            secretName: cosign-login
+            items:
+              - key: configjson
+                path: config.json
 
-periodics:
-  - name: e2e-daily
-    annotations:
-    labels:
-    cron: "0 15 * * 1-5"
-    skip_report: false
-    decorate: true
+  - name: build-push-image-molecule
     cluster: default
+    run_if_changed: 'images/molecule/.*'
+    branches:
+    - "main"
+    annotations:
+      description: Build and Push Image to DockerHub every commit
+    decorate: true
+    decoration_config:
+      censor_secrets: true
+    max_concurrency: 0
     spec:
       containers:
-        - image: "nephio/e2e:1"
-          command:
-            - "/bin/sh"
-          args:
-            - "-c"
-            - |
-              set -eE; cd e2e/terraform; trap 'terraform destroy -auto-approve' EXIT;
-              terraform init && timeout 75m terraform apply -auto-approve
-          volumeMounts:
-            - name: satoken
-              mountPath: "/etc/satoken"
-            - name: ssh-key-vol
-              mountPath: "/etc/ssh-key"
-            - name: nephio-e2e-yaml
-              mountPath: "/etc/nephio"
-          resources:
-            requests:
-              cpu: 2
-              memory: 2Gi
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:debug
+        command:
+        - "/bin/sh"
+        - "-c"
+        - |
+          executor --context=${PWD}/images/molecule \
+            --dockerfile=Dockerfile --destination=nephio/molecule:${BUILD_ID} \
+            --destination=nephio/molecule:latest
+        volumeMounts:
+          - name: kaniko-secret
+            mountPath: /kaniko/.docker/
+        resources:
+          requests:
+            cpu: 1
+            memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:v0.0.2
+        command:
+          - "/bin/sh"
+          - "-c"
+          - |
+            /usr/local/bin/release docker.io nephio molecule ${BUILD_ID}
+        volumeMounts:
+          - name: cosign-secret
+            mountPath: /root/.docker/
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
       volumes:
-        - name: satoken
+        - name: kaniko-secret
           secret:
-            secretName: satoken
+            secretName: regcred
             items:
-              - key: satoken
-                path: satoken
-        - name: ssh-key-vol
+              - key: .dockerconfigjson
+                path: config.json
+        - name: cosign-secret
           secret:
-            secretName: ssh-key-e2e
-            defaultMode: 256
+            secretName: cosign-login
             items:
-              - key: id_rsa
-                path: id_rsa
-              - key: id_rsa.pub
-                path: id_rsa.pub
-        - name: nephio-e2e-yaml
-          secret:
-            secretName: nephio-e2e-yaml
-            items:
-              - key: nephio.yaml
-                path: nephio.yaml
+              - key: configjson
+                path: config.json

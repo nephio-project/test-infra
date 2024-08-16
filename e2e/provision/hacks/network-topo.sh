@@ -9,15 +9,16 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 ##
+
 set -o pipefail
 set -o errexit
 set -o nounset
 [[ ${DEBUG:-false} != "true" ]] || set -o xtrace
-export HOME=${HOME:-/home/ubuntu/}
-export E2EDIR=${E2EDIR:-$HOME/test-infra/e2e}
-export TESTDIR=${TESTDIR:-$E2EDIR/tests}
-export LIBDIR=${LIBDIR:-$E2EDIR/lib}
 
-export LEAF_IP=$(docker inspect net-free5gc-net-leaf -f '{{.NetworkSettings.Networks.kind.IPAddress}}')
+# shellcheck source=e2e/defaults.env
+source "$E2EDIR/defaults.env"
 
-envsubst <"$TESTDIR/003-network-topo.tmpl" >"$TESTDIR/003-network-topo.yaml"
+export LEAF_IP=$(docker inspect net-5g-leaf -f '{{.NetworkSettings.Networks.kind.IPAddress}}')
+kubeconfig="$HOME/.kube/config"
+
+envsubst <"$TESTDIR/network-topo.tmpl" | kubectl --kubeconfig $kubeconfig apply -f -
