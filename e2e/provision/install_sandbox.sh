@@ -75,6 +75,14 @@ fact_caching_connection = /tmp
 EOT
 
 # Management cluster creation
+if [[ ${MGMT_CLUSTER_TYPE:-kind} == "kubeadm" ]]; then
+    ansible_cmd_kubeadm="$(command -v ansible-playbook) -i 127.0.0.1, playbooks/deploy_kubeadm_k8s.yml --extra-vars=\"k8s_ver=${K8S_VERSION:1:4}\" "
+    [[ ${DEBUG:-false} != "true" ]] || ansible_cmd_kubeadm+="-vvv "
+    echo "$ansible_cmd_kubeadm"
+    eval "$ansible_cmd_kubeadm" | tee ~/kubeadm.log
+    echo "Done installing kubeadm cluster"
+fi
+
 ansible_cmd="$(command -v ansible-playbook) -i 127.0.0.1, playbooks/cluster.yml --tags ${ANSIBLE_TAG:-all} "
 [[ ${DEBUG:-false} != "true" ]] || ansible_cmd+="-vvv "
 if [ -n "${ANSIBLE_CMD_EXTRA_VAR_LIST:-}" ]; then

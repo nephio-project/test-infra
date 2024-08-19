@@ -1,3 +1,4 @@
+---
 - name: Get containerd and unarchive to /usr/local
   become: true
   ansible.builtin.unarchive:
@@ -206,3 +207,11 @@
   ansible.builtin.shell: kubectl taint node $(hostname) node-role.kubernetes.io/control-plane-
   register: my_output
   changed_when: my_output.rc != 0
+
+- name: Wait for deployments to complete
+  ansible.builtin.include_tasks: wait-deployments.yml
+  loop: "{{ kube-system + kube-flannel + local-path-storage }}"
+  loop_control:
+    loop_var: namespace
+  vars:
+    context: "{{ k8s.context }}"

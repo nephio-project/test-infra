@@ -1,5 +1,17 @@
 ---
 - name: Deploy k8s using kubeadm on host
   hosts: all
+  pre_tasks:
+    - name: Install Docker Engine needed for kpt functions
+      become: true
+      block:
+        - name: Install docker binaries
+          ansible.builtin.include_role:
+            name: andrewrothstein.docker_engine
+        - name: Grant Docker permissions to user
+          ansible.builtin.user:
+            name: "{{ ansible_user_id }}"
+            groups: docker
+            append: true
   roles:
     - role: kubeadm
