@@ -85,7 +85,7 @@
     state: restarted
 
 - name: Install kubelet kubeadm kubectl on {{ ansible_os_family }}
-  ansible.builtin.include_tasks: kubeadm-{{ ansible_os_family }}.yaml
+  ansible.builtin.include_tasks: kubeadm-{{ ansible_os_family }}.yml
 
 - name: Create 0-containerd.conf file
   become: true
