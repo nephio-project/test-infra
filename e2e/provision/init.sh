@@ -87,7 +87,6 @@ if [ ${MGMT_CLUSTER_TYPE} == "kubeadm" ]; then
 fi
 export ANSIBLE_CMD_EXTRA_VAR_LIST='{ "nephio_catalog_repo_uri": "'${NEPHIO_CATALOG_REPO_URI}'", "k8s": { "context" : "'${K8S_CONTEXT}'", "version" : "'$K8S_VERSION'" } }'
 
-
 if [ ${K8S_CONTEXT} == "kind-kind" ]; then
     export ANSIBLE_TAG=all
 else

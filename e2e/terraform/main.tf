@@ -22,9 +22,9 @@ module "gcp-fedora-34" {
   nephio_mgmt_cluster_type = var.mgmt_cluster_type
 }
 
-module "gcp-fedora-40" {
+module "gcp-fedora-38" {
   source               = ".//modules/gcp"
-  vmimage              = "fedora-cloud/fedora-cloud-40"
+  vmimage              = "fedora-cloud/fedora-cloud-38"
   ansible_user         = "fedora"
   nephio_e2e_type      = var.e2e_type
   nephio_e2e_fail_fast = var.fail_fast
