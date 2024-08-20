@@ -1,0 +1,208 @@
+- name: Get containerd and unarchive to /usr/local
+  become: true
+  ansible.builtin.unarchive:
+    src: https://github.com/containerd/containerd/releases/download/v{{ containerd_ver }}/containerd-{{ containerd_ver }}-linux-amd64.tar.gz
+    dest: /usr/local/
+    remote_src: true
+
+- name: Copy remote container.service file to /usr/lib/systemd/system/
+  become: true
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/containerd/containerd/main/containerd.service
+    dest: /usr/lib/systemd/system/
+    mode: '0755'
+
+- name: Apply new SELinux file context to filesystem on {{ ansible_os_family }}
+  ansible.builtin.command: restorecon -Rv /usr/lib/systemd/system/
+  when: ansible_os_family == "RedHat"
+  register: my_output
+  changed_when: my_output.rc != 0
+
+- name: Just force systemd to reread configs
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Enable and start containerd
+  become: true
+  ansible.builtin.systemd:
+    name: containerd.service
+    state: started
+    enabled: true
+
+- name: Copy remote runc.amd64 file to /usr/local/sbin/runc
+  become: true
+  ansible.builtin.get_url:
+    url: https://github.com/opencontainers/runc/releases/download/v{{ runc_ver }}/runc.amd64
+    dest: /usr/local/sbin/runc
+    mode: '0755'
+
+- name: Generate containerd config.toml file
+  become: true
+  block:
+    - name: Create directory /etc/containerd
+      ansible.builtin.file:
+        state: directory
+        path: /etc/containerd
+        mode: '0755'
+    - name: Generate the default config.toml file
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          containerd config default | sudo tee /etc/containerd/config.toml
+        executable: /bin/bash
+      register: my_output
+      changed_when: my_output.rc != 0
+    - name: Set SystemdCgroup to be 'true'
+      ansible.builtin.replace:
+        path: /etc/containerd/config.toml
+        regexp: 'SystemdCgroup = false'
+        replace: 'SystemdCgroup = true'
+    - name: Enable CRI plugins by commenting out disabled_plugins = ["cri"]
+      ansible.builtin.replace:
+        path: /etc/containerd/config.toml
+        regexp: '^disabled_plugins ='
+        replace: '#disabled_plugins ='
+
+- name: Copy cni plugins tar and extract to /opt/cni/bin
+  become: true
+  block:
+    - name: Create directory /opt/cni/bin
+      ansible.builtin.file:
+        state: directory
+        path: /opt/cni/bin
+        mode: '0755'
+    - name: Get, extract and copy plugins
+      ansible.builtin.unarchive:
+        src: https://github.com/containernetworking/plugins/releases/download/v{{ cni_plugins_ver }}/cni-plugins-linux-amd64-v{{ cni_plugins_ver }}.tgz
+        dest: /opt/cni/bin
+        remote_src: true
+
+- name: Reload containerd.service
+  become: true
+  ansible.builtin.systemd:
+    name: containerd.service
+    state: restarted
+
+- name: Install kubelet kubeadm kubectl on {{ ansible_os_family }}
+  ansible.builtin.include_tasks: kubeadm-{{ ansible_os_family }}.yml
+
+- name: Create 0-containerd.conf file
+  become: true
+  block:
+    - name: Ensure directory exists
+      ansible.builtin.file:
+        path: /etc/systemd/system/kubelet.service.d
+        state: directory
+        mode: '0755'
+    - name: Create 0-containerd.conf file
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/kubelet.service.d/0-containerd.conf
+        content: >
+          [Service]
+
+          Environment="KUBELET_EXTRA_ARGS=--runtime-request-timeout=15m
+          --fail-swap-on=false
+          --container-runtime-endpoint=unix:///run/containerd/containerd.sock"
+        mode: '0644'
+
+- name: Set net.ipv4.ip_forward to 1
+  become: true
+  block:
+    - name: Create file /etc/sysctl.d/10-ip-forwarding.conf
+      ansible.posix.sysctl:
+        name: net.ipv4.ip_forward
+        value: '1'
+        sysctl_file: /etc/sysctl.d/10-ip-forwarding.conf
+    - name: Set ip forwarding on in /proc and in the sysctl file and reload if necessary
+      ansible.posix.sysctl:
+        name: net.ipv4.ip_forward
+        value: '1'
+        sysctl_set: true
+        state: present
+        reload: true
+
+- name: Add the br_netfilter module and make sure it is loaded after reboots
+  become: true
+  block:
+    - name: Add the br_netfilter module
+      community.general.modprobe:
+        name: br_netfilter
+        state: present
+        persistent: present
+
+    - name: Systemctl daemon-reload
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+- name: Configure crictl to use the containerd.sock
+  become: true
+  ansible.builtin.command: crictl config runtime-endpoint unix:///var/run/containerd/containerd.sock
+  register: my_output
+  changed_when: my_output.rc != 0
+
+- name: Check if kubeadm init has already been invoked by checking for kubeadm tokens
+  become: true
+  ansible.builtin.command: kubeadm token list
+  register: token
+  ignore_errors: true
+  changed_when: false
+
+- name: Invoke kubeadm init
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      kubeadm init --pod-network-cidr={{ pod_network_cidr }} --control-plane-endpoint=$(hostname -i | xargs -n1 | grep ^{{ ctrlplane_ep_ip_filter }})
+    executable: /bin/bash
+  when: token.stderr_lines != []
+  register: my_output
+  changed_when: my_output.rc != 0
+
+- name: Create .kube directory
+  ansible.builtin.file:
+    state: directory
+    path: $HOME/.kube
+    mode: '0755'
+
+- name: Copy kubeconfig file
+  become: true
+  ansible.builtin.copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /home/{{ ansible_user_id }}/.kube/config
+    remote_src: true
+    mode: '0755'
+
+- name: Change file ownership for kubeconfig
+  become: true
+  ansible.builtin.shell: chown $(id -u {{ ansible_user_id }} ):$(id -g {{ ansible_user_id }} ) /home/{{ ansible_user_id }}/.kube/config
+  register: my_output
+  changed_when: my_output.rc != 0
+
+- name: Apply the network plugin
+  ansible.builtin.command: kubectl apply -f {{ network_plugin_url }}
+  register: my_output
+  changed_when: my_output.rc != 0
+
+- name: Apply multus plugin
+  ansible.builtin.command: >-
+    kubectl apply
+    --filename="https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/v{{ multus_ver }}/deployments/multus-daemonset-thick-plugin.yml"
+  when: multus_ver is defined
+  register: my_output
+  changed_when: my_output.rc != 0
+
+- name: Apply local-path-storage plugin
+  ansible.builtin.command: kubectl apply --filename="https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.27/deploy/local-path-storage.yaml"
+  register: my_output
+  changed_when: my_output.rc != 0
+
+- name: Set default storage class
+  ansible.builtin.shell: kubectl patch storageclass local-path -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+  register: my_output
+  changed_when: my_output.rc != 0
+
+- name: Remove the NoSchedule taint on master node
+  ansible.builtin.shell: kubectl taint node $(hostname) node-role.kubernetes.io/control-plane-
+  register: my_output
+  changed_when: my_output.rc != 0

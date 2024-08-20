@@ -1,0 +1,5 @@
+---
+- name: Deploy k8s using kubeadm on host
+  hosts: all
+  roles:
+    - role: kubeadm

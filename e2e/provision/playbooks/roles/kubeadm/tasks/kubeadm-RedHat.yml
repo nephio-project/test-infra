@@ -1,0 +1,48 @@
+- name: Install kubelet kubeadm kubectl on {{ ansible_os_family }}
+  become: true
+  block:
+    - name: Install iptables-legacy package
+      ansible.builtin.package:
+        name:
+          - iptables-legacy
+
+    - name: Add k8s yum repository
+      ansible.builtin.yum_repository:
+        name: Kubernetes
+        description: Kubernetes Repository
+        baseurl: https://pkgs.k8s.io/core:/stable:/v{{ k8s_ver }}/rpm/
+        enabled: true
+        gpgcheck: true
+        repo_gpgcheck: true
+        gpgkey: https://pkgs.k8s.io/core:/stable:/v{{ k8s_ver }}/rpm/repodata/repomd.xml.key
+
+    - name: Put SELinux in permissive mode
+      ansible.posix.selinux:
+        policy: targeted
+        state: permissive
+
+    - name: Install kubelet kubeadm kubectl
+      ansible.builtin.dnf:
+        name:
+          - kubelet
+          - kubeadm
+          - kubectl
+        state: present
+
+    - name: Disable swap 1/2
+      become: true
+      ansible.builtin.command: swapoff -a
+      register: my_output
+      changed_when: my_output.rc != 0
+
+    - name: Disable swap in fstab 2/2
+      become: true
+      ansible.builtin.replace:
+        path: /etc/fstab
+        regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+        replace: '# \1'
+
+    - name: Remove zram-generator-defaults package
+      ansible.builtin.package:
+        name: zram-generator-defaults
+        state: absent
