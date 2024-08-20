@@ -207,6 +207,7 @@
   ansible.builtin.shell: kubectl taint node $(hostname) node-role.kubernetes.io/control-plane-
   register: my_output
   changed_when: my_output.rc != 0
+<<<<<<< HEAD
 
 - name: Wait for deployments to complete
   ansible.builtin.include_tasks: wait-deployments.yml
@@ -215,3 +216,5 @@
     loop_var: namespace
   vars:
     context: "{{ k8s.context }}"
+=======
+>>>>>>> 4a828c2 (add support for installing nonKIND cluster via kubeadm (previously PR #46) (#296))
