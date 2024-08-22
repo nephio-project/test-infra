@@ -1,3 +1,4 @@
+---
 - name: Install kubelet kubeadm kubectl on {{ ansible_os_family }}
   become: true
   block:

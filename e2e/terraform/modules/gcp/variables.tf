@@ -75,3 +75,9 @@ variable "nephio_e2e_fail_fast" {
   default     = "false"
   type        = string
 }
+
+variable "nephio_mgmt_cluster_type" {
+  description = "The Nephio management cluster type"
+  default     = "kind"
+  type        = string
+}
