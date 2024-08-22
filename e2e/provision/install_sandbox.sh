@@ -15,8 +15,8 @@ set -o nounset
 
 export HOME=${HOME:-/home/ubuntu/}
 
-function h1() {
-    echo 
+function h1 {
+    echo
     echo "** $*"
 }
 
@@ -43,7 +43,7 @@ esac
 sudo pip install -r requirements.txt
 
 # this is needed if ansible was installed by pipx:
-if [ -d "$HOME/.local/bin" ]; then 
+if [ -d "$HOME/.local/bin" ]; then
     export PATH="$HOME/.local/bin:$PATH"
 fi
 ansible-galaxy role install -r galaxy-requirements.yml
