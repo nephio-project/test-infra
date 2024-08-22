@@ -74,12 +74,18 @@ NEPHIO_USER=${NEPHIO_USER:-$(get_metadata nephio-user "${USER:-ubuntu}")}
 NEPHIO_CATALOG_REPO_URI=${NEPHIO_CATALOG_REPO_URI:-$(get_metadata nephio-catalog-repo-uri "https://github.com/nephio-project/catalog.git")}
 K8S_CONTEXT=${K8S_CONTEXT:-"kind-kind"}
 K8S_VERSION=${K8S_VERSION:-"v1.29.2"}
-export ANSIBLE_CMD_EXTRA_VAR_LIST='{ "nephio_catalog_repo_uri": "'${NEPHIO_CATALOG_REPO_URI}'", "k8s": { "context" : "'${K8S_CONTEXT}'", "version" : "'$K8S_VERSION'" } }'
 HOME=${NEPHIO_HOME:-/home/$NEPHIO_USER}
 REPO_DIR=${NEPHIO_REPO_DIR:-$HOME/test-infra}
 DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME:-""}
 DOCKERHUB_TOKEN=${DOCKERHUB_TOKEN:-""}
 FAIL_FAST=${FAIL_FAST:-$(get_metadata fail_fast "false")}
+# MGMT_CLUSTER_TYPE is intended to be set by prow jobs
+MGMT_CLUSTER_TYPE=${MGMT_CLUSTER_TYPE:-$(get_metadata mgmt_cluster_type "kind")}
+
+if [ ${MGMT_CLUSTER_TYPE} == "kubeadm" ]; then
+    K8S_CONTEXT="kubernetes-admin@kubernetes"
+fi
+export ANSIBLE_CMD_EXTRA_VAR_LIST='{ "nephio_catalog_repo_uri": "'${NEPHIO_CATALOG_REPO_URI}'", "k8s": { "context" : "'${K8S_CONTEXT}'", "version" : "'$K8S_VERSION'" } }'
 
 if [ ${K8S_CONTEXT} == "kind-kind" ]; then
     export ANSIBLE_TAG=all
@@ -87,7 +93,7 @@ else
     export ANSIBLE_TAG=nonkind_k8s
 fi
 
-echo "$DEBUG, $RUN_E2E, $REPO, $BRANCH, $NEPHIO_USER, $HOME, $REPO_DIR, $DOCKERHUB_USERNAME, $DOCKERHUB_TOKEN, $ANSIBLE_TAG, $ANSIBLE_CMD_EXTRA_VAR_LIST"
+echo "$DEBUG, $RUN_E2E, $REPO, $BRANCH, $NEPHIO_USER, $HOME, $REPO_DIR, $DOCKERHUB_USERNAME, $DOCKERHUB_TOKEN, $ANSIBLE_TAG, $ANSIBLE_CMD_EXTRA_VAR_LIST $K8S_CONTEXT $MGMT_CLUSTER_TYPE"
 trap get_status ERR
 
 # Validate root permissions for current user and NEPHIO_USER
@@ -166,11 +172,11 @@ chown "$NEPHIO_USER:$NEPHIO_USER" "$HOME/.bash_aliases"
 # Sandbox Creation
 int_start=$(date +%s)
 cd "$REPO_DIR/e2e/provision"
-export DEBUG DOCKERHUB_USERNAME DOCKERHUB_TOKEN FAIL_FAST
+export DEBUG DOCKERHUB_USERNAME DOCKERHUB_TOKEN FAIL_FAST MGMT_CLUSTER_TYPE K8S_VERSION
 runuser -u "$NEPHIO_USER" ./install_sandbox.sh
 printf "%s secs\n" "$(($(date +%s) - int_start))"
 
-if [[ $RUN_E2E == "true" ]]; then
+if [[ $RUN_E2E == "true" && $MGMT_CLUSTER_TYPE == "kind" ]]; then
     runuser -u "$NEPHIO_USER" "$REPO_DIR/e2e/e2e.sh"
 fi
 

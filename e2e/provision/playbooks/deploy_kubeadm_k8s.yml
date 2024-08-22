@@ -1,5 +1,30 @@
 ---
 - name: Deploy k8s using kubeadm on host
   hosts: all
+  pre_tasks:
+    - name: Sysctl settings updates
+      become: true
+      ansible.posix.sysctl:
+        reload: true
+        sysctl_file: /etc/sysctl.conf
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+        state: present
+      with_items:
+        - {name: fs.inotify.max_user_watches, value: 524288}
+        - {name: fs.inotify.max_user_instances, value: 512}
+        - {name: kernel.keys.maxkeys, value: 500000}
+        - {name: kernel.keys.maxbytes, value: 1000000}
+    - name: Install Docker Engine needed for kpt functions
+      become: true
+      block:
+        - name: Install docker binaries
+          ansible.builtin.include_role:
+            name: andrewrothstein.docker_engine
+        - name: Grant Docker permissions to user
+          ansible.builtin.user:
+            name: "{{ ansible_user_id }}"
+            groups: docker
+            append: true
   roles:
     - role: kubeadm
