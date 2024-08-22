@@ -15,13 +15,12 @@ set -o nounset
 
 export HOME=${HOME:-/home/ubuntu/}
 
-function h1 {
-    echo
-    echo "** $*"
+function print_task_header {
+    printf "\n** $*"
 }
 
 # Install dependencies for it's ansible execution
-h1 "Install dependencies"
+print_task_header "Install dependencies"
 source /etc/os-release || source /usr/lib/os-release
 case ${ID,,} in
 ubuntu | debian)
@@ -49,12 +48,12 @@ fi
 ansible-galaxy role install -r galaxy-requirements.yml
 ansible-galaxy collection install -r galaxy-requirements.yml
 
-h1 "Configure SSH access"
+print_task_header "Configure SSH access"
 rm -f ~/.ssh/id_rsa*
 echo -e "\n\n\n" | ssh-keygen -t rsa -N ""
 cat "$HOME/.ssh/id_rsa.pub" >>"$HOME/.ssh/authorized_keys"
 
-h1 "Configure Ansible"
+print_task_header "Configure Ansible"
 sudo mkdir -p /etc/ansible/
 sudo tee /etc/ansible/ansible.cfg <<EOT
 [ssh_connection]
@@ -88,7 +87,7 @@ fact_caching_connection = /tmp
 EOT
 
 # Management cluster creation
-h1 "Create management cluster"
+print_task_header "Create management cluster"
 if [[ ${MGMT_CLUSTER_TYPE:-kind} == "kubeadm" ]]; then
     ansible_cmd_kubeadm="$(command -v ansible-playbook) -i 127.0.0.1, --connection=local playbooks/deploy_kubeadm_k8s.yml --extra-vars=\"k8s_ver=${K8S_VERSION:1:4}\" "
     [[ ${DEBUG:-false} != "true" ]] || ansible_cmd_kubeadm+="-vvv "

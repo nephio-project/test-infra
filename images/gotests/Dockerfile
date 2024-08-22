@@ -1,4 +1,4 @@
-FROM golang:1.22.2-bullseye as builder
+FROM golang:1.22.2-bullseye AS builder
 ARG ctrl_tools_ver=0.15.0
 WORKDIR /go/src/
 ADD https://github.com/kubernetes-sigs/controller-tools/archive/refs/tags/v$ctrl_tools_ver.tar.gz ./
