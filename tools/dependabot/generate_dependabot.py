@@ -27,6 +27,8 @@ updates:
     directory: /
     schedule:
       interval: daily
+    labels:
+      - "ok-to-test"
     open-pull-requests-limit: 99
 """
 
@@ -66,6 +68,8 @@ def package_ecosystem(ecosystem, rel_path, interval):
     directory: {rel_path}
     schedule:
       interval: {interval}
+    labels:
+      - "ok-to-test"
 """
     return block
 
