@@ -141,6 +141,12 @@
         src: https://github.com/nephio-project/porch/releases/download/main/porchctl.tgz
         dest: /usr/local/bin/
         creates: /usr/local/bin/porchctl
+    - name: Call porchctl version
+      ansible.builtin.shell: porchctl version
+      register: porchctl_version
+    - name: Show porchctl version
+      ansible.builtin.debug:
+        var: porchctl_version
   roles:
     - bootstrap
     - role: install
