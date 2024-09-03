@@ -66,7 +66,8 @@ fi
 # in general is something we should not be seeing, but is not really a failure
 # state, so we will work around it in here. A separate issues has been filed to
 # debug why a controller is unexpectedly changing the package.
-
+set +o pipefail # turn off for the retry loop below
+set +o errexit  # turn off for the retry loop below
 retries=5
 while [[ $retries -gt 0 ]]; do
     rm -rf $ws
@@ -118,6 +119,9 @@ while [[ $retries -gt 0 ]]; do
         retries=$((retries - 1))
     fi
 done
+
+set -o pipefail # turn back on
+set -o errexit  # turn back on
 
 # Get current SMF pod state after scaling
 k8s_wait_ready_replicas "deployment" "smf-regional" "$cluster_kubeconfig" "free5gc-cp"
