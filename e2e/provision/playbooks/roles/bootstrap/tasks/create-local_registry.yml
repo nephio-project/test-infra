@@ -1,0 +1,46 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2024 The Nephio Authors.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- name: Create a local docker registry
+  become: true
+  community.docker.docker_container:
+    name: docker_registry_proxy
+    image: rpardini/docker-registry-proxy:0.6.4
+    hostname: docker-registry-proxy
+    detach: true
+    restart: true
+    restart_policy: "always"
+    networks:
+      - name: kind
+    ports:
+      - 0.0.0.0:3128:3128
+    volumes:
+      - /tmp/docker_mirror_cache:/docker_mirror_cache
+      - /tmp/docker_mirror_certs:/ca
+    env:
+      ENABLE_MANIFEST_CACHE: "true"
+      REGISTRIES: "k8s.gcr.io gcr.io quay.io"
+
+- name: Waits for local docker registry readiness
+  ansible.builtin.uri:
+    url: http://127.0.0.1:3128
+  until: _result.status == 200
+  retries: 600
+  delay: 1
+  register: _result
+
+- name: Disable IPv6 DNS resolvers
+  become: true
+  community.docker.docker_container_exec:
+    container: docker_registry_proxy
+    argv:
+      - /bin/bash
+      - -c
+      - 'echo "resolver 8.8.8.8 4.2.2.2 ipv6=off;" > /etc/nginx/resolvers.conf && /usr/sbin/nginx -s reload'
