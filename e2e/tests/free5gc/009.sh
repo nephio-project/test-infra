@@ -67,6 +67,31 @@ fi
 # state, so we will work around it in here. A separate issues has been filed to
 # debug why a controller is unexpectedly changing the package.
 
+
+# Calls porchctl, but does not immediatelly die on conflict errors (e.g.: "the object has been modified; please apply your changes to the latest version and try again"),
+# but returns with a non-zero code instead.
+# It dies on any other error as usual.
+function porchctl_enable_conflict {
+    # do not immediatelly die on error
+    set +o pipefail
+    set +o errexit
+    output="$(porchctl "$@" 2>&1)"
+    rc=$?
+    # turn errorhandling back on
+    set -o pipefail
+    set -o errexit
+
+    if [[ $output =~ "modified" ]]; then
+        info "Capacity update failed due to concurrent change, retrying"
+        retries=$((retries - 1))
+        return 1
+    fi
+    if [[ $rc -ne 0 ]]; then
+        exit $rc
+    fi
+    return 0
+}
+
 retries=5
 while [[ $retries -gt 0 ]]; do
     rm -rf $ws
@@ -84,40 +109,26 @@ while [[ $retries -gt 0 ]]; do
 
     modified=false
     info "Pushing update"
-    output=$(porchctl rpkg push -n default "$smf_pkg_rev" $ws 2>&1)
-    if [[ $output =~ "modified" ]]; then
-        modified=true
+    if ! porchctl_enable_conflict rpkg push -n default "$smf_pkg_rev" $ws ; then
+        continue
     fi
 
-    if [[ $modified == false ]]; then
-        info "Proposing update"
-        output=$(porchctl rpkg propose -n default "$smf_pkg_rev" 2>&1)
-        if [[ $output =~ "modified" ]]; then
-            modified=true
-        else
-            k8s_wait_exists "packagerev" "$smf_pkg_rev"
-        fi
+    info "Proposing update"
+    if ! porchctl_enable_conflict rpkg propose -n default "$smf_pkg_rev" ; then
+        continue
     fi
+    k8s_wait_exists "packagerev" "$smf_pkg_rev"
 
-    if [[ $modified == false ]]; then
-        info "approving package $smf_pkg_rev update"
-        output=$(porchctl rpkg approve -n default "$smf_pkg_rev" 2>&1)
-        info "approved package $smf_pkg_rev update"
-        kubectl wait --for jsonpath='{.spec.lifecycle}'=Published packagerevisions "$smf_pkg_rev" --timeout="600s"
-        info "published package $smf_pkg_rev update"
-
-        if [[ $output =~ "modified" ]]; then
-            modified=true
-        fi
+    info "approving package $smf_pkg_rev update"
+    if ! porchctl_enable_conflict rpkg approve -n default "$smf_pkg_rev" ; then
+        continue
     fi
-
-    if [[ $modified == false ]]; then
-        retries=0
-    else
-        info "Capacity update failed due to concurrent change, retrying"
-        retries=$((retries - 1))
-    fi
+    info "approved package $smf_pkg_rev update"
+    break
 done
+
+kubectl wait --for jsonpath='{.spec.lifecycle}'=Published packagerevisions "$smf_pkg_rev" --timeout="600s"
+info "published package $smf_pkg_rev update"
 
 # Get current SMF pod state after scaling
 k8s_wait_ready_replicas "deployment" "smf-regional" "$cluster_kubeconfig" "free5gc-cp"
