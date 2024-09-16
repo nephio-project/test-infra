@@ -10,7 +10,7 @@
 ##############################################################################
 
 ## TEST METADATA
-## TEST-NAME: Deploy OAI E1 and F1 Split RAN Network Functions
+## TEST-NAME: Deploy OAI CU-UP and DU Network Functions
 ##
 
 set -o pipefail
@@ -57,15 +57,11 @@ function _wait_for_ran {
 _regional_kubeconfig="$(k8s_get_capi_kubeconfig "regional")"
 _edge_kubeconfig="$(k8s_get_capi_kubeconfig "edge")"
 
-k8s_apply "$TESTDIR/004-ran-network.yaml"
+k8s_apply "$TESTDIR/004b-ran-network.yaml"
 
-for nf in du cuup cucp; do
+for nf in du cuup; do
     k8s_wait_ready "packagevariant" "oai-$nf"
 done
-
-kpt_wait_pkg "regional" "oai-ran-cucp" "nephio" "1800"
-k8s_wait_exists "nfdeployment" "cucp-regional" "$_regional_kubeconfig" "oai-ran-cucp"
-k8s_wait_ready_replicas "deployment" "oai-gnb-cu-cp" "$_regional_kubeconfig" "oai-ran-cucp"
 
 kpt_wait_pkg "edge" "oai-ran-cuup" "nephio" "1800"
 k8s_wait_exists "nfdeployment" "cuup-edge" "$_edge_kubeconfig" "oai-ran-cuup"
@@ -75,8 +71,6 @@ kpt_wait_pkg "edge" "oai-ran-du" "nephio" "1800"
 k8s_wait_exists "nfdeployment" "du-edge" "$_edge_kubeconfig" "oai-ran-du"
 k8s_wait_ready_replicas "deployment" "oai-gnb-du" "$_edge_kubeconfig" "oai-ran-du"
 
-# Check if the NGAPSetup Request Response is okay between AMF and CU-CP
-_wait_for_ran "$_regional_kubeconfig" "Received NGAP_REGISTER_GNB_CNF: associated AMF" "N2"
 # Check if the E1Setup Request Response is okay between CU-CP and CU-UP
 _wait_for_ran "$_regional_kubeconfig" "Accepting new CU-UP ID" "E1"
 # Check if the F1Setup Request Response is okay between DU and CU-CP
