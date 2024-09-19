@@ -11,23 +11,6 @@
 apiVersion: config.porch.kpt.dev/v1alpha1
 kind: PackageVariant
 metadata:
-  name: oai-cucp
-spec:
-  upstream:
-    repo: catalog-workloads-oai-ran
-    package: pkg-example-cucp-bp
-    revision: main
-  downstream:
-    repo: regional
-    package: oai-ran-cucp
-  annotations:
-    approval.nephio.org/policy: initial
-  injectors:
-  - name: regional
----
-apiVersion: config.porch.kpt.dev/v1alpha1
-kind: PackageVariant
-metadata:
   name: oai-du
 spec:
   upstream:
@@ -38,7 +21,7 @@ spec:
     repo: edge
     package: oai-ran-du
   annotations:
-    approval.nephio.org/policy: initial
+    approval.nephio.org/policy: always
   injectors:
   - name: edge
 ---
@@ -55,7 +38,7 @@ spec:
     repo: edge
     package: oai-ran-cuup
   annotations:
-    approval.nephio.org/policy: initial
+    approval.nephio.org/policy: always
   injectors:
   - name: edge
 
