@@ -54,6 +54,7 @@ locals {
   image_version = replace(var.image_version, ".", "-")
 }
 
+
 source "googlecompute" "nephio-packer" {
   project_id              = var.project_id
   zone                    = var.zone
@@ -63,7 +64,7 @@ source "googlecompute" "nephio-packer" {
   ssh_username            = var.ssh_username
   use_os_login            = "false"
   disk_size               = 50
-  image_name              = "nephio-pre-baked-${local.image_version}-${var.source_image_family}-${local.datestamp}"
+  image_name              = "nephio-pre-baked-${local.image_version}-${var.source_image_family}"
   credentials_file        = "/etc/satoken/satoken"
 }
 
@@ -72,6 +73,11 @@ build {
   provisioner "file" {
     source      = "../../../../test-infra"
     destination = "/home/${var.ssh_username}/test-infra"
+  }
+
+  provisioner "file" {
+    destination = "/timestamp.txt"
+    content     = "${local.datestamp}"
   }
 
   provisioner "shell" {
