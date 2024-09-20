@@ -12,6 +12,8 @@
 # shellcheck source=e2e/lib/_utils.sh
 source "${E2EDIR:-$HOME/test-infra/e2e}/lib/_utils.sh"
 
+LOG_DIR="/var/log/e2e"
+
 function _get_test_metadata {
     local testfile=$1
     local fieldname=$2
@@ -31,14 +33,22 @@ function run_test {
     if [ -f "/sys/class/net/$mgmt_nic/statistics/rx_bytes" ]; then
         int_rx_bytes_before=$(cat "/sys/class/net/$mgmt_nic/statistics/rx_bytes")
     fi
+    mkdir -p "$LOG_DIR"
+    local log_file="$LOG_DIR/$testfile.log"
     info "+++++ starting $testfile $testname"
+    info "+++++ logging into $log_file"
     local rc=0
-    /bin/bash "$testfile" || rc=$?
+    # Run the test script logging stdout/stderr to log file
+    /bin/bash "$testfile" > >(tee -a "$log_file") 2>&1 || rc=$?
     local result="PASS"
     if [[ $rc != 0 ]]; then
         result="FAIL ($rc)"
     fi
-
+    # Append the result to log file as well
+    echo "$result" | tee -a "$log_file"
+    # Copy log file to Prow storage
+    cp "$log_file" "$ARTIFACTS/"
+    
     info "+++++ finished $testfile $testname (result: $result)"
     local seconds="$(($(date +%s) - int_start))"
     printf "TIME $(basename $testfile): %s secs\n" $seconds
