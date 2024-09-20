@@ -25,7 +25,7 @@
     - name: Install kubernetes python package
       become: true
       ansible.builtin.pip:
-        name: kubernetes==26.1.0
+        name: kubernetes==31.0.0
   roles:
     - role: andrewrothstein.kind
       vars:
