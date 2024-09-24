@@ -34,7 +34,7 @@ function run_test {
         int_rx_bytes_before=$(cat "/sys/class/net/$mgmt_nic/statistics/rx_bytes")
     fi
     mkdir -p "$LOG_DIR"
-    local log_file="$LOG_DIR/$testfile.log"
+    local log_file="$LOG_DIR/$testname.log"
     info "+++++ starting $testfile $testname"
     info "+++++ logging into $log_file"
     local rc=0
