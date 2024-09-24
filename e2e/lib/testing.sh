@@ -12,7 +12,7 @@
 # shellcheck source=e2e/lib/_utils.sh
 source "${E2EDIR:-$HOME/test-infra/e2e}/lib/_utils.sh"
 
-LOG_DIR="/var/log/e2e"
+LOG_DIR="$HOME/log/e2e"
 
 function _get_test_metadata {
     local testfile=$1
