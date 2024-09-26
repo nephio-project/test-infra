@@ -2,6 +2,10 @@
 - name: Deploy k8s using kubeadm on host
   hosts: all
   pre_tasks:
+    - name: Install Prerequisite Collections and Roles
+      community.general.ansible_galaxy_install:
+        type: both
+        requirements_file: ../galaxy-requirements.yml
     - name: Sysctl settings updates
       become: true
       ansible.posix.sysctl:
