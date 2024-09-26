@@ -61,17 +61,12 @@ if [[ $lifecycle == "Published" ]]; then
     info "Copied to $smf_pkg_rev, pulling"
 fi
 
-# We need to put this entire section in a retry loop, because it is possible
-# for a controller to come in and change the package after we pull it. This
-# in general is something we should not be seeing, but is not really a failure
-# state, so we will work around it in here. A separate issues has been filed to
-# debug why a controller is unexpectedly changing the package.
-
-
-# Calls porchctl, but does not immediatelly die on conflict errors (e.g.: "the object has been modified; please apply your changes to the latest version and try again"),
+# Calls porchctl, but does not immediatelly die due to:
+# - conflict errors (e.g.: "the object has been modified; please apply your changes to the latest version and try again")
+# - readiness errors (e.g.: "readiness conditions not met")
 # but returns with a non-zero code instead.
 # It dies on any other error as usual.
-function porchctl_enable_conflict {
+function porchctl_enable_err_check {
     # do not immediatelly die on error
     set +o pipefail
     set +o errexit
@@ -81,8 +76,8 @@ function porchctl_enable_conflict {
     set -o pipefail
     set -o errexit
 
-    if [[ $output =~ "modified" ]]; then
-        info "Capacity update failed due to concurrent change, retrying"
+    if [[ $output =~ "modified" ]] || [[ $output =~ "readiness" ]]; then
+        info "Capacity update failed due to $output, retrying"
         retries=$((retries - 1))
         return 1
     fi
@@ -109,18 +104,18 @@ while [[ $retries -gt 0 ]]; do
 
     modified=false
     info "Pushing update"
-    if ! porchctl_enable_conflict rpkg push -n default "$smf_pkg_rev" $ws ; then
+    if ! porchctl_enable_err_check rpkg push -n default "$smf_pkg_rev" $ws ; then
         continue
     fi
 
     info "Proposing update"
-    if ! porchctl_enable_conflict rpkg propose -n default "$smf_pkg_rev" ; then
+    if ! porchctl_enable_err_check rpkg propose -n default "$smf_pkg_rev" ; then
         continue
     fi
     k8s_wait_exists "packagerev" "$smf_pkg_rev"
 
     info "approving package $smf_pkg_rev update"
-    if ! porchctl_enable_conflict rpkg approve -n default "$smf_pkg_rev" ; then
+    if ! porchctl_enable_err_check rpkg approve -n default "$smf_pkg_rev" ; then
         continue
     fi
     info "approved package $smf_pkg_rev update"
