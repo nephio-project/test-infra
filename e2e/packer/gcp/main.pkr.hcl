@@ -76,7 +76,7 @@ build {
   }
 
   provisioner "file" {
-    destination = "/timestamp.txt"
+    destination = "/home/${var.ssh_username}/timestamp.txt"
     content     = "${local.datestamp}"
   }
 
