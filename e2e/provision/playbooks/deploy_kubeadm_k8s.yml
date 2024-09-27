@@ -5,7 +5,7 @@
     - name: Install Prerequisite Collections and Roles
       community.general.ansible_galaxy_install:
         type: both
-        requirements_file: ../galaxy-requirements.yml
+        requirements_file: "{{ playbook_dir }}/../galaxy-requirements.yml"
     - name: Sysctl settings updates
       become: true
       ansible.posix.sysctl:
