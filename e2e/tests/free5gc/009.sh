@@ -64,6 +64,9 @@ fi
 # Calls porchctl, but does not immediatelly die due to:
 # - conflict errors (e.g.: "the object has been modified; please apply your changes to the latest version and try again")
 # - readiness errors (e.g.: "readiness conditions not met")
+# Calls porchctl, but does not immediatelly die due to:
+# - conflict errors (e.g.: "the object has been modified; please apply your changes to the latest version and try again")
+# - readiness errors (e.g.: "readiness conditions not met")
 # but returns with a non-zero code instead.
 # It dies on any other error as usual.
 function porchctl_enable_err_check {
@@ -76,7 +79,7 @@ function porchctl_enable_err_check {
     set -o pipefail
     set -o errexit
 
-    if [[ $output =~ "modified" ]] || [[ $output =~ "readiness" ]]; then
+    if [[ $output =~ "modified" ]] || [[ $output =~ "readiness" ]] ; then
         info "Capacity update failed due to $output, retrying"
         retries=$((retries - 1))
         return 1
@@ -87,8 +90,17 @@ function porchctl_enable_err_check {
     return 0
 }
 
-retries=5
+
+function get_pkgrev_conditions {
+    conditions=$(kubectl --kubeconfig "$kubeconfig" get packagerevision "$smf_pkg_rev" -o jsonpath='{range .status.conditions[*]}{.type}{" : "}{.status}{"\n"}{end}')
+    info $conditions
+}
+
+retries=20
 while [[ $retries -gt 0 ]]; do
+    info "Getting conditons before PULL"
+    get_pkgrev_conditions
+
     rm -rf $ws
     porchctl rpkg pull -n default "$smf_pkg_rev" $ws
 
@@ -102,11 +114,18 @@ while [[ $retries -gt 0 ]]; do
 
     diff -r /tmp/$ws $ws || echo
 
+    info "Getting conditons before PUSH"
+    get_pkgrev_conditions
+
     modified=false
     info "Pushing update"
     if ! porchctl_enable_err_check rpkg push -n default "$smf_pkg_rev" $ws ; then
         continue
     fi
+
+    sleep 10
+    info "Getting conditons before PROPOSE"
+    get_pkgrev_conditions
 
     info "Proposing update"
     if ! porchctl_enable_err_check rpkg propose -n default "$smf_pkg_rev" ; then
