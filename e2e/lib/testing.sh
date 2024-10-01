@@ -46,6 +46,9 @@ function run_test {
     fi
     # Append the result to log file as well
     echo "$result" | tee -a "$log_file"
+    # ARTIFACTS variable should be set by Prow, fallback if it is not
+    ARTIFACTS="${ARTIFACTS:-$HOME/artifacts}"
+    mkdir -p "$ARTIFACTS"
     # Copy log file to Prow storage
     cp "$log_file" "$ARTIFACTS/"
     
