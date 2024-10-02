@@ -1,4 +1,4 @@
-FROM golang:1.22 as builder
+FROM golang:1.22 AS builder
 RUN git clone --depth 1 https://github.com/kubernetes-sigs/prow.git /opt/prow
 
 WORKDIR /opt/prow

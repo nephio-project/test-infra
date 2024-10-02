@@ -15,7 +15,12 @@ set -o nounset
 
 export HOME=${HOME:-/home/ubuntu/}
 
+function print_task_header {
+    printf "\n** $*"
+}
+
 # Install dependencies for it's ansible execution
+print_task_header "Install dependencies"
 source /etc/os-release || source /usr/lib/os-release
 case ${ID,,} in
 ubuntu | debian)
@@ -35,13 +40,20 @@ rhel | centos | fedora | rocky)
 esac
 
 sudo pip install -r requirements.txt
+
+# this is needed if ansible was installed by pipx:
+if [ -d "$HOME/.local/bin" ]; then
+    export PATH="$HOME/.local/bin:$PATH"
+fi
 ansible-galaxy role install -r galaxy-requirements.yml
 ansible-galaxy collection install -r galaxy-requirements.yml
 
+print_task_header "Configure SSH access"
 rm -f ~/.ssh/id_rsa*
 echo -e "\n\n\n" | ssh-keygen -t rsa -N ""
 cat "$HOME/.ssh/id_rsa.pub" >>"$HOME/.ssh/authorized_keys"
 
+print_task_header "Configure Ansible"
 sudo mkdir -p /etc/ansible/
 sudo tee /etc/ansible/ansible.cfg <<EOT
 [ssh_connection]
@@ -57,7 +69,7 @@ log_path = /var/log/deploy_sandbox.log
 # Increase the forks
 forks = 20
 # Enable mitogen
-strategy_plugins = $(dirname "$(sudo find / -name mitogen_linear.py | head -n 1)")
+strategy_plugins = $(find /usr /home -mount -name mitogen -type d | head -n 1)
 # Enable timing information
 callbacks_enabled = timer, profile_tasks, profile_roles
 # The playbooks is only run on the implicit localhost.
@@ -75,15 +87,16 @@ fact_caching_connection = /tmp
 EOT
 
 # Management cluster creation
+print_task_header "Create management cluster"
 if [[ ${MGMT_CLUSTER_TYPE:-kind} == "kubeadm" ]]; then
-    ansible_cmd_kubeadm="$(command -v ansible-playbook) -i 127.0.0.1, playbooks/deploy_kubeadm_k8s.yml --extra-vars=\"k8s_ver=${K8S_VERSION:1:4}\" "
+    ansible_cmd_kubeadm="$(command -v ansible-playbook) -i 127.0.0.1, --connection=local playbooks/deploy_kubeadm_k8s.yml --extra-vars=\"k8s_ver=${K8S_VERSION:1:4}\" "
     [[ ${DEBUG:-false} != "true" ]] || ansible_cmd_kubeadm+="-vvv "
     echo "$ansible_cmd_kubeadm"
     eval "$ansible_cmd_kubeadm" | tee ~/kubeadm.log
     echo "Done installing kubeadm cluster"
 fi
 
-ansible_cmd="$(command -v ansible-playbook) -i 127.0.0.1, playbooks/cluster.yml --tags ${ANSIBLE_TAG:-all} "
+ansible_cmd="$(command -v ansible-playbook) -i 127.0.0.1, --connection=local playbooks/cluster.yml --tags ${ANSIBLE_TAG:-all} "
 [[ ${DEBUG:-false} != "true" ]] || ansible_cmd+="-vvv "
 if [ -n "${ANSIBLE_CMD_EXTRA_VAR_LIST:-}" ]; then
     ansible_cmd+=" --extra-vars=\"${ANSIBLE_CMD_EXTRA_VAR_LIST}\""
