@@ -12,7 +12,7 @@ variable "region" {
 
 variable "zone" {
   description = "GCP zone to deploy CI instances"
-  default     = "europe-west9-a"
+  default     = "us-central1-c"
   type        = string
 }
 
