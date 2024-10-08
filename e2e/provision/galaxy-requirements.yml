@@ -10,15 +10,15 @@
 
 roles:
   - name: andrewrothstein.docker_engine
-    version: v0.3.0
+    version: v0.3.1
   - name: andrewrothstein.podman
     version: v2.1.1
   - name: andrewrothstein.kind
-    version: v1.2.11
+    version: v1.2.12
   - name: andrewrothstein.kubectl
-    version: v1.3.7
+    version: v1.4.0
   - name: andrewrothstein.kpt
-    version: 0.0.3
+    version: 0.0.4
   - name: darkwizard242.cni
     version: 2.5.0
 
