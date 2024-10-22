@@ -1881,7 +1881,7 @@ periodics:
           args:
             - "-c"
             - |
-              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/packer/gcp"; packer init . && packer build .
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/packer/gcp"; packer init . && packer build -force .
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
