@@ -22,6 +22,10 @@ driver:
   service_account_file: $GOOGLE_JSON_KEY_LOCATION
   external_access: true
   instance_os_type: linux
+  ssh_connection_options:
+    - '-o ConnectTimeout=120'
+    - '-o ServerAliveInterval=15'
+    - '-o ServerAliveCountMax=5'
 lint: |
   set -e
   PATH=${PATH}
