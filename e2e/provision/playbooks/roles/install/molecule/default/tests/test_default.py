@@ -127,7 +127,6 @@ def test_api_resources_created_for_porch(host):
             "repositories",
         ],
         "porch.kpt.dev": [
-            "functions",
             "packagerevisionresources",
             "packagerevisions",
             "packages",
