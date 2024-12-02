@@ -149,12 +149,51 @@
   ignore_errors: true
   changed_when: false
 
+- name: Get control plane endpoint
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      $(hostname -i | xargs -n1 | grep ^{{ ctrlplane_ep_ip_filter }})
+    executable: /bin/bash
+  register: control_plane_endpoint
+  ignore_errors: true
+
+- name: Read kubeadm config
+  set_fact:
+    kubeadm_config_data: "{{ lookup('file', kubeadm_config) | from_yaml }}"
+
+- name: Generate new kubeadm config
+  set_fact:
+    new_kubeadm_config_data: |
+      networking:
+        podSubnet: "{{ pod_network_cidr }}"
+      controlPlaneEndpoint: "{{ control_plane_endpoint.stdout }}"
+
+- name: Patch kubeadm config
+  set_fact:
+    kubeadm_data: "{{ kubeadm_config_data | combine(new_kubeadm_config_data | from_yaml, recursive=True) }}"
+
+- name: Write new kubeadm config
+  copy:
+    content: "{{ kubeadm_data | to_nice_yaml }}"
+    dest: "/tmp/yaml_output"
+
+- name: Set kubeadm cmd with config
+  set_fact:
+    kubeadm_cmd: kubeadm init "--config=/tmp/yaml_output"
+  when: kubeadm_config is defined
+
+- name: Set kubeadm cmd without config
+  set_fact:
+    kubeadm_cmd: kubeadm init --pod-network-cidr={{ pod_network_cidr }} --control-plane-endpoint={{ control_plane_endpoint.stdout }}
+  when: kubeadm_config is undefined
+
 - name: Invoke kubeadm init
   become: true
   ansible.builtin.shell:
     cmd: |
       set -o pipefail
-      kubeadm init --pod-network-cidr={{ pod_network_cidr }} --control-plane-endpoint=$(hostname -i | xargs -n1 | grep ^{{ ctrlplane_ep_ip_filter }})
+      {{ kubeadm_cmd }}
     executable: /bin/bash
   when: token.stderr_lines != []
   register: my_output
