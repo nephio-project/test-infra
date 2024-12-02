@@ -62,6 +62,7 @@ nephio:
       - config-management-monitoring
       - config-management-system
       - resource-group-system
+      - flux-system
   kpt:
     packages:
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
@@ -87,6 +88,11 @@ nephio:
         version: main
         async: 480
         poll: 0
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: nephio/optional/fluxcd
+        version: main
+        async: 240
+        poll: 5
 
 nephio_webui:
   k8s:
