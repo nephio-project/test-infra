@@ -292,7 +292,7 @@ presubmits:
   - name: e2e-kubeadm-ubuntu-jammy
     annotations:
     labels:
-    run_if_changed: '^e2e/'
+    run_if_changed: '^e2e/provision/playbooks/roles/kubeadm'
     skip_report: false
     optional: true
     decorate: true
@@ -335,7 +335,7 @@ presubmits:
   - name: e2e-kubeadm-fedora-38
     annotations:
     labels:
-    run_if_changed: '^e2e/'
+    run_if_changed: '^e2e/provision/playbooks/roles/kubeadm'
     skip_report: false
     optional: true
     decorate: true
