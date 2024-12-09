@@ -16,7 +16,7 @@ module "gcp-ubuntu-jammy" {
 module "gcp-fedora-41" {
   source               = ".//modules/gcp"
   vmimage              = "fedora-coreos-cloud/fedora-coreos-41-20241109-3-0-gcp-x86-64"
-  ansible_user         = "fedora"
+  ansible_user         = "core"
   nephio_e2e_type      = var.e2e_type
   nephio_e2e_fail_fast = var.fail_fast
   nephio_mgmt_cluster_type = var.mgmt_cluster_type
