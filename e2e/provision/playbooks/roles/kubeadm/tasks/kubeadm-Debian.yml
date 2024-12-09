@@ -37,6 +37,19 @@
           - kubectl
         state: present
 
+    - name: Disable swap 1/2
+      become: true
+      ansible.builtin.command: swapoff -a
+      register: my_output
+      changed_when: my_output.rc != 0
+
+    - name: Disable swap in fstab 2/2
+      become: true
+      ansible.builtin.replace:
+        path: /etc/fstab
+        regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+        replace: '# \1'
+
     - name: Hold kubeadm
       ansible.builtin.dpkg_selections:
         name: kubeadm
