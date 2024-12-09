@@ -37,14 +37,6 @@ platforms:
       gui: false
     groups:
       - ubuntu
-  - name: fedora34-$POSFIX_NAME
-    box: generic/fedora34
-    memory: 8192
-    cpus: 4
-    provider_options:
-      gui: false
-    groups:
-      - fedora
   - name: fedora41-$POSFIX_NAME
     box: generic/fedora41
     memory: 8192

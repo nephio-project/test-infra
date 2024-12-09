@@ -16,12 +16,8 @@ ubuntu_jammy:
   name: generic/ubuntu2204
   project_id: ubuntu-os-cloud
   family: ubuntu-2204-lts
-fedora_34:
-  name: fedora/34-cloud-base
-  reload: true
-  project_id: fedora-cloud
-  family: fedora-cloud-34
 fedora_41:
   name: fedora/41-cloud-base
+  reload: true
   project_id: fedora-cloud
   family: fedora-cloud-41
