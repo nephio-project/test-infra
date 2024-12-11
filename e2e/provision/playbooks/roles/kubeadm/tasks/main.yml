@@ -162,6 +162,7 @@
 - name: Read kubeadm config
   ansible.builtin.set_fact:
     kubeadm_config_data: "{{ lookup('file', kubeadm_config) | from_yaml }}"
+  when: kubeadm_config is defined
 
 - name: Generate new kubeadm config
   ansible.builtin.set_fact:
@@ -169,16 +170,19 @@
       networking:
         podSubnet: "{{ pod_network_cidr }}"
       controlPlaneEndpoint: "{{ control_plane_endpoint.stdout }}"
+  when: kubeadm_config is defined
 
 - name: Patch kubeadm config
   ansible.builtin.set_fact:
     kubeadm_data: "{{ kubeadm_config_data | combine(new_kubeadm_config_data | from_yaml, recursive=True) }}"
+  when: kubeadm_config is defined
 
 - name: Write new kubeadm config
   ansible.builtin.copy:
     mode: "0644"
     content: "{{ kubeadm_data | to_nice_yaml }}"
     dest: "/tmp/yaml_output"
+  when: kubeadm_config is defined
 
 - name: Set kubeadm cmd with config
   ansible.builtin.set_fact:
