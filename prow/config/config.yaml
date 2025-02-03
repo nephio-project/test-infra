@@ -1074,6 +1074,78 @@ postsubmits:
               - key: configjson
                 path: config.json
 
+
+  - name: build-push-image-o2ims-operator-release-conf
+    cluster: default
+    always_run: true
+    branches:
+    - "^v.*$"
+    annotations:
+      description: Build and Push Image to DockerHub when release tag is created
+    decorate: true
+    decoration_config:
+      censor_secrets: true
+    max_concurrency: 0
+    spec:
+      containers:
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:debug
+        command:
+        - "/bin/sh"
+        - "-c"
+        - |
+          executor --context=${PWD} \
+            --dockerfile=operators/o2ims-operator/Dockerfile --destination=nephio/o2ims-operator:${PULL_BASE_REF}
+        volumeMounts:
+          - name: kaniko-secret
+            mountPath: /kaniko/.docker/
+        resources:
+          requests:
+            cpu: 1
+            memory: 1Gi
+      - name: nephio-image-signer
+        image: nephio/releaser:v0.0.2
+        command:
+          - "/bin/sh"
+          - "-c"
+          - |
+            /usr/local/bin/release docker.io nephio o2ims-operator ${PULL_BASE_REF}
+        volumeMounts:
+          - name: cosign-secret
+            mountPath: /root/.docker/
+        resources:
+          requests:
+            cpu: 1
+            memory: 64Mi
+          limits:
+            cpu: 1
+            memory: 128Mi
+        env:
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key
+                key: COSIGN_PRIVATE_KEY
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign-private-key-passwd
+                key: COSIGN_PASSWORD
+      volumes:
+        - name: kaniko-secret
+          secret:
+            secretName: regcred
+            items:
+              - key: .dockerconfigjson
+                path: config.json
+        - name: cosign-secret
+          secret:
+            secretName: cosign-login
+            items:
+              - key: configjson
+                path: config.json
+
+
   nephio-project/oai:
   - name: build-push-image-oai-release-conf
     cluster: default
