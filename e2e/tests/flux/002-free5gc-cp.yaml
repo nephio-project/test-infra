@@ -23,4 +23,4 @@ spec:
     approval.nephio.org/policy: initial
   pipeline:
     mutators:
-    - image: docker.io/efiacor/gen-kustomize-res:latest
+    - image: docker.io/nephio/gen-kustomize-res:latest
