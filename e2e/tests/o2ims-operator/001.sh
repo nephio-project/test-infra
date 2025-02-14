@@ -35,12 +35,29 @@ source "${LIBDIR}/_assertions.sh"
 # shellcheck source=e2e/lib/_utils.sh
 source "${LIBDIR}/_utils.sh"
 
-# TODO: Replace with catalog entry
-#git clone -b o2ims-operator git@github.com:dkosteck/nephio.git /tmp/nephio
-#(cd /tmp/nephio && git checkout e0f33e9f652c8d1b9f380283293e476f54e0843f)
+# If the packagerevisions endpoint is down, restart the porch-system pod until the endpoint is up
+exit_code=0
+kubectl get packagerevisions || exit_code=$?
+while [ $exit_code -ne 0 ]; do
+    exit_code=0
+    pod="$(kubectl get pods -n porch-system --no-headers -o custom-columns=":metadata.name" | grep server)"
+    kubectl delete pod $pod -n porch-system
+    kubectl wait --for=delete pod $pod -n porch-system --timeout=600s
+    pod="$(kubectl get pods -n porch-system --no-headers -o custom-columns=":metadata.name" | grep server)"
+    k8s_wait_ready "pod" $pod "" "porch-system"
+    kubectl get packagerevisions || exit_code=$?
+done
+
+# Clone the catalog
 pkg_rev=$(porchctl rpkg clone -n default "https://github.com/nephio-project/catalog.git/nephio/optional/o2ims@$REVISION" --repository mgmt o2ims | cut -f 1 -d ' ')
 k8s_wait_exists "packagerev" "$pkg_rev"
 
+# TODO: Remove once official image is published
+porchctl rpkg pull -n default "$pkg_rev" "o2ims"
+kpt fn eval o2ims --image gcr.io/kpt-fn/search-replace:v0.2.0 -- 'by-path=spec.template.spec.containers[0].image' "put-value=arorasagar/o2ims-operator:latest"
+porchctl rpkg push -n default "$pkg_rev" "o2ims"
+
+# Draft
 kubectl wait --for jsonpath='{.spec.lifecycle}'=Draft packagerevisions "$pkg_rev" --timeout="600s"
 assert_branch_exists "drafts/o2ims/v1"
 assert_commit_msg_in_branch "Intermediate commit" "drafts/o2ims/v1"
@@ -60,30 +77,20 @@ info "published package $pkg_rev"
 
 kpt_wait_pkg "mgmt" "o2ims"
 
-# Build and apply the O2IMS Operator
-#docker build -t o2ims:latest -f /tmp/nephio/operators/o2ims-operator/Dockerfile /tmp/nephio/operators/o2ims-operator
-#kind load docker-image o2ims:latest -n mgmt
-#k8s_apply /tmp/nephio/operators/o2ims-operator/tests/deployment/operator.yaml
+# Wait for the o2ims pod to appear
+exit_code=0
+o2ims_pod="$(kubectl get pods -n o2ims --no-headers -o custom-columns=":metadata.name" | grep o2ims)" || exit_code=$?
+while [ $exit_code -ne 0 ]; do
+    exit_code=0
+    o2ims_pod="$(kubectl get pods -n o2ims --no-headers -o custom-columns=":metadata.name" | grep o2ims)" || exit_code=$?
+    sleep 1
+done
 
 # Make sure the operator starts
 o2ims_pod="$(kubectl get pods -n o2ims --no-headers -o custom-columns=":metadata.name" | grep o2ims)"
 k8s_wait_ready "pod" $o2ims_pod "" "o2ims"
 
-# If the packagerevisions endpoint is down, restart the porch-system pod until the endpoint is up
-exit_code=0
-kubectl get packagerevisions || exit_code=$?
-while [ $exit_code -ne 0 ]; do
-    exit_code=0
-    pod="$(kubectl get pods -n porch-system --no-headers -o custom-columns=":metadata.name" | grep server)"
-    kubectl delete pod $pod -n porch-system
-    kubectl wait --for=delete pod $pod -n porch-system --timeout=600s
-    pod="$(kubectl get pods -n porch-system --no-headers -o custom-columns=":metadata.name" | grep server)"
-    k8s_wait_ready "pod" $pod "" "porch-system"
-    kubectl get packagerevisions || exit_code=$?
-done
-
 # Apply the sample provisioning request
-#k8s_apply /tmp/nephio/operators/o2ims-operator/tests/sample_provisioning_request.yaml
 k8s_apply "$TESTDIR/001-sample-provisioning-request.yaml"
 
 # wait for the edge cluster
