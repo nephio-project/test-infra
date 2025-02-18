@@ -52,11 +52,6 @@ done
 pkg_rev=$(porchctl rpkg clone -n default "https://github.com/nephio-project/catalog.git/nephio/optional/o2ims@$REVISION" --repository mgmt o2ims | cut -f 1 -d ' ')
 k8s_wait_exists "packagerev" "$pkg_rev"
 
-# TODO: Remove once official image is published
-porchctl rpkg pull -n default "$pkg_rev" "o2ims"
-kpt fn eval o2ims --image gcr.io/kpt-fn/search-replace:v0.2.0 -- 'by-path=spec.template.spec.containers[0].image' "put-value=arorasagar/o2ims-operator:latest"
-porchctl rpkg push -n default "$pkg_rev" "o2ims"
-
 # Draft
 kubectl wait --for jsonpath='{.spec.lifecycle}'=Draft packagerevisions "$pkg_rev" --timeout="600s"
 assert_branch_exists "drafts/o2ims/v1"
