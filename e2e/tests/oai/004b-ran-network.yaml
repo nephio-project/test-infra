@@ -16,7 +16,7 @@ spec:
   upstream:
     repo: catalog-workloads-oai-ran
     package: pkg-example-du-bp
-    revision: main
+    revision: v4.0.0
   downstream:
     repo: edge
     package: oai-ran-du
@@ -33,7 +33,7 @@ spec:
   upstream:
     repo: catalog-workloads-oai-ran
     package: pkg-example-cuup-bp
-    revision: main
+    revision: v4.0.0
   downstream:
     repo: edge
     package: oai-ran-cuup
