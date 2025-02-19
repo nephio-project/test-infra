@@ -1094,8 +1094,7 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=/home/prow/go/src/nephio_build/operators/o2ims-operator/ \ 
-            --dockerfile=Dockerfile --destination=nephio/o2ims-operator:${PULL_BASE_REF}
+          executor --context=/home/prow/go/src/nephio_build/operators/o2ims-operator/ --dockerfile=Dockerfile --destination=nephio/o2ims-operator:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
@@ -1165,8 +1164,7 @@ postsubmits:
         - "/bin/sh"
         - "-c"
         - |
-          executor --context=/home/prow/go/src/nephio_build/operators/focom-operator/ \ 
-            --dockerfile=Dockerfile --destination=nephio/focom-operator:${PULL_BASE_REF}
+          executor --context=/home/prow/go/src/nephio_build/operators/focom-operator/ --dockerfile=Dockerfile --destination=nephio/focom-operator:${PULL_BASE_REF}
         volumeMounts:
           - name: kaniko-secret
             mountPath: /kaniko/.docker/
