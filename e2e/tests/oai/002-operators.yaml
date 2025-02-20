@@ -16,7 +16,7 @@ spec:
   upstream:
     repo: oai-core-packages
     package: oai-cp-operators
-    revision: r4
+    revision: v4.0.0
   downstream:
     repo: core
     package: oai-cp-operators
@@ -33,7 +33,7 @@ spec:
   upstream:
     repo: oai-core-packages
     package: oai-up-operators
-    revision: r4
+    revision: v4.0.0
   downstream:
     repo: edge
     package: oai-up-operators
