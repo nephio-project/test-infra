@@ -16,7 +16,7 @@ spec:
   upstream:
     repo: catalog-workloads-oai-ran
     package: pkg-example-cucp-bp
-    revision: main
+    revision: v4.0.0
   downstream:
     repo: regional
     package: oai-ran-cucp

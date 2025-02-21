@@ -16,7 +16,7 @@ spec:
   upstream:
     repo: oai-core-packages
     package: database
-    revision: main
+    revision: v4.0.0
   targets:
   - objectSelector:
       apiVersion: infra.nephio.org/v1alpha1
