@@ -13,19 +13,10 @@ module "gcp-ubuntu-jammy" {
   nephio_mgmt_cluster_type = var.mgmt_cluster_type
 }
 
-module "gcp-fedora-34" {
+module "gcp-fedora-41" {
   source               = ".//modules/gcp"
-  vmimage              = "fedora-cloud/fedora-cloud-34"
-  ansible_user         = "fedora"
-  nephio_e2e_type      = var.e2e_type
-  nephio_e2e_fail_fast = var.fail_fast
-  nephio_mgmt_cluster_type = var.mgmt_cluster_type
-}
-
-module "gcp-fedora-38" {
-  source               = ".//modules/gcp"
-  vmimage              = "fedora-cloud/fedora-cloud-38"
-  ansible_user         = "fedora"
+  vmimage              = "fedora-coreos-cloud/fedora-coreos-41-20241109-3-0-gcp-x86-64"
+  ansible_user         = "core"
   nephio_e2e_type      = var.e2e_type
   nephio_e2e_fail_fast = var.fail_fast
   nephio_mgmt_cluster_type = var.mgmt_cluster_type
