@@ -12,7 +12,7 @@
   become: true
   community.docker.docker_container:
     name: docker_registry_proxy
-    image: rpardini/docker-registry-proxy:0.6.4
+    image: rpardini/docker-registry-proxy:0.6.5
     hostname: docker-registry-proxy
     detach: true
     restart: true
