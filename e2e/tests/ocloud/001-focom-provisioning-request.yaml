@@ -1,0 +1,51 @@
+apiVersion: focom.nephio.org/v1alpha1
+kind: OCloud
+metadata:
+  name: ocloud-1
+  namespace: focom-operator-system
+spec:
+  o2imsSecret:
+    secretRef:
+      name: ocloud-kubeconfig
+      namespace: default
+---
+apiVersion: provisioning.oran.org/v1alpha1
+kind: TemplateInfo
+metadata:
+  name: nephio-workload-cluster-v3.0.0
+  namespace: focom-operator-system
+spec:
+  templateName: nephio-workload-cluster
+  templateVersion: v3.0.0
+  templateParameterSchema: |
+    {
+      "type": "object",
+      "infra": {
+      "param1": {
+          "type": "string"
+        },
+        "params": {
+          "type": "integer"
+        }
+      },
+      "required": ["param1"]
+    }
+---
+apiVersion: focom.nephio.org/v1alpha1
+kind: FocomProvisioningRequest
+metadata:
+  name: focom-cluster-prov-req-nephio
+  namespace: focom-operator-system
+spec:
+  name: sample-edge
+  description: "Provisioning request for setting up a sample edge kind cluster"
+  oCloudId: ocloud-1
+  oCloudNamespace: focom-operator-system
+  templateName: nephio-workload-cluster
+  templateVersion: v3.0.0
+  templateParameters:
+    clusterName: edge
+    labels:
+      nephio.org/site-type: edge
+      nephio.org/region: europe-paris-west
+      nephio.org/owner: nephio-o2ims
