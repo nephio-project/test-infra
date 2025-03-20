@@ -71,8 +71,8 @@ kpt pkg get --for-deployment https://github.com/nephio-project/catalog.git/nephi
 kubectl --kubeconfig $focom_kubecofig apply -f $tmp_pkg_path
 
 # Wait for the focom op to become available
-k8s_wait_exists "deployment" "focom-operator" $focom_kubecofig "focom-operator-system"
-kubectl rollout status deployment/focom-operator --namespace="focom-operator-system" --kubeconfig=$focom_kubecofig --timeout="600s"
+k8s_wait_exists "deployment" "focom-operator-controller-manager" $focom_kubecofig "focom-operator-system"
+kubectl rollout status deployment/focom-operator-controller-manager --namespace="focom-operator-system" --kubeconfig=$focom_kubecofig --timeout="600s"
 
 # Update the kubeconfig IPAddress
 ip=$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' kind-control-plane)
