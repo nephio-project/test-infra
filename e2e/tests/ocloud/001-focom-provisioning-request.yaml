@@ -12,11 +12,11 @@ spec:
 apiVersion: provisioning.oran.org/v1alpha1
 kind: TemplateInfo
 metadata:
-  name: nephio-workload-cluster-v3.0.0
+  name: nephio-workload-cluster-main
   namespace: focom-operator-system
 spec:
   templateName: nephio-workload-cluster
-  templateVersion: v3.0.0
+  templateVersion: main
   templateParameterSchema: |
     {
       "type": "object",
@@ -42,7 +42,7 @@ spec:
   oCloudId: ocloud-1
   oCloudNamespace: focom-operator-system
   templateName: nephio-workload-cluster
-  templateVersion: v3.0.0
+  templateVersion: main
   templateParameters:
     clusterName: edge
     labels:

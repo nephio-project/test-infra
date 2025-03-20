@@ -31,7 +31,7 @@ source "${LIBDIR}/_assertions.sh"
 
 
 # Clone the o2ims pkg
-pkg_rev=$(porchctl rpkg clone -n default "https://github.com/nephio-project/catalog.git/nephio/optional/o2ims@$REVISION" --repository mgmt o2ims | cut -f 1 -d ' ')
+pkg_rev=$(porchctl rpkg clone -n default "https://github.com/nephio-project/catalog.git/nephio/optional/o2ims@$BRANCH" --repository mgmt o2ims | cut -f 1 -d ' ')
 k8s_wait_exists "packagerev" "$pkg_rev"
 
 # Create Draft

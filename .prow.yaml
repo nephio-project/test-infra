@@ -417,10 +417,10 @@ presubmits:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
-  - name: e2e-o2ims-ubuntu-jammy
+  - name: e2e-ocloud-ubuntu-jammy
     annotations:
     labels:
-    run_if_changed: '^(e2e/tests/02ims/|e2e/lib/|e2e/e2e.sh|e2e/defaults.env)'
+    run_if_changed: '^(e2e/tests/ocloud/|e2e/lib/|e2e/e2e.sh|e2e/defaults.env)'
     skip_report: false
     decorate: true
     cluster: default
@@ -433,7 +433,7 @@ presubmits:
             - "-c"
             - |
               set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -var="e2e_type=o2ims" -var="fail_fast=true" -auto-approve
+              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -var="e2e_type=ocloud" -var="fail_fast=true" -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -459,10 +459,10 @@ presubmits:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
-  - name: e2e-o2ims-fedora-38
+  - name: e2e-ocloud-fedora-38
     annotations:
     labels:
-    run_if_changed: '^(e2e/tests/02ims/|e2e/lib/|e2e/e2e.sh|e2e/defaults.env)'
+    run_if_changed: '^(e2e/tests/ocloud/|e2e/lib/|e2e/e2e.sh|e2e/defaults.env)'
     skip_report: false
     optional: true
     decorate: true
@@ -476,7 +476,7 @@ presubmits:
             - "-c"
             - |
               set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-38 -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-fedora-38 -var="e2e_type=o2ims" -var="fail_fast=true" -auto-approve
+              terraform init && timeout 120m terraform apply -target module.gcp-fedora-38 -var="e2e_type=ocloud" -var="fail_fast=true" -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
