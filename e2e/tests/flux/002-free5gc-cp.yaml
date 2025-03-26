@@ -15,7 +15,7 @@ spec:
   upstream:
     repo: catalog-workloads-free5gc
     package: free5gc-cp
-    revision: main
+    revision: -1
   downstream:
     repo: regional
     package: free5gc-cp

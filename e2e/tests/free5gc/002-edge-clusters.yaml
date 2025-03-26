@@ -16,7 +16,7 @@ spec:
   upstream:
     repo: catalog-infra-capi
     package: nephio-workload-cluster
-    revision: main
+    revision: -1
   targets:
   - repositories:
     - name: mgmt
