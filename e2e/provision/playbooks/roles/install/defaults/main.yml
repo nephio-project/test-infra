@@ -67,7 +67,7 @@ nephio:
     packages:
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: nephio/core/porch
-        version: main
+        version: -1
         async: 480
         poll: 5
         inventory_id: nephio
@@ -75,22 +75,22 @@ nephio:
         resourcegroup_ns: porch-system
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: nephio/core/nephio-operator
-        version: main
+        version: -1
         async: 480
         poll: 5
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: nephio/core/configsync
-        version: main
+        version: -1
         async: 240
         poll: 5
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: nephio/optional/network-config
-        version: main
+        version: -1
         async: 480
         poll: 0
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: nephio/optional/fluxcd
-        version: main
+        version: -1
         async: 240
         poll: 5
 
@@ -101,4 +101,4 @@ nephio_webui:
     package:
       repo_uri: "{{ nephio_catalog_repo_uri }}"
       pkg: nephio/optional/webui
-      version: main
+      version: -1
