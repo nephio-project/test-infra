@@ -101,4 +101,4 @@ nephio_webui:
     package:
       repo_uri: "{{ nephio_catalog_repo_uri }}"
       pkg: nephio/optional/webui
-      version: -1
+      version: main
