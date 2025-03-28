@@ -6,7 +6,7 @@ spec:
   name: sample-edge
   description: "Provisioning request for setting up a sample edge kind cluster."
   templateName: nephio-workload-cluster
-  templateVersion: v3.0.0
+  templateVersion: -1
   templateParameters:
     clusterName: edge
     labels:
