@@ -28,7 +28,6 @@ function capi_cluster_ready {
     # Wait for package variants
     for pv in cluster kindnet local-path-provisioner multus repo vlanindex; do
         k8s_wait_exists "packagevariants" "${cluster}-$pv"
-       
     done
 
     if [[ "$use_configsync" = true ]] ; then

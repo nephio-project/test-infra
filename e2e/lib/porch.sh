@@ -15,7 +15,7 @@ source "${E2EDIR:-$HOME/test-infra/e2e}/lib/_utils.sh"
 function porch_wait_published_packagerev {
     local pkg_name="$1"
     local repository="$2"
-    local revision="${3:-main}"
+    local revision="${3:--1}"
     local timeout=${4:-900}
     lapse=$timeout
 
