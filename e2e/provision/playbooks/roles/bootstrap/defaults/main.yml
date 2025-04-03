@@ -102,6 +102,19 @@ cluster_api:
         async: 1500
         poll: 0
 
+cluster_api_nonkind_k8s:
+  enabled: true
+  k8s:
+    namespaces:
+      - capm3-system
+  kpt:
+    packages:
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: infra/capi/cluster-capi-infrastructure-metal3
+        version: "{{ nephio_catalog_revision }}"
+        async: 1500
+        poll: 0
+
 metallb:
   enabled: true
   k8s:
