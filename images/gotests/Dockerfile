@@ -31,7 +31,7 @@ WORKDIR /go/src/lichen
 RUN go build -o /tmp/lichen
 
 
-FROM golang:1.23.5-bullseye
+FROM golang:1.23.8-bullseye
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN apt-get update && \
   apt-get install -y --no-install-recommends \
