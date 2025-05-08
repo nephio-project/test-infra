@@ -119,7 +119,7 @@ presubmits:
             items:
               - key: satoken
                 path: satoken
-  - name: e2e-free5gc-ubuntu-focal
+  - name: e2e-free5gc-ubuntu-jammy
     annotations:
     labels:
     run_if_changed: '^e2e/'
@@ -134,8 +134,8 @@ presubmits:
           args:
             - "-c"
             - |
-              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-focal -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-focal -var="fail_fast=true" -auto-approve
+              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -var="fail_fast=true" -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -161,7 +161,7 @@ presubmits:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
-  - name: e2e-free5gc-fedora-34
+  - name: e2e-free5gc-fedora-42
     annotations:
     labels:
     run_if_changed: '^e2e/'
@@ -177,8 +177,8 @@ presubmits:
           args:
             - "-c"
             - |
-              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-34 -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-fedora-34 -var="fail_fast=true" -auto-approve
+              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-42 -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-fedora-42 -var="fail_fast=true" -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -246,7 +246,7 @@ presubmits:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
-  - name: e2e-oai-fedora-34
+  - name: e2e-oai-fedora-42
     annotations:
     labels:
     run_if_changed: '^e2e/'
@@ -262,8 +262,8 @@ presubmits:
           args:
             - "-c"
             - |
-              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-34 -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-fedora-34 -var="e2e_type=oai" -var="fail_fast=true" -auto-approve
+              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-42 -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-fedora-42 -var="e2e_type=oai" -var="fail_fast=true" -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -459,7 +459,7 @@ presubmits:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
-  - name: e2e-o2ims-fedora-34
+  - name: e2e-o2ims-fedora-42
     annotations:
     labels:
     run_if_changed: '^e2e/'
@@ -475,8 +475,8 @@ presubmits:
           args:
             - "-c"
             - |
-              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-34 -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-fedora-34 -var="e2e_type=o2ims" -var="fail_fast=true" -auto-approve
+              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-42 -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-fedora-42 -var="e2e_type=o2ims" -var="fail_fast=true" -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
