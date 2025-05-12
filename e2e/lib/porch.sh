@@ -15,7 +15,7 @@ source "${E2EDIR:-$HOME/test-infra/e2e}/lib/_utils.sh"
 function porch_wait_published_packagerev {
     local pkg_name="$1"
     local repository="$2"
-    local revision="${3:--1}"
+    local workspacename="${3:-main}"
     local timeout=${4:-900}
     lapse=$timeout
 
@@ -23,8 +23,12 @@ function porch_wait_published_packagerev {
     local found=""
     while [[ $lapse -gt 0 ]]; do
         for pkg_rev in $(kubectl get packagerevisions -o jsonpath="{range .items[?(@.spec.packageName==\"$pkg_name\")]}{.metadata.name}{\"\\n\"}{end}"); do
-            if [ "$(kubectl get packagerevision "$pkg_rev" -o jsonpath='{.spec.repository}/{.spec.revision}')" == "$repository/$revision" ]; then
+            if [ "$(kubectl get packagerevision "$pkg_rev" -o jsonpath='{.spec.repository}/{.spec.workspaceName}')" == "$repository/$workspacename" ]; then
                 found=$pkg_rev
+                break
+            fi
+            if [ "$(kubectl get packagerevision "$pkg_rev" -o jsonpath='{.spec.lifecycle}')" == "Proposed" ]; then
+                porchctl rpkg approve -n default "$pkg_rev"
                 break
             fi
         done

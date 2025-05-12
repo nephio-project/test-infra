@@ -60,6 +60,7 @@ k8s_apply "$TESTDIR/004a-ran-network.yaml"
 
 k8s_wait_ready "packagevariant" "oai-cucp"
 
+porch_wait_published_packagerev "oai-ran-cucp" "regional" "packagevariant-1"
 kpt_wait_pkg "regional" "oai-ran-cucp" "nephio" "1800"
 k8s_wait_exists "nfdeployment" "cucp-regional" "$_regional_kubeconfig" "oai-ran-cucp"
 k8s_wait_ready_replicas "deployment" "oai-gnb-cu-cp" "$_regional_kubeconfig" "oai-ran-cucp"
