@@ -6,7 +6,7 @@ spec:
   upstream:
     repo: catalog-workloads-tools
     package: ueransim
-    revision: -1
+    workspaceName: main
   downstream:
     repo: edge01
     package: ueransim

@@ -34,6 +34,6 @@ k8s_apply "$TESTDIR/002-free5gc-cp.yaml"
 
 kubeconfig="$HOME/.kube/config"
 k8s_wait_exists "packagevariant" "free5gc-control-plane"
-porch_wait_published_packagerev "free5gc-cp" "regional" "$PACKAGE_REVISION"
+porch_wait_published_packagerev "free5gc-cp" "regional" "$PACKAGE_WORKSPACE_NAME"
 kpt_wait_pkg "regional" "free5gc-cp"
 k8s_wait_ready_replicas "statefulset" "mongodb" "$(k8s_get_capi_kubeconfig "regional")" "free5gc-cp"

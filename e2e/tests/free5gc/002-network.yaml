@@ -16,7 +16,7 @@ spec:
   upstream:
     repo: catalog-distros-sandbox
     package: network
-    revision: -1
+    workspaceName: main
   downstream:
     repo: mgmt
     package: network

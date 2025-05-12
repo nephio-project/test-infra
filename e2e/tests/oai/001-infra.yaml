@@ -16,7 +16,7 @@ spec:
   upstream:
     repo: catalog-infra-capi
     package: nephio-workload-cluster
-    revision: -1
+    workspaceName: main
   downstream:
     repo: mgmt
     package: core
@@ -37,7 +37,7 @@ spec:
   upstream:
     repo: catalog-infra-capi
     package: nephio-workload-cluster
-    revision: -1
+    workspaceName: main
   targets:
   - repositories:
     - name: mgmt
@@ -61,7 +61,7 @@ spec:
   upstream:
     repo: catalog-infra-capi
     package: nephio-workload-cluster
-    revision: -1
+    workspaceName: main
   targets:
   - repositories:
     - name: mgmt

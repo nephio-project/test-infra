@@ -33,7 +33,7 @@ source "${LIBDIR}/porch.sh"
 # shellcheck source=e2e/lib/_assertions.sh
 source "${LIBDIR}/_assertions.sh"
 
-pkg_rev=$(porchctl rpkg clone -n default "https://github.com/nephio-project/catalog.git/workloads/free5gc/free5gc-cp@$REVISION" --repository regional free5gc-cp | cut -f 1 -d ' ')
+pkg_rev=$(porchctl rpkg clone -n default "https://github.com/nephio-project/catalog.git/workloads/free5gc/free5gc-cp@$BRANCH" --repository regional free5gc-cp | cut -f 1 -d ' ')
 k8s_wait_exists "packagerev" "$pkg_rev"
 
 kubectl wait --for jsonpath='{.spec.lifecycle}'=Draft packagerevisions "$pkg_rev" --timeout="600s"
