@@ -27,12 +27,6 @@ function porch_wait_published_packagerev {
                 found=$pkg_rev
                 break
             fi
-
-            # Force an approval if package revision has been proposed for more than 3 minutes
-            if [ $((lapse + 180)) -lt $timeout ] && [ "$(kubectl get packagerevision "$pkg_rev" -o jsonpath='{.spec.lifecycle}')" == "Proposed" ]; then
-                porchctl rpkg approve -n default "$pkg_rev"
-                break
-            fi
         done
         if [[ $found ]]; then
             info "found package published revision on $pkg_name"
