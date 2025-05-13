@@ -31,15 +31,6 @@ module "gcp-fedora-38" {
   nephio_mgmt_cluster_type = var.mgmt_cluster_type
 }
 
-module "gcp-fedora-40" {
-  source               = ".//modules/gcp"
-  vmimage              = "fedora-cloud/fedora-cloud-40"
-  ansible_user         = "fedora"
-  nephio_e2e_type      = var.e2e_type
-  nephio_e2e_fail_fast = var.fail_fast
-  nephio_mgmt_cluster_type = var.mgmt_cluster_type
-}
-
 variable "e2e_type" {
   description = "The End-to-End testing type"
   default     = "free5gc"
