@@ -27,6 +27,9 @@ source "${LIBDIR}/k8s.sh"
 # shellcheck source=e2e/lib/kpt.sh
 source "${LIBDIR}/kpt.sh"
 
+# shellcheck source=e2e/lib/porch.sh
+source "${LIBDIR}/porch.sh"
+
 function _wait_for_ue {
     local kubeconfig=$1
     local log_msg=$2
@@ -64,6 +67,7 @@ function _wait_for_ue_pdu_session {
 k8s_apply "$TESTDIR/005-ue.yaml"
 
 k8s_wait_ready "packagevariant" "oai-ue"
+porch_wait_published_packagerev "oai-ran-ue" "edge" "packagevariant-1"
 kpt_wait_pkg "edge" "oai-ran-ue" "nephio" "1800"
 
 _edge_kubeconfig="$(k8s_get_capi_kubeconfig "edge")"
