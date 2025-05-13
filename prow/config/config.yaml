@@ -2049,7 +2049,7 @@ periodics:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
-  - name: e2e-daily-fedora-34-oai
+  - name: e2e-daily-fedora-41-oai
     annotations:
     labels:
     cron: "0 15 * * 1-6"
@@ -2069,8 +2069,8 @@ periodics:
           args:
             - "-c"
             - |
-              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-34 -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-fedora-34 -var="e2e_type=oai" -auto-approve
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-41 -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-fedora-41 -var="e2e_type=oai" -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
