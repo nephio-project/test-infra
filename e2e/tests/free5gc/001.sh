@@ -45,7 +45,7 @@ function assert_workload_resource_contains {
     assert_contains "$(_curl_workload_cluster_content "$1")" "$2" "$3"
 }
 
-regional_pkg_rev=$(porchctl rpkg clone -n default "https://github.com/nephio-project/catalog.git/infra/capi/nephio-workload-cluster@$REVISION" --repository mgmt regional | cut -f 1 -d ' ')
+regional_pkg_rev=$(porchctl rpkg clone -n default "https://github.com/nephio-project/catalog.git/infra/capi/nephio-workload-cluster@$BRANCH" --repository mgmt regional | cut -f 1 -d ' ')
 k8s_wait_exists "packagerev" "$regional_pkg_rev"
 
 # Draft creation

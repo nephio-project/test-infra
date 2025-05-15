@@ -6,7 +6,7 @@ spec:
   upstream:
     repo: catalog-workloads-free5gc
     package: free5gc-operator
-    revision: main
+    workspaceName: main
   targets:
   - objectSelector:
       apiVersion: infra.nephio.org/v1alpha1

@@ -27,6 +27,9 @@ source "${LIBDIR}/k8s.sh"
 # shellcheck source=e2e/lib/kpt.sh
 source "${LIBDIR}/kpt.sh"
 
+# shellcheck source=e2e/lib/porch.sh
+source "${LIBDIR}/porch.sh"
+
 function _wait_for_ran {
     kubeconfig=$1
     wait_msg=$2
@@ -60,6 +63,7 @@ k8s_apply "$TESTDIR/004a-ran-network.yaml"
 
 k8s_wait_ready "packagevariant" "oai-cucp"
 
+porch_wait_published_packagerev "oai-ran-cucp" "regional" "packagevariant-1"
 kpt_wait_pkg "regional" "oai-ran-cucp" "nephio" "1800"
 k8s_wait_exists "nfdeployment" "cucp-regional" "$_regional_kubeconfig" "oai-ran-cucp"
 k8s_wait_ready_replicas "deployment" "oai-gnb-cu-cp" "$_regional_kubeconfig" "oai-ran-cucp"

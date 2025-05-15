@@ -27,6 +27,9 @@ source "${LIBDIR}/_utils.sh"
 # shellcheck source=e2e/lib/k8s.sh
 source "${LIBDIR}/k8s.sh"
 
+# shellcheck source=e2e/lib/porch.sh
+source "${LIBDIR}/porch.sh"
+
 kubeconfig="$HOME/.kube/config"
 # Set the new value for maxUplinkThroughput as a parameter
 new_capacity_value=${1:-20G}
@@ -51,6 +54,9 @@ upf_deployment_pkg=$(kubectl --kubeconfig "$kubeconfig" get packagevariant edge-
 info "Copying $upf_deployment_pkg"
 ws="edge01-upf-scaling"
 upf_pkg_rev=$(porchctl rpkg copy -n default "$upf_deployment_pkg" --workspace "$ws" | cut -d ' ' -f 1)
+
+porch_wait_packagerev_ready "$upf_pkg_rev"
+
 info "Copied to $upf_pkg_rev, pulling"
 
 rm -rf $ws
@@ -64,6 +70,8 @@ kpt fn eval --image gcr.io/kpt-fn/search-replace:v0.2.0 "$ws" -- by-path='spec.m
 kpt fn eval --image gcr.io/kpt-fn/search-replace:v0.2.0 "$ws" -- by-path='spec.maxDownlinkThroughput' by-file-path='**/capacity.yaml' put-value="$new_capacity_value"
 
 diff -r /tmp/$ws $ws || echo
+
+porch_wait_packagerev_ready "$upf_pkg_rev"
 
 info "Pushing $upf_pkg_rev update"
 porchctl rpkg push -n default "$upf_pkg_rev" $ws
