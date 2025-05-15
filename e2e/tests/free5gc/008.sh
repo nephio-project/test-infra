@@ -72,9 +72,6 @@ kpt fn eval --image gcr.io/kpt-fn/search-replace:v0.2.0 "$ws" -- by-path='spec.m
 diff -r /tmp/$ws $ws || echo
 
 porch_wait_packagerev_ready "$upf_pkg_rev"
-rm -rf /tmp/$ws
-porchctl rpkg pull -n default "$upf_pkg_rev" /tmp/$ws
-cp /tmp/$ws/.KptRevisionMetadata $ws/.KptRevisionMetadata
 
 info "Pushing $upf_pkg_rev update"
 porchctl rpkg push -n default "$upf_pkg_rev" $ws
