@@ -84,29 +84,37 @@ resource "google_compute_instance" "e2e_instances" {
       "source /etc/os-release || true",
       "echo \"OS: $ID ($VERSION_ID)\"",
 
-      "ROOT_PART=$(findmnt / -o SOURCE -n | sed 's/\[.*\]//')",
-      "DISK=$(echo $ROOT_PART | sed -E 's/[0-9]+$//')",
-      "PART_NUM=$(echo $ROOT_PART | grep -o '[0-9]*$')",
-      "FS_TYPE=$(df -T / | tail -1 | awk '{print $2}')",
+      "ROOT_PART=$(findmnt / -o SOURCE -n | sed 's/\\[.*\\]//')",  # Escaped brackets
+      "DISK=$(echo $ROOT_PART | sed -E 's/[0-9]+$//')",  # Get the parent disk without the partition number
+      "PART_NUM=$(echo $ROOT_PART | grep -o '[0-9]*$')",  # Extract the partition number
+      "FS_TYPE=$(df -T / | tail -1 | awk '{print $2}')",  # Detect filesystem type
 
       "echo \"ROOT_PART: $ROOT_PART | DISK: $DISK | PART_NUM: $PART_NUM | FS_TYPE: $FS_TYPE\"",
 
-      "echo '📦 Installing growpart...'",
-      "sudo dnf install -y cloud-utils-growpart || sudo apt-get install -y cloud-guest-utils || true",
+      "echo '📦 Installing necessary packages...'",
+
+      # Install necessary utilities for different distros
+      "if [ -x $(command -v dnf) ]; then sudo dnf install -y cloud-utils-growpart; else sudo apt-get install -y cloud-guest-utils; fi",
 
       "echo '📈 Expanding partition...'",
-      "sudo growpart $DISK $PART_NUM || echo '⚠️ growpart failed or unnecessary'",
+      "if [ -x $(command -v growpart) ]; then sudo growpart $DISK $PART_NUM || echo '⚠️ growpart failed or unnecessary'; else echo '⚠️ growpart not available.'; fi",
 
+      # Resize filesystem based on FS_TYPE
       "case $FS_TYPE in",
       "  btrfs)",
-      "    echo '🔧 Resizing Btrfs filesystem...'; sudo dnf install -y btrfs-progs || true;",
-      "    sudo btrfs filesystem resize max / || echo 'Btrfs resize failed' ;;",
+      "    echo '🔧 Resizing Btrfs filesystem...';",
+      "    if ! command -v btrfs; then sudo dnf install -y btrfs-progs || true; fi;",
+      "    sudo btrfs filesystem resize max / || echo '⚠️ Btrfs resize failed' ;;",
 
       "  ext4)",
-      "    echo '🔧 Resizing ext4 filesystem...'; sudo resize2fs $ROOT_PART || echo 'resize2fs failed' ;;",
+      "    echo '🔧 Resizing ext4 filesystem...';",
+      "    if ! command -v resize2fs; then sudo apt-get install -y e2fsprogs || true; fi;",
+      "    sudo resize2fs $ROOT_PART || echo '⚠️ resize2fs failed' ;;",
 
       "  xfs)",
-      "    echo '🔧 Resizing XFS filesystem...'; sudo xfs_growfs / || echo 'xfs_growfs failed' ;;",
+      "    echo '🔧 Resizing XFS filesystem...';",
+      "    if ! command -v xfs_growfs; then sudo apt-get install -y xfsprogs || true; fi;",
+      "    sudo xfs_growfs / || echo '⚠️ xfs_growfs failed' ;;",
 
       "  *)",
       "    echo \"❌ Unsupported filesystem type: $FS_TYPE\" ;;",
