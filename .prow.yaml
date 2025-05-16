@@ -122,7 +122,7 @@ presubmits:
   - name: e2e-free5gc-ubuntu-jammy
     annotations:
     labels:
-    run_if_changed: '^e2e/'
+    run_if_changed: '^(e2e/tests/free5gc/|e2e/lib/|e2e/e2e.sh|e2e/defaults.env)'
     skip_report: false
     decorate: true
     cluster: default
@@ -164,7 +164,7 @@ presubmits:
   - name: e2e-free5gc-fedora-38
     annotations:
     labels:
-    run_if_changed: '^e2e/'
+    run_if_changed: '^(e2e/tests/free5gc/|e2e/lib/|e2e/e2e.sh|e2e/defaults.env)'
     skip_report: false
     optional: true
     decorate: true
@@ -207,7 +207,7 @@ presubmits:
   - name: e2e-oai-ubuntu-jammy
     annotations:
     labels:
-    run_if_changed: '^e2e/'
+    run_if_changed: '^(e2e/tests/oai/|e2e/lib/|e2e/e2e.sh|e2e/defaults.env)'
     skip_report: false
     decorate: true
     cluster: default
@@ -249,7 +249,7 @@ presubmits:
   - name: e2e-oai-fedora-38
     annotations:
     labels:
-    run_if_changed: '^e2e/'
+    run_if_changed: '^(e2e/tests/oai/|e2e/lib/|e2e/e2e.sh|e2e/defaults.env)'
     skip_report: false
     optional: true
     decorate: true
@@ -378,7 +378,7 @@ presubmits:
   - name: e2e-flux-ubuntu-jammy
     annotations:
     labels:
-    run_if_changed: '^e2e/'
+    run_if_changed: '^(e2e/tests/flux/|e2e/lib/|e2e/e2e.sh|e2e/defaults.env)'
     skip_report: false
     decorate: true
     cluster: default
@@ -420,7 +420,7 @@ presubmits:
   - name: e2e-o2ims-ubuntu-jammy
     annotations:
     labels:
-    run_if_changed: '^e2e/'
+    run_if_changed: '^(e2e/tests/02ims/|e2e/lib/|e2e/e2e.sh|e2e/defaults.env)'
     skip_report: false
     decorate: true
     cluster: default
@@ -462,7 +462,7 @@ presubmits:
   - name: e2e-o2ims-fedora-38
     annotations:
     labels:
-    run_if_changed: '^e2e/'
+    run_if_changed: '^(e2e/tests/02ims/|e2e/lib/|e2e/e2e.sh|e2e/defaults.env)'
     skip_report: false
     optional: true
     decorate: true
