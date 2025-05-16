@@ -84,7 +84,7 @@ resource "google_compute_instance" "e2e_instances" {
       "source /etc/os-release || true",
       "echo \"OS: $ID ($VERSION_ID)\"",
 
-      "ROOT_PART=$(findmnt / -o SOURCE -n)",
+      "ROOT_PART=$(findmnt / -o SOURCE -n | sed 's/\[.*\]//')",
       "DISK=$(echo $ROOT_PART | sed -E 's/[0-9]+$//')",
       "PART_NUM=$(echo $ROOT_PART | grep -o '[0-9]*$')",
       "FS_TYPE=$(df -T / | tail -1 | awk '{print $2}')",
