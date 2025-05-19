@@ -37,7 +37,7 @@ metadata:
   name: focom-cluster-prov-req-nephio
   namespace: focom-operator-system
 spec:
-  name: sample-edge
+  name: edge-cluster-req
   description: "Provisioning request for setting up a sample edge kind cluster"
   oCloudId: ocloud-1
   oCloudNamespace: focom-operator-system
