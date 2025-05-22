@@ -39,7 +39,7 @@ variable "source_image_project_id" {
 
 variable "source_image_family" {
   description = "OS image family to be used for the creation of CI instances"
-  default     = "ubuntu-2004-lts"
+  default     = "ubuntu-2204-lts"
   type        = string
 }
 
