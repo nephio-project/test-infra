@@ -54,6 +54,12 @@ locals {
   image_version = replace(var.image_version, ".", "-")
 }
 
+variable "image_ttl" {
+  description = "Time-to-live label"
+  type        = string
+  default     = "48h"
+}
+
 source "googlecompute" "nephio-packer" {
   project_id              = var.project_id
   zone                    = var.zone
@@ -65,6 +71,11 @@ source "googlecompute" "nephio-packer" {
   disk_size               = 50
   credentials_file        = "/etc/satoken/satoken"
   image_name              = "nephio-pre-baked-${local.image_version}-${local.datestamp}"
+  image_labels            = {
+    created_by = "prow"
+    pr_number  = var.image_version
+    ttl        = var.image_ttl
+  }
 }
 
 build {

@@ -511,20 +511,19 @@ presubmits:
     optional: true
     decorate: true
     cluster: default
-    extra_refs:
-      - org: nephio-project
-        repo: test-infra
-        base_ref: main
-        path_alias: nephio_repo/test-infra
     spec:
       containers:
         - image: "hashicorp/packer:1.10"
           command:
-            - "/bin/sh"
+              - /bin/sh
+              - -c
           args:
-            - "-c"
-            - |
-              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/packer/gcp"; packer init . && packer build -force .
+              - |
+                echo "Running Packer build...";
+                set -eE;
+                cd "$GOPATH/src/nephio_repo/test-infra/e2e/packer/gcp";
+                packer init .
+                packer build -var 'image_version=pr-${PULL_NUMBER}' presubmit.pkr.hcl
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -1050,3 +1049,34 @@ postsubmits:
             items:
               - key: configjson
                 path: config.json
+
+periodics:
+  - name: image-cleanup
+    decorate: true
+    interval: 24h
+    cluster: default
+    spec:
+      containers:
+        - image: google/cloud-sdk:slim
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - |
+              echo "Starting GCP image cleanup...";
+              PROJECT_ID="pure-faculty-367518";
+              IMAGES=$(gcloud compute images list --project="$PROJECT_ID" --filter="name~^nephio-pre-baked-.* AND creationTimestamp<$(date -d '3 days ago' --utc +%Y-%m-%dT%H:%M:%SZ)" --format="value(name)");
+              for image in $IMAGES; do
+                echo "Deleting image $image...";
+                gcloud compute images delete "$image" --project="$PROJECT_ID" --quiet;
+              done
+          volumeMounts:
+            - name: satoken
+              mountPath: /etc/satoken
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
