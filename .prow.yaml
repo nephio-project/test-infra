@@ -506,7 +506,7 @@ presubmits:
   - name: pre-bake-ubuntu-jammy
     annotations:
     labels:
-    run_if_changed: '^(e2e/packer/)'
+    run_if_changed: '^(e2e/packer/gcp/)'
     skip_report: false
     optional: true
     decorate: true
@@ -521,7 +521,7 @@ presubmits:
               - |
                 echo "Running Packer build...";
                 set -eE;
-                cd "nephio_repo/test-infra/e2e/packer/gcp"
+                cd $GOPATH/src/github.com/nephio-project/test-infra/e2e/packer/gcp
                 packer init .
                 packer build -var 'image_version=pr-${PULL_NUMBER}' presubmit.pkr.hcl
           volumeMounts:
