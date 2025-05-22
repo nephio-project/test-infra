@@ -1862,10 +1862,10 @@ presubmits:
             - "--prow-yaml-repo-name=$(REPO_OWNER)/$(REPO_NAME)"
 
 periodics:
-  - name: e2e-daily-ubuntu-focal-free5gc
+  - name: e2e-daily-ubuntu-jammy-free5gc
     annotations:
     labels:
-    cron: "0 15 * * 1-6"
+    cron: "0 3 * * 1-6"
     skip_report: false
     decorate: true
     cluster: default
@@ -1882,8 +1882,8 @@ periodics:
           args:
             - "-c"
             - |
-              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-focal -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-focal -auto-approve
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -1912,7 +1912,7 @@ periodics:
   - name: e2e-daily-fedora-38-free5gc
     annotations:
     labels:
-    cron: "0 15 * * 1-6"
+    cron: "0 3 * * 1-6"
     skip_report: false
     decorate: true
     cluster: default
@@ -1959,7 +1959,7 @@ periodics:
   - name: e2e-daily-ubuntu-jammy-oai
     annotations:
     labels:
-    cron: "0 15 * * 1-6"
+    cron: "0 3 * * 1-6"
     skip_report: false
     decorate: true
     cluster: default
@@ -2003,56 +2003,10 @@ periodics:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
-  - name: pre-bake-daily-ubuntu-jammy
-    annotations:
-    labels:
-    cron: "0 15 * * 1-6"
-    skip_report: false
-    decorate: true
-    cluster: default
-    extra_refs:
-      - org: nephio-project
-        repo: test-infra
-        base_ref: main
-        path_alias: nephio_repo/test-infra
-    spec:
-      containers:
-        - image: "hashicorp/packer:1.10"
-          command:
-            - "/bin/sh"
-          args:
-            - "-c"
-            - |
-              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/packer/gcp"; packer init . && packer build -force .
-          volumeMounts:
-            - name: satoken
-              mountPath: "/etc/satoken"
-            - name: ssh-key-vol
-              mountPath: "/etc/ssh-key"
-          resources:
-            requests:
-              cpu: 2
-              memory: 2Gi
-      volumes:
-        - name: satoken
-          secret:
-            secretName: satoken
-            items:
-              - key: satoken
-                path: satoken
-        - name: ssh-key-vol
-          secret:
-            secretName: ssh-key-e2e
-            defaultMode: 256
-            items:
-              - key: id_rsa
-                path: id_rsa
-              - key: id_rsa.pub
-                path: id_rsa.pub
   - name: e2e-daily-fedora-38-oai
     annotations:
     labels:
-    cron: "0 15 * * 1-6"
+    cron: "0 3 * * 1-6"
     skip_report: false
     decorate: true
     cluster: default
@@ -2099,7 +2053,7 @@ periodics:
   - name: e2e-daily-ubuntu-jammy-kubeadm
     annotations:
     labels:
-    cron: "0 15 * * 1-6"
+    cron: "0 3 * * 1-6"
     skip_report: false
     decorate: true
     cluster: default
@@ -2146,7 +2100,7 @@ periodics:
   - name: e2e-daily-fedora-38-kubeadm
     annotations:
     labels:
-    cron: "0 15 * * 1-6"
+    cron: "0 3 * * 1-6"
     skip_report: false
     decorate: true
     cluster: default
@@ -2193,7 +2147,7 @@ periodics:
   - name: e2e-daily-ubuntu-jammy-flux
     annotations:
     labels:
-    cron: "0 15 * * 1-6"
+    cron: "0 3 * * 1-6"
     skip_report: false
     decorate: true
     cluster: default
@@ -2284,3 +2238,51 @@ periodics:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
+
+  - name: pre-bake-daily-ubuntu-jammy
+    annotations:
+    labels:
+    cron: "0 0 * * *"
+    skip_report: false
+    decorate: true
+    cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: test-infra
+        base_ref: main
+        path_alias: nephio_repo/test-infra
+    spec:
+      containers:
+        - image: "hashicorp/packer:1.10"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - |
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/packer/gcp"; packer init . && packer build -force .
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+            - name: ssh-key-vol
+              mountPath: "/etc/ssh-key"
+          resources:
+            requests:
+              cpu: 2
+              memory: 2Gi
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+        - name: ssh-key-vol
+          secret:
+            secretName: ssh-key-e2e
+            defaultMode: 256
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: id_rsa.pub
+                path: id_rsa.pub
+  
