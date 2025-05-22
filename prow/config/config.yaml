@@ -1865,7 +1865,7 @@ periodics:
   - name: e2e-daily-ubuntu-jammy-free5gc
     annotations:
     labels:
-    cron: "0 15 * * 1-6"
+    cron: "0 3 * * 1-6"
     skip_report: false
     decorate: true
     cluster: default
@@ -1912,7 +1912,7 @@ periodics:
   - name: e2e-daily-fedora-38-free5gc
     annotations:
     labels:
-    cron: "0 15 * * 1-6"
+    cron: "0 3 * * 1-6"
     skip_report: false
     decorate: true
     cluster: default
@@ -1959,7 +1959,7 @@ periodics:
   - name: e2e-daily-ubuntu-jammy-oai
     annotations:
     labels:
-    cron: "0 15 * * 1-6"
+    cron: "0 3 * * 1-6"
     skip_report: false
     decorate: true
     cluster: default
@@ -2006,7 +2006,7 @@ periodics:
   - name: pre-bake-daily-ubuntu-jammy
     annotations:
     labels:
-    cron: "0 15 * * 1-6"
+    cron: "0 3 * * 1-6"
     skip_report: false
     decorate: true
     cluster: default
@@ -2052,7 +2052,7 @@ periodics:
   - name: e2e-daily-fedora-38-oai
     annotations:
     labels:
-    cron: "0 15 * * 1-6"
+    cron: "0 3 * * 1-6"
     skip_report: false
     decorate: true
     cluster: default
@@ -2099,7 +2099,7 @@ periodics:
   - name: e2e-daily-ubuntu-jammy-kubeadm
     annotations:
     labels:
-    cron: "0 15 * * 1-6"
+    cron: "0 3 * * 1-6"
     skip_report: false
     decorate: true
     cluster: default
@@ -2146,7 +2146,7 @@ periodics:
   - name: e2e-daily-fedora-38-kubeadm
     annotations:
     labels:
-    cron: "0 15 * * 1-6"
+    cron: "0 3 * * 1-6"
     skip_report: false
     decorate: true
     cluster: default
@@ -2193,7 +2193,7 @@ periodics:
   - name: e2e-daily-ubuntu-jammy-flux
     annotations:
     labels:
-    cron: "0 15 * * 1-6"
+    cron: "0 3 * * 1-6"
     skip_report: false
     decorate: true
     cluster: default
