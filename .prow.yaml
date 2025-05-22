@@ -521,7 +521,7 @@ presubmits:
               - |
                 echo "Running Packer build...";
                 set -eE;
-                cd "$GOPATH/src/nephio_repo/test-infra/e2e/packer/gcp";
+                cd "nephio_repo/test-infra/e2e/packer/gcp"
                 packer init .
                 packer build -var 'image_version=pr-${PULL_NUMBER}' presubmit.pkr.hcl
           volumeMounts:
