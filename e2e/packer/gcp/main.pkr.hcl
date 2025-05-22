@@ -7,10 +7,14 @@ packer {
   }
 }
 
+# ------------------------
+# Variables
+# ------------------------
+
 variable "image_version" {
   description = "Image version"
   type        = string
-  default     = "1.0.0"
+  default     = "1.0.1"
 }
 
 variable "machine_type" {
@@ -49,10 +53,24 @@ variable "zone" {
   default     = "us-central1-c"
 }
 
+variable "image_ttl" {
+  description = "Time-to-live label"
+  type        = string
+  default     = "48h"
+}
+
+# ------------------------
+# Locals
+# ------------------------
+
 locals {
   datestamp     = formatdate("YYYYMMDD", timestamp())
   image_version = replace(var.image_version, ".", "-")
 }
+
+# ------------------------
+# Source
+# ------------------------
 
 source "googlecompute" "nephio-packer" {
   project_id              = var.project_id
@@ -64,8 +82,17 @@ source "googlecompute" "nephio-packer" {
   use_os_login            = "false"
   disk_size               = 50
   credentials_file        = "/etc/satoken/satoken"
-  image_name              = "nephio-pre-baked-${local.image_version}-${local.datestamp}"
+  image_name              = "nephio-pre-baked-${local.source_image_family}-${local.image_version}-${local.datestamp}"
+  image_labels = {
+    created_by = "prow"
+    pr_number  = var.image_version
+    ttl        = var.image_ttl
+  }
 }
+
+# ------------------------
+# Build
+# ------------------------
 
 build {
   sources = ["source.googlecompute.nephio-packer"]
