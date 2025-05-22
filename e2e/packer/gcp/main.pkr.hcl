@@ -76,7 +76,7 @@ source "googlecompute" "nephio-packer" {
   project_id              = var.project_id
   zone                    = var.zone
   machine_type            = var.machine_type
-  source_image_project_id = var.source_image_project_id
+  source_image_project_id = [var.source_image_project_id]
   source_image_family     = var.source_image_family
   ssh_username            = var.ssh_username
   use_os_login            = "false"
