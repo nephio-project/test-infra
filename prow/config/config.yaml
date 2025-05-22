@@ -1862,7 +1862,7 @@ presubmits:
             - "--prow-yaml-repo-name=$(REPO_OWNER)/$(REPO_NAME)"
 
 periodics:
-  - name: e2e-daily-ubuntu-focal-free5gc
+  - name: e2e-daily-ubuntu-jammy-free5gc
     annotations:
     labels:
     cron: "0 15 * * 1-6"
@@ -1882,8 +1882,8 @@ periodics:
           args:
             - "-c"
             - |
-              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-focal -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-focal -auto-approve
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
