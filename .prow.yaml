@@ -523,7 +523,7 @@ presubmits:
                 set -eE;
                 cd $GOPATH/src/github.com/nephio-project/test-infra/e2e/packer/gcp
                 packer init .
-                packer build -var 'image_version=pr-${PULL_NUMBER}' main.pkr.hcl
+                packer build -var "image_version=pr-${PULL_NUMBER,,}"  main.pkr.hcl
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
