@@ -76,13 +76,13 @@ source "googlecompute" "nephio-packer" {
   project_id              = var.project_id
   zone                    = var.zone
   machine_type            = var.machine_type
-  source_image_project_id = [var.source_image_project_id]
+  source_image_project_id = var.source_image_project_id
   source_image_family     = var.source_image_family
   ssh_username            = var.ssh_username
   use_os_login            = "false"
   disk_size               = 50
   credentials_file        = "/etc/satoken/satoken"
-  image_name              = "nephio-pre-baked-${local.source_image_family}-${local.image_version}-${local.datestamp}"
+  image_name              = "nephio-pre-baked-${var.source_image_family}-${local.image_version}-${local.datestamp}"
   image_labels = {
     created_by = "prow"
     pr_number  = var.image_version
