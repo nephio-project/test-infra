@@ -9,7 +9,7 @@
 ##############################################################################
 
 scenario:
-  name: install-integration-ci
+  name: ci
   test_sequence:
     - dependency
     - cleanup
