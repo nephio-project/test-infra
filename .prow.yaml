@@ -25,10 +25,15 @@ presubmits:
       containers:
         - image: "nephio/linter:latest"
           command:
-            - "/bin/sh"
+            - /tools/entrypoint
           args:
-            - "-c"
-            - set -eE; cd e2e/provision; /usr/local/bin/tox -e lint
+            - "--"
+            - /bin/sh
+            - -c
+            - |
+              set -eE
+              cd e2e/provision
+              /usr/local/bin/tox -e lint
   - name: images-hadolint
     annotations:
     labels:
