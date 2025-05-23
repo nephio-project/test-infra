@@ -20,8 +20,8 @@
       become: true
       when: ansible_facts['os_family'] == "RedHat"
       vars:
-        fedora_pkg_mgr: "{{ 'dnf' if ansible_facts['distribution_major_version']|int >= 22 else 'yum' }}"
-      package:
+        fedora_pkg_mgr: "{{ 'dnf' if ansible_facts['distribution_major_version'] | int >= 22 else 'yum' }}"
+      ansible.builtin.package:
         name: python3-pip
         state: present
     - name: Install pip package
