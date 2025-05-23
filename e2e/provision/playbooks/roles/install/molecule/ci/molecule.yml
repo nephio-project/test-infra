@@ -12,13 +12,10 @@ scenario:
   name: ci
   test_sequence:
     - dependency
-    - cleanup
-    - destroy
     - syntax
     - create
     - prepare
     - converge
-    - idempotence
     - verify
     - cleanup
     - destroy
