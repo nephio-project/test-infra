@@ -32,34 +32,24 @@ lint: |
   yamllint -c ../../../.yaml-lint.yml .
   ansible-lint -v -c ../../../.ansible-lint
 platforms:
-  - name: int-focal-vm-$POSFIX_NAME
+  - name: int-jammy-vm-$POSFIX_NAME
     zone: us-central1-c
     machine_type: e2-standard-16
-    image: projects/ubuntu-os-cloud/global/images/family/ubuntu-2004-lts
+    image: projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts
     tags:
       items:
         - allow-ssh
     groups:
       - ubuntu
-# TODO: The following plaforms require strategies to reload new kernel versions
-#  - name: int-jammy-vm-$POSFIX_NAME
-#    zone: us-central1-c
-#    machine_type: e2-standard-16
-#    image: projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts
-#    tags:
-#      items:
-#        - allow-ssh
-#    groups:
-#      - ubuntu
-#  - name: int-fedora34-vm-$POSFIX_NAME
-#    zone: us-central1-c
-#    machine_type: e2-standard-16
-#    image: projects/fedora-cloud/global/images/family/fedora-cloud-34
-#    tags:
-#      items:
-#        - allow-ssh
-#    groups:
-#      - fedora
+  - name: int-fedora38-vm-$POSFIX_NAME
+    zone: us-central1-c
+    machine_type: e2-standard-16
+    image: projects/fedora-cloud/global/images/family/fedora-cloud-38
+    tags:
+      items:
+        - allow-ssh
+    groups:
+      - fedora
 provisioner:
   name: ansible
   playbooks:

@@ -21,8 +21,8 @@ lint: |
   yamllint -c ../../../.yaml-lint.yml .
   ansible-lint -v -c ../../../.ansible-lint
 platforms:
-  - name: focal
-    box: generic/ubuntu2004
+  - name: jammy
+    box: generic/ubuntu2204
     memory: 8192
     cpus: 4
     provider_options:

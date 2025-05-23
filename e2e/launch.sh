@@ -28,7 +28,7 @@ gcloud compute instances delete -q "$VM" || echo
 gcloud compute instances create \
     --machine-type e2-standard-8 \
     --boot-disk-size 200GB \
-    --image-family=ubuntu-2004-lts \
+    --image-family=ubuntu-2204-lts \
     --image-project=ubuntu-os-cloud \
     "--metadata=startup-script-url=$STARTUP_SCRIPT_URL,nephio-run-e2e=$RUNE2E,nephio-test-infra-repo=$FULLREPO,nephio-test-infra-branch=$BRANCH,nephio-setup-debug=$DEBUG" \
     "$VM"
