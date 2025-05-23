@@ -41,15 +41,16 @@ platforms:
         - allow-ssh
     groups:
       - ubuntu
-  - name: int-fedora38-vm-$POSFIX_NAME
-    zone: us-central1-c
-    machine_type: e2-standard-16
-    image: projects/fedora-cloud/global/images/family/fedora-cloud-38
-    tags:
-      items:
-        - allow-ssh
-    groups:
-      - fedora
+  # TODO - Investigate why bootstrap fails for fedora38
+  # - name: int-fedora38-vm-$POSFIX_NAME
+  #   zone: us-central1-c
+  #   machine_type: e2-standard-16
+  #   image: projects/fedora-cloud/global/images/family/fedora-cloud-38
+  #   tags:
+  #     items:
+  #       - allow-ssh
+  #   groups:
+  #     - fedora
 provisioner:
   name: ansible
   playbooks:
