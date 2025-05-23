@@ -10,7 +10,7 @@
 
 - name: Boostrap servers
   hosts: all
-  become: yes
+  become: true
   pre_tasks:
     - name: Wait for SSH to be available
       ansible.builtin.wait_for_connection:

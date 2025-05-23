@@ -16,7 +16,9 @@
 
 def test_ssh_running(host):
     ssh = host.service("ssh")
-    assert ssh.is_running or ssh.is_enabled or host.socket("tcp://0.0.0.0:22").is_listening
+    assert (
+        ssh.is_running or ssh.is_enabled or host.socket("tcp://0.0.0.0:22").is_listening
+    )
 
 
 def _check_k8s_deployment(host, deployment, namespace):
