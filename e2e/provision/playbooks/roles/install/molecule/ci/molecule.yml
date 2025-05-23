@@ -8,6 +8,21 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
+scenario:
+  name: install-integration-ci
+  test_sequence:
+    - dependency
+    - cleanup
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - verify
+    - cleanup
+    - destroy
+
 dependency:
   name: galaxy
   options:
