@@ -128,4 +128,22 @@ build {
       "echo '=============================================='"
     ]
   }
+  
+  provisioner "shell" {
+    inline = [
+      "echo 'Waiting for Kubernetes API server...'",
+      "for i in {1..30}; do kubectl get nodes && break || sleep 10; done",
+
+      "echo 'Waiting for all nodes to be Ready...'",
+      "for node in $(kubectl get nodes -o name); do kubectl wait --for=condition=Ready \"$node\" --timeout=300s; done",
+
+      "echo 'Waiting for all pods to be Ready in all namespaces...'",
+      "kubectl wait --for=condition=Ready pod --all --all-namespaces --timeout=300s",
+
+      "for repo in mgmt mgmt-staging; do",
+      "  echo \"Waiting for Repository '$repo' to become Ready...\"",
+      "  kubectl wait --for=condition=Ready repository.config.porch.kpt.dev/\"$repo\" -n default --timeout=300s",
+      "done"
+    ]
+  }
 }
