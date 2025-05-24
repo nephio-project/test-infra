@@ -139,7 +139,13 @@ resource "google_compute_instance" "e2e_instances" {
 
       "echo 'Waiting for all pods to be Ready in all namespaces...'",
       "kubectl wait --for=condition=Ready pod --all --all-namespaces --timeout=300s",
-      ]
+
+      "echo 'Waiting for sandbox repositories to become Ready...'",
+      "bash -c 'for repo in mgmt mgmt-staging; do \
+        echo Waiting for Repository \"$repo\" to become Ready...; \
+        kubectl wait --for=condition=Ready repository.config.porch.kpt.dev/\"$repo\" -n default --timeout=300s; \
+      done'"
+    ]
   }
 
   provisioner "remote-exec" {
