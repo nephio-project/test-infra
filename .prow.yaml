@@ -519,12 +519,15 @@ presubmits:
               - -c
           args:
               - |
-                echo "Running Packer build...";
+                echo "Running PR Packer build...";
                 set -eE;
                 cd $GOPATH/src/github.com/nephio-project/test-infra/e2e/packer/gcp
                 image_version=pr-$(echo "${PULL_NUMBER}" | tr '[:upper:]' '[:lower:]')
                 packer init .
                 packer build -var "image_version=${image_version}"  main.pkr.hcl
+                echo "Image name will be: nephio-pre-baked-ubuntu-2204-lts-${image_version}-$(date +%Y%m%d)"
+                mkdir -p /artifacts
+                cp /etc/nephio/VERSION.txt /artifacts/VERSION.txt || echo "VERSION.txt not found"
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
