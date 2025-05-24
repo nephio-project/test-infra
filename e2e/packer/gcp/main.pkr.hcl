@@ -64,9 +64,9 @@ variable "image_ttl" {
 # ------------------------
 
 locals {
-  datestamp     = formatdate("YYYYMMDD", timestamp())
-  sanitized_version = regexreplace(var.image_version, "[^a-zA-Z0-9_-]", "-")
-  image_version = lower(replace(local.sanitized_version, ".", "-"))
+  datestamp         = formatdate("YYYYMMDD", timestamp())
+  sanitized_version = regex_replace(var.image_version, "[^a-zA-Z0-9_-]", "-")
+  image_version     = lower(replace(local.sanitized_version, ".", "-"))
 }
 
 # ------------------------
