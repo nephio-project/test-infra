@@ -109,7 +109,7 @@ build {
   }
 
   provisioner "file" {
-    destination = "/etc/nephio/VERSION.txt"
+    destination = "/home/${var.ssh_username}/VERSION.txt"
     content     = <<-EOF
   Image Version: ${var.image_version}
   Built On: ${local.datestamp}
