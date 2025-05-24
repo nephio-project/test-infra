@@ -37,7 +37,7 @@ output "name" {
 data "google_compute_image" "latest" {
   project     = var.project
   most_recent = true
-  filter      = "name ~ '${var.name_regex}'"
+  filter      = "name eq 'nephio-pre-baked-ubuntu-2204-lts.*'"
 }
 
 locals {
