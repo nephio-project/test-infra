@@ -35,7 +35,7 @@ output "name" {
 }
 
 data "google_compute_image" "latest" {
-  project     = var.project_id
+  project     = var.project
   most_recent = true
   filter      = "name ~ '${var.name_regex}'"
 }
