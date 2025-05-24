@@ -20,8 +20,8 @@ lint: |
   PATH=${PATH}
   yamllint -c ../../../.yaml-lint.yml .
 platforms:
-  - name: focal-$POSFIX_NAME
-    box: generic/ubuntu2004
+  - name: jammy-$POSFIX_NAME
+    box: generic/ubuntu2204
     provider_options:
       gui: false
 provisioner:

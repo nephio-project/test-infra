@@ -28,10 +28,10 @@ lint: |
   yamllint -c ../../../.yaml-lint.yml .
   ansible-lint -v -c ../../../.ansible-lint
 platforms:
-  - name: int-focal-vm-$POSFIX_NAME
+  - name: int-jammy-vm-$POSFIX_NAME
     zone: us-central1-c
     machine_type: e2-standard-16
-    image: projects/ubuntu-os-cloud/global/images/family/ubuntu-2004-lts
+    image: projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts
     tags:
       items:
         - allow-ssh
@@ -48,7 +48,7 @@ provisioner:
         local_dest_directory: /tmp/kpt-molecule-test/nginx
         pkg: package-examples/nginx
         repo_uri: https://github.com/GoogleContainerTools/kpt
-        version: v0.9
+        version: v1.0.0-beta.57
         context: kind-kind
         kpt_async: 600
         kpt_poll: 5

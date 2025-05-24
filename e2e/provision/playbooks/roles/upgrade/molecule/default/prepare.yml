@@ -10,7 +10,11 @@
 
 - name: Boostrap servers
   hosts: all
+  become: true
   pre_tasks:
+    - name: Wait for SSH to be available
+      ansible.builtin.wait_for_connection:
+        timeout: 300
     - name: Update Apt cache
       ansible.builtin.raw: apt-get update --allow-releaseinfo-change
       become: true

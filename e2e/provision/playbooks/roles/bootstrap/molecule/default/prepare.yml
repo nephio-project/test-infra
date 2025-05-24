@@ -10,12 +10,24 @@
 
 - name: Boostrap servers
   hosts: all
+  become: true
   pre_tasks:
+    - name: Wait for SSH to be available
+      ansible.builtin.wait_for_connection:
+        timeout: 300
     - name: Update Apt cache
       ansible.builtin.raw: apt-get update --allow-releaseinfo-change
       become: true
       changed_when: false
       when: ansible_distribution == 'Ubuntu'
+    - name: Install pip on Fedora
+      become: true
+      when: ansible_facts['os_family'] == "RedHat"
+      vars:
+        fedora_pkg_mgr: "{{ 'dnf' if ansible_facts['distribution_major_version'] | int >= 22 else 'yum' }}"
+      ansible.builtin.package:
+        name: python3-pip
+        state: present
     - name: Install pip package
       become: true
       ansible.builtin.package:

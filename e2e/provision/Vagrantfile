@@ -14,7 +14,7 @@ require 'yaml'
 
 vagrant_root = File.dirname(__FILE__)
 vagrant_boxes = YAML.load_file("#{vagrant_root}/distros_supported.yml")
-os_distro = ENV['OS_DISTRO'] || 'ubuntu_focal'
+os_distro = ENV['OS_DISTRO'] || 'ubuntu_jammy'
 box = vagrant_boxes[os_distro]
 num_sandboxes = ENV['NUM_SANDBOXES'] || '1'
 

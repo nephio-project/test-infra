@@ -24,7 +24,7 @@ variable "instance" {
 
 variable "vmimage" {
   description = "OS image to be used for the creation of CI instances"
-  default     = "ubuntu-os-cloud/ubuntu-2004-lts"
+  default     = "ubuntu-os-cloud/ubuntu-2204-lts"
   type        = string
 }
 
