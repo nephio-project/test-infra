@@ -130,6 +130,15 @@ resource "google_compute_instance" "e2e_instances" {
   }
   provisioner "remote-exec" {
     inline = [
+      "echo 'Waiting for Kubernetes API server...'",
+      "for i in {1..30}; do kubectl version --short && break || sleep 10; done",
+
+      "echo 'Waiting for all nodes to be Ready...'",
+      "kubectl wait --for=condition=Ready nodes --timeout=300s",
+
+      "echo 'Waiting for all pods to be Ready in all namespaces...'",
+      "kubectl wait --for=condition=Ready pod --all --all-namespaces --timeout=300s",
+
       "cd /home/${var.ansible_user}/test-infra/e2e/",
       "chmod +x e2e.sh",
       "sudo -E FAIL_FAST=${var.nephio_e2e_fail_fast} MGMT_CLUSTER_TYPE=${var.nephio_mgmt_cluster_type} E2ETYPE=${var.nephio_e2e_type} NEPHIO_REPO_DIR=/home/${var.ansible_user}/test-infra NEPHIO_DEBUG=true NEPHIO_RUN_E2E=true NEPHIO_USER=${var.ansible_user} ./e2e.sh"
