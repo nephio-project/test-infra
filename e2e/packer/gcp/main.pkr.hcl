@@ -64,8 +64,9 @@ variable "image_ttl" {
 # ------------------------
 
 locals {
-  datestamp     = formatdate("YYYYMMDD", timestamp())
-  image_version = replace(var.image_version, ".", "-")
+  datestamp         = formatdate("YYYYMMDD", timestamp())
+  sanitized_version = regex_replace(var.image_version, "[^a-zA-Z0-9_-]", "-")
+  image_version     = lower(replace(local.sanitized_version, ".", "-"))
 }
 
 # ------------------------
@@ -85,7 +86,7 @@ source "googlecompute" "nephio-packer" {
   image_name              = "nephio-pre-baked-${var.source_image_family}-${local.image_version}-${local.datestamp}"
   image_labels = {
     created_by = "prow"
-    pr_number  = var.image_version
+    pr_number  = local.image_version
     ttl        = var.image_ttl
   }
 }
@@ -105,6 +106,14 @@ build {
   provisioner "file" {
     destination = "/home/${var.ssh_username}/timestamp.txt"
     content     = "${local.datestamp}"
+  }
+
+  provisioner "file" {
+    destination = "/home/${var.ssh_username}/VERSION.txt"
+    content     = <<-EOF
+  Image Version: ${var.image_version}
+  Built On: ${local.datestamp}
+  EOF
   }
 
   provisioner "shell" {

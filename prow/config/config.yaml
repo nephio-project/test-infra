@@ -2259,11 +2259,15 @@ periodics:
               - -c
           args:
               - |
-                echo "Running periodic Packer build...";
+                echo "Running nightly Packer build...";
                 set -eE;
                 cd "$GOPATH/src/nephio_repo/test-infra/e2e/packer/gcp"
+                image_version="daily"
                 packer init .
-                packer build -force .
+                packer build -force -var "image_version=${image_version}" .
+                echo "Image name will be: nephio-pre-baked-ubuntu-2204-lts-${image_version}-$(date +%Y%m%d)"
+                mkdir -p /artifacts
+                cp /home/ubuntu/VERSION.txt /artifacts/VERSION.txt || echo "VERSION.txt not found"
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
