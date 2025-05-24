@@ -35,9 +35,9 @@ output "name" {
 }
 
 data "google_compute_image" "latest" {
-  project     = var.project
+  project     = var.project_id
   most_recent = true
-  filter      = "name matches '${var.name_regex}'"
+  filter      = "name ~ '${var.name_regex}'"
 }
 
 locals {
