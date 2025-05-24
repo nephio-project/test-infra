@@ -554,7 +554,48 @@ presubmits:
               - key: id_rsa.pub
                 path: id_rsa.pub
   
-
+  - name: e2e-flux-ubuntu-jammy-packer
+    annotations:
+    labels:
+    run_if_changed: '^(e2e/terraform/modules/latest-packer-image/|e2e/terraform/main.tf)'
+    skip_report: false
+    decorate: true
+    cluster: default
+    spec:
+      containers:
+        - image: "nephio/e2e:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - |
+              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.latest-ubuntu-packer-image -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.latest-ubuntu-packer-image -var="e2e_type=flux" -var="fail_fast=true" -auto-approve
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+            - name: ssh-key-vol
+              mountPath: "/etc/ssh-key"
+          resources:
+            requests:
+              cpu: 2
+              memory: 2Gi
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+        - name: ssh-key-vol
+          secret:
+            secretName: ssh-key-e2e
+            defaultMode: 256
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: id_rsa.pub
+                path: id_rsa.pub
 
 postsubmits:
   - name: build-push-image-releaser

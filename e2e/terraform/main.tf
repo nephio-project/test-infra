@@ -1,3 +1,11 @@
+module "latest-ubuntu-packer-image" {
+  source               = ".//modules/latest-packer-image"
+  name_regex           = "^nephio-pre-baked-ubuntu-2204-lts.*"
+  nephio_e2e_type      = var.e2e_type
+  nephio_e2e_fail_fast = var.fail_fast
+  nephio_mgmt_cluster_type = var.mgmt_cluster_type
+}
+
 module "gcp-ubuntu-jammy" {
   source               = ".//modules/gcp"
   vmimage              = "ubuntu-os-cloud/ubuntu-2204-lts"
