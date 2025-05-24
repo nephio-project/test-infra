@@ -130,21 +130,21 @@ resource "google_compute_instance" "e2e_instances" {
   }
 
   provisioner "remote-exec" {
-    inline = [
-      "echo 'Waiting for Kubernetes API server...'",
-      "for i in {1..30}; do kubectl get nodes && break || sleep 10; done",
+    inline = [<<EOT
+      echo 'Waiting for Kubernetes API server...'
+      for i in {1..30}; do kubectl get nodes && break || sleep 10; done
 
-      "echo 'Waiting for all nodes to be Ready...'",
-      "for node in $(kubectl get nodes -o name); do kubectl wait --for=condition=Ready \"$node\" --timeout=300s; done",
+      echo 'Waiting for all nodes to be Ready...'
+      for node in $(kubectl get nodes -o name); do kubectl wait --for=condition=Ready "$node" --timeout=300s; done
 
-      "echo 'Waiting for all pods to be Ready in all namespaces...'",
-      "kubectl wait --for=condition=Ready pod --all --all-namespaces --timeout=300s",
+      echo 'Waiting for all pods to be Ready in all namespaces...'
+      kubectl wait --for=condition=Ready pod --all --all-namespaces --timeout=300s
 
-      "echo 'Waiting for sandbox repositories to become Ready...'",
-      "bash -c 'for repo in mgmt mgmt-staging; do \
-        echo Waiting for Repository \"$repo\" to become Ready...; \
-        kubectl wait --for=condition=Ready repository.config.porch.kpt.dev/\"$repo\" -n default --timeout=300s; \
-      done'"
+      for repo in mgmt mgmt-staging; do
+        echo "Waiting for Repository '$repo' to become Ready..."
+        kubectl wait --for=condition=Ready repository.config.porch.kpt.dev/"$repo" -n default --timeout=300s
+      done
+    EOT
     ]
   }
 
