@@ -1882,8 +1882,8 @@ periodics:
           args:
             - "-c"
             - |
-              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -auto-approve
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.latest-ubuntu-packer-image -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.latest-ubuntu-packer-image -var="e2e_type=free5gc" -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -1976,8 +1976,8 @@ periodics:
           args:
             - "-c"
             - |
-              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -var="e2e_type=oai" -auto-approve
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.latest-ubuntu-packer-image -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.latest-ubuntu-packer-image -var="e2e_type=oai" -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -2070,8 +2070,8 @@ periodics:
           args:
             - "-c"
             - |
-              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -var="fail_fast=true" -var="mgmt_cluster_type=kubeadm" -auto-approve
+              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.latest-ubuntu-packer-image -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.latest-ubuntu-packer-image -var="fail_fast=true" -var="mgmt_cluster_type=kubeadm" -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -2164,8 +2164,8 @@ periodics:
           args:
             - "-c"
             - |
-              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -var="e2e_type=flux" -auto-approve
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.latest-ubuntu-packer-image -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.latest-ubuntu-packer-image -var="e2e_type=flux" -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -2211,8 +2211,8 @@ periodics:
           args:
             - "-c"
             - |
-              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -var="e2e_type=ocloud" -auto-approve
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.latest-ubuntu-packer-image -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.latest-ubuntu-packer-image -var="e2e_type=ocloud" -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
@@ -2293,4 +2293,33 @@ periodics:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
+  - name: pre-bake-daily-image-cleanup
+    decorate: true
+    interval: 24h
+    cluster: default
+    spec:
+      containers:
+        - image: google/cloud-sdk:slim
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - |
+              echo "Starting GCP image cleanup...";
+              PROJECT_ID="pure-faculty-367518";
+              IMAGES=$(gcloud compute images list --project="$PROJECT_ID" --filter="name~^nephio-pre-baked-.* AND creationTimestamp<$(date -d '3 days ago' --utc +%Y-%m-%dT%H:%M:%SZ)" --format="value(name)");
+              for image in $IMAGES; do
+                echo "Deleting image $image...";
+                gcloud compute images delete "$image" --project="$PROJECT_ID" --quiet;
+              done
+          volumeMounts:
+            - name: satoken
+              mountPath: /etc/satoken
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
   
