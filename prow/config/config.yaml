@@ -1862,383 +1862,7 @@ presubmits:
             - "--prow-yaml-repo-name=$(REPO_OWNER)/$(REPO_NAME)"
 
 periodics:
-  - name: e2e-daily-ubuntu-jammy-free5gc
-    annotations:
-    labels:
-    cron: "0 3 * * 1-6"
-    skip_report: false
-    decorate: true
-    cluster: default
-    extra_refs:
-      - org: nephio-project
-        repo: test-infra
-        base_ref: main
-        path_alias: nephio_repo/test-infra
-    spec:
-      containers:
-        - image: "nephio/e2e:latest"
-          command:
-            - "/bin/sh"
-          args:
-            - "-c"
-            - |
-              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.latest-ubuntu-packer-image -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.latest-ubuntu-packer-image -var="e2e_type=free5gc" -auto-approve
-          volumeMounts:
-            - name: satoken
-              mountPath: "/etc/satoken"
-            - name: ssh-key-vol
-              mountPath: "/etc/ssh-key"
-          resources:
-            requests:
-              cpu: 2
-              memory: 2Gi
-      volumes:
-        - name: satoken
-          secret:
-            secretName: satoken
-            items:
-              - key: satoken
-                path: satoken
-        - name: ssh-key-vol
-          secret:
-            secretName: ssh-key-e2e
-            defaultMode: 256
-            items:
-              - key: id_rsa
-                path: id_rsa
-              - key: id_rsa.pub
-                path: id_rsa.pub
-  - name: e2e-daily-fedora-38-free5gc
-    annotations:
-    labels:
-    cron: "0 3 * * 1-6"
-    skip_report: false
-    decorate: true
-    cluster: default
-    extra_refs:
-      - org: nephio-project
-        repo: test-infra
-        base_ref: main
-        path_alias: nephio_repo/test-infra
-    spec:
-      containers:
-        - image: "nephio/e2e:latest"
-          command:
-            - "/bin/sh"
-          args:
-            - "-c"
-            - |
-              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-38 -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-fedora-38 -auto-approve
-          volumeMounts:
-            - name: satoken
-              mountPath: "/etc/satoken"
-            - name: ssh-key-vol
-              mountPath: "/etc/ssh-key"
-          resources:
-            requests:
-              cpu: 2
-              memory: 2Gi
-      volumes:
-        - name: satoken
-          secret:
-            secretName: satoken
-            items:
-              - key: satoken
-                path: satoken
-        - name: ssh-key-vol
-          secret:
-            secretName: ssh-key-e2e
-            defaultMode: 256
-            items:
-              - key: id_rsa
-                path: id_rsa
-              - key: id_rsa.pub
-                path: id_rsa.pub
-  - name: e2e-daily-ubuntu-jammy-oai
-    annotations:
-    labels:
-    cron: "0 3 * * 1-6"
-    skip_report: false
-    decorate: true
-    cluster: default
-    extra_refs:
-      - org: nephio-project
-        repo: test-infra
-        base_ref: main
-        path_alias: nephio_repo/test-infra
-    spec:
-      containers:
-        - image: "nephio/e2e:latest"
-          command:
-            - "/bin/sh"
-          args:
-            - "-c"
-            - |
-              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.latest-ubuntu-packer-image -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.latest-ubuntu-packer-image -var="e2e_type=oai" -auto-approve
-          volumeMounts:
-            - name: satoken
-              mountPath: "/etc/satoken"
-            - name: ssh-key-vol
-              mountPath: "/etc/ssh-key"
-          resources:
-            requests:
-              cpu: 2
-              memory: 2Gi
-      volumes:
-        - name: satoken
-          secret:
-            secretName: satoken
-            items:
-              - key: satoken
-                path: satoken
-        - name: ssh-key-vol
-          secret:
-            secretName: ssh-key-e2e
-            defaultMode: 256
-            items:
-              - key: id_rsa
-                path: id_rsa
-              - key: id_rsa.pub
-                path: id_rsa.pub
-  - name: e2e-daily-fedora-38-oai
-    annotations:
-    labels:
-    cron: "0 3 * * 1-6"
-    skip_report: false
-    decorate: true
-    cluster: default
-    extra_refs:
-      - org: nephio-project
-        repo: test-infra
-        base_ref: main
-        path_alias: nephio_repo/test-infra
-    spec:
-      containers:
-        - image: "nephio/e2e:latest"
-          command:
-            - "/bin/sh"
-          args:
-            - "-c"
-            - |
-              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-38 -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-fedora-38 -var="e2e_type=oai" -auto-approve
-          volumeMounts:
-            - name: satoken
-              mountPath: "/etc/satoken"
-            - name: ssh-key-vol
-              mountPath: "/etc/ssh-key"
-          resources:
-            requests:
-              cpu: 2
-              memory: 2Gi
-      volumes:
-        - name: satoken
-          secret:
-            secretName: satoken
-            items:
-              - key: satoken
-                path: satoken
-        - name: ssh-key-vol
-          secret:
-            secretName: ssh-key-e2e
-            defaultMode: 256
-            items:
-              - key: id_rsa
-                path: id_rsa
-              - key: id_rsa.pub
-                path: id_rsa.pub
-  - name: e2e-daily-ubuntu-jammy-kubeadm
-    annotations:
-    labels:
-    cron: "0 3 * * 1-6"
-    skip_report: false
-    decorate: true
-    cluster: default
-    extra_refs:
-      - org: nephio-project
-        repo: test-infra
-        base_ref: main
-        path_alias: nephio_repo/test-infra
-    spec:
-      containers:
-        - image: "nephio/e2e:latest"
-          command:
-            - "/bin/sh"
-          args:
-            - "-c"
-            - |
-              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.latest-ubuntu-packer-image -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.latest-ubuntu-packer-image -var="fail_fast=true" -var="mgmt_cluster_type=kubeadm" -auto-approve
-          volumeMounts:
-            - name: satoken
-              mountPath: "/etc/satoken"
-            - name: ssh-key-vol
-              mountPath: "/etc/ssh-key"
-          resources:
-            requests:
-              cpu: 2
-              memory: 2Gi
-      volumes:
-        - name: satoken
-          secret:
-            secretName: satoken
-            items:
-              - key: satoken
-                path: satoken
-        - name: ssh-key-vol
-          secret:
-            secretName: ssh-key-e2e
-            defaultMode: 256
-            items:
-              - key: id_rsa
-                path: id_rsa
-              - key: id_rsa.pub
-                path: id_rsa.pub
-  - name: e2e-daily-fedora-38-kubeadm
-    annotations:
-    labels:
-    cron: "0 3 * * 1-6"
-    skip_report: false
-    decorate: true
-    cluster: default
-    extra_refs:
-      - org: nephio-project
-        repo: test-infra
-        base_ref: main
-        path_alias: nephio_repo/test-infra
-    spec:
-      containers:
-        - image: "nephio/e2e:latest"
-          command:
-            - "/bin/sh"
-          args:
-            - "-c"
-            - |
-              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-38 -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-fedora-38 -var="fail_fast=true" -var="mgmt_cluster_type=kubeadm" -auto-approve
-          volumeMounts:
-            - name: satoken
-              mountPath: "/etc/satoken"
-            - name: ssh-key-vol
-              mountPath: "/etc/ssh-key"
-          resources:
-            requests:
-              cpu: 2
-              memory: 2Gi
-      volumes:
-        - name: satoken
-          secret:
-            secretName: satoken
-            items:
-              - key: satoken
-                path: satoken
-        - name: ssh-key-vol
-          secret:
-            secretName: ssh-key-e2e
-            defaultMode: 256
-            items:
-              - key: id_rsa
-                path: id_rsa
-              - key: id_rsa.pub
-                path: id_rsa.pub
-  - name: e2e-daily-ubuntu-jammy-flux
-    annotations:
-    labels:
-    cron: "0 3 * * 1-6"
-    skip_report: false
-    decorate: true
-    cluster: default
-    extra_refs:
-      - org: nephio-project
-        repo: test-infra
-        base_ref: main
-        path_alias: nephio_repo/test-infra
-    spec:
-      containers:
-        - image: "nephio/e2e:latest"
-          command:
-            - "/bin/sh"
-          args:
-            - "-c"
-            - |
-              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.latest-ubuntu-packer-image -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.latest-ubuntu-packer-image -var="e2e_type=flux" -auto-approve
-          volumeMounts:
-            - name: satoken
-              mountPath: "/etc/satoken"
-            - name: ssh-key-vol
-              mountPath: "/etc/ssh-key"
-          resources:
-            requests:
-              cpu: 2
-              memory: 2Gi
-      volumes:
-        - name: satoken
-          secret:
-            secretName: satoken
-            items:
-              - key: satoken
-                path: satoken
-        - name: ssh-key-vol
-          secret:
-            secretName: ssh-key-e2e
-            defaultMode: 256
-            items:
-              - key: id_rsa
-                path: id_rsa
-              - key: id_rsa.pub
-                path: id_rsa.pub
-  - name: e2e-weekly-ubuntu-jammy-ocloud
-    annotations:
-    labels:
-    cron: "0 3 * * 0"
-    skip_report: false
-    decorate: true
-    cluster: default
-    extra_refs:
-      - org: nephio-project
-        repo: test-infra
-        base_ref: main
-        path_alias: nephio_repo/test-infra
-    spec:
-      containers:
-        - image: "nephio/e2e:latest"
-          command:
-            - "/bin/sh"
-          args:
-            - "-c"
-            - |
-              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.latest-ubuntu-packer-image -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.latest-ubuntu-packer-image -var="e2e_type=ocloud" -auto-approve
-          volumeMounts:
-            - name: satoken
-              mountPath: "/etc/satoken"
-            - name: ssh-key-vol
-              mountPath: "/etc/ssh-key"
-          resources:
-            requests:
-              cpu: 2
-              memory: 2Gi
-      volumes:
-        - name: satoken
-          secret:
-            secretName: satoken
-            items:
-              - key: satoken
-                path: satoken
-        - name: ssh-key-vol
-          secret:
-            secretName: ssh-key-e2e
-            defaultMode: 256
-            items:
-              - key: id_rsa
-                path: id_rsa
-              - key: id_rsa.pub
-                path: id_rsa.pub
-
+  # Daily jobs
   - name: pre-bake-daily-ubuntu-jammy
     annotations:
     labels:
@@ -2293,6 +1917,7 @@ periodics:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
+
   - name: pre-bake-daily-image-cleanup
     decorate: true
     interval: 24h
@@ -2315,6 +1940,38 @@ periodics:
           volumeMounts:
             - name: satoken
               mountPath: /etc/satoken
+
+  - name: e2e-daily-ubuntu-jammy-free5gc
+    annotations:
+    labels:
+    cron: "0 3 * * 1-6"
+    skip_report: false
+    decorate: true
+    cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: test-infra
+        base_ref: main
+        path_alias: nephio_repo/test-infra
+    spec:
+      containers:
+        - image: "nephio/e2e:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - |
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -auto-approve
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+            - name: ssh-key-vol
+              mountPath: "/etc/ssh-key"
+          resources:
+            requests:
+              cpu: 2
+              memory: 2Gi
       volumes:
         - name: satoken
           secret:
@@ -2322,4 +1979,349 @@ periodics:
             items:
               - key: satoken
                 path: satoken
-  
+        - name: ssh-key-vol
+          secret:
+            secretName: ssh-key-e2e
+            defaultMode: 256
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: id_rsa.pub
+                path: id_rsa.pub
+
+  - name: e2e-daily-fedora-38-free5gc
+    annotations:
+    labels:
+    cron: "0 3 * * 1-6"
+    skip_report: false
+    decorate: true
+    cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: test-infra
+        base_ref: main
+        path_alias: nephio_repo/test-infra
+    spec:
+      containers:
+        - image: "nephio/e2e:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - |
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-38 -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-fedora-38 -auto-approve
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+            - name: ssh-key-vol
+              mountPath: "/etc/ssh-key"
+          resources:
+            requests:
+              cpu: 2
+              memory: 2Gi
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+        - name: ssh-key-vol
+          secret:
+            secretName: ssh-key-e2e
+            defaultMode: 256
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: id_rsa.pub
+                path: id_rsa.pub
+
+  - name: e2e-daily-ubuntu-jammy-oai
+    annotations:
+    labels:
+    cron: "0 3 * * 1-6"
+    skip_report: false
+    decorate: true
+    cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: test-infra
+        base_ref: main
+        path_alias: nephio_repo/test-infra
+    spec:
+      containers:
+        - image: "nephio/e2e:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - |
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -var="e2e_type=oai" -auto-approve
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+            - name: ssh-key-vol
+              mountPath: "/etc/ssh-key"
+          resources:
+            requests:
+              cpu: 2
+              memory: 2Gi
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+        - name: ssh-key-vol
+          secret:
+            secretName: ssh-key-e2e
+            defaultMode: 256
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: id_rsa.pub
+                path: id_rsa.pub
+
+  - name: e2e-daily-fedora-38-oai
+    annotations:
+    labels:
+    cron: "0 3 * * 1-6"
+    skip_report: false
+    decorate: true
+    cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: test-infra
+        base_ref: main
+        path_alias: nephio_repo/test-infra
+    spec:
+      containers:
+        - image: "nephio/e2e:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - |
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-38 -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-fedora-38 -var="e2e_type=oai" -auto-approve
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+            - name: ssh-key-vol
+              mountPath: "/etc/ssh-key"
+          resources:
+            requests:
+              cpu: 2
+              memory: 2Gi
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+        - name: ssh-key-vol
+          secret:
+            secretName: ssh-key-e2e
+            defaultMode: 256
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: id_rsa.pub
+                path: id_rsa.pub
+
+  - name: e2e-daily-ubuntu-jammy-flux
+    annotations:
+    labels:
+    cron: "0 3 * * 1-6"
+    skip_report: false
+    decorate: true
+    cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: test-infra
+        base_ref: main
+        path_alias: nephio_repo/test-infra
+    spec:
+      containers:
+        - image: "nephio/e2e:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - |
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -var="e2e_type=flux" -auto-approve
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+            - name: ssh-key-vol
+              mountPath: "/etc/ssh-key"
+          resources:
+            requests:
+              cpu: 2
+              memory: 2Gi
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+        - name: ssh-key-vol
+          secret:
+            secretName: ssh-key-e2e
+            defaultMode: 256
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: id_rsa.pub
+                path: id_rsa.pub
+
+  # Weekly jobs
+  - name: e2e-weekly-ubuntu-jammy-kubeadm
+    annotations:
+    labels:
+    cron: "0 3 * * 0"
+    skip_report: false
+    decorate: true
+    cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: test-infra
+        base_ref: main
+        path_alias: nephio_repo/test-infra
+    spec:
+      containers:
+        - image: "nephio/e2e:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - |
+              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -var="fail_fast=true" -var="mgmt_cluster_type=kubeadm" -auto-approve
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+            - name: ssh-key-vol
+              mountPath: "/etc/ssh-key"
+          resources:
+            requests:
+              cpu: 2
+              memory: 2Gi
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+        - name: ssh-key-vol
+          secret:
+            secretName: ssh-key-e2e
+            defaultMode: 256
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: id_rsa.pub
+                path: id_rsa.pub
+
+  - name: e2e-weekly-fedora-38-kubeadm
+    annotations:
+    labels:
+    cron: "0 3 * * 0"
+    skip_report: false
+    decorate: true
+    cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: test-infra
+        base_ref: main
+        path_alias: nephio_repo/test-infra
+    spec:
+      containers:
+        - image: "nephio/e2e:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - |
+              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-fedora-38 -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-fedora-38 -var="fail_fast=true" -var="mgmt_cluster_type=kubeadm" -auto-approve
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+            - name: ssh-key-vol
+              mountPath: "/etc/ssh-key"
+          resources:
+            requests:
+              cpu: 2
+              memory: 2Gi
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+        - name: ssh-key-vol
+          secret:
+            secretName: ssh-key-e2e
+            defaultMode: 256
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: id_rsa.pub
+                path: id_rsa.pub
+
+  - name: e2e-weekly-ubuntu-jammy-ocloud
+    annotations:
+    labels:
+    cron: "0 3 * * 0"
+    skip_report: false
+    decorate: true
+    cluster: default
+    extra_refs:
+      - org: nephio-project
+        repo: test-infra
+        base_ref: main
+        path_alias: nephio_repo/test-infra
+    spec:
+      containers:
+        - image: "nephio/e2e:latest"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - |
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -var="e2e_type=ocloud" -auto-approve
+          volumeMounts:
+            - name: satoken
+              mountPath: "/etc/satoken"
+            - name: ssh-key-vol
+              mountPath: "/etc/ssh-key"
+          resources:
+            requests:
+              cpu: 2
+              memory: 2Gi
+      volumes:
+        - name: satoken
+          secret:
+            secretName: satoken
+            items:
+              - key: satoken
+                path: satoken
+        - name: ssh-key-vol
+          secret:
+            secretName: ssh-key-e2e
+            defaultMode: 256
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: id_rsa.pub
+                path: id_rsa.pub
