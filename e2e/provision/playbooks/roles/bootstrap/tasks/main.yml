@@ -34,6 +34,28 @@
   tags:
     - always
 
+- name: Debug k8s.context value and its type
+  tags:
+    - always
+  ansible.builtin.debug:
+    msg:
+      - "Value of k8s.context: '{{ k8s.context | default('VARIABLE UNDEFINED') }}'"
+      - "Type of k8s.context: {{ k8s.context | type_debug }}"
+      - "Result of condition 'k8s.context is defined': {{ k8s.context is defined }}"
+      - "Result of condition 'k8s.context != 'kind-kind'': {{ k8s.context | default('__dummy__') != 'kind-kind' }}"
+      - "Overall 'when' condition result (if variable defined): {{ (k8s.context is defined and k8s.context != 'kind-kind') | default('N/A (var undefined)') }}"
+
+- name: Apply kpt packages that are supported only on nonkind_k8s clusters
+  ansible.builtin.include_tasks:
+    file: apply-pkgs-nonkind-k8s.yml
+    apply:
+      tags:
+        - nonkind_k8s
+  tags:
+    - nonkind_k8s
+  when: k8s.context != 'kind-kind'
+
+
 - name: Create docker hub secret
   tags:
     - nonkind_k8s
