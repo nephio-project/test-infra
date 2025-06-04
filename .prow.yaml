@@ -553,8 +553,6 @@ presubmits:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
-  
-
 
 postsubmits:
   - name: build-push-image-releaser
@@ -1053,34 +1051,3 @@ postsubmits:
             items:
               - key: configjson
                 path: config.json
-
-periodics:
-  - name: image-cleanup
-    decorate: true
-    interval: 24h
-    cluster: default
-    spec:
-      containers:
-        - image: google/cloud-sdk:slim
-          command:
-            - /bin/sh
-            - -c
-          args:
-            - |
-              echo "Starting GCP image cleanup...";
-              PROJECT_ID="pure-faculty-367518";
-              IMAGES=$(gcloud compute images list --project="$PROJECT_ID" --filter="name~^nephio-pre-baked-.* AND creationTimestamp<$(date -d '3 days ago' --utc +%Y-%m-%dT%H:%M:%SZ)" --format="value(name)");
-              for image in $IMAGES; do
-                echo "Deleting image $image...";
-                gcloud compute images delete "$image" --project="$PROJECT_ID" --quiet;
-              done
-          volumeMounts:
-            - name: satoken
-              mountPath: /etc/satoken
-      volumes:
-        - name: satoken
-          secret:
-            secretName: satoken
-            items:
-              - key: satoken
-                path: satoken
