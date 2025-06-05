@@ -196,6 +196,8 @@
             name: "{{ item }}"
             namespace: default
         wait: true
+        wait_timeout: 300
+        wait_sleep: 10
         wait_condition:
           type: Ready
           status: true
