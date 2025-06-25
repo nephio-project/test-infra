@@ -56,7 +56,7 @@ function _define_ip_address_pool {
     porchctl rpkg propose -n default "$pkg_rev"
     kubectl wait --for jsonpath='{.spec.lifecycle}'=Proposed packagerevisions "$pkg_rev" --timeout="600s"
     assert_branch_exists "proposed/$cluster-metallb-sandbox-config/v1" "nephio/mgmt-staging"
-    assert_commit_msg_in_branch "Intermediate commit" "proposed/$cluster-metallb-sandbox-config/v1" "nephio/mgmt-staging"
+    assert_commit_msg_in_branch "Rendering package" "proposed/$cluster-metallb-sandbox-config/v1" "nephio/mgmt-staging"
 
     # Approval
     info "approving package $pkg_rev update"

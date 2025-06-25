@@ -38,12 +38,12 @@ k8s_wait_exists "packagerev" "$pkg_rev"
 
 kubectl wait --for jsonpath='{.spec.lifecycle}'=Draft packagerevisions "$pkg_rev" --timeout="600s"
 assert_branch_exists "drafts/free5gc-cp/v1" "nephio/regional"
-assert_commit_msg_in_branch "Intermediate commit" "drafts/free5gc-cp/v1" "nephio/regional"
+assert_commit_msg_in_branch "Rendering package" "drafts/free5gc-cp/v1" "nephio/regional"
 
 porchctl rpkg propose -n default "$pkg_rev"
 kubectl wait --for jsonpath='{.spec.lifecycle}'=Proposed packagerevisions "$pkg_rev" --timeout="600s"
 assert_branch_exists "proposed/free5gc-cp/v1" "nephio/regional"
-assert_commit_msg_in_branch "Intermediate commit" "proposed/free5gc-cp/v1" "nephio/regional"
+assert_commit_msg_in_branch "Rendering package" "proposed/free5gc-cp/v1" "nephio/regional"
 
 info "approving package $pkg_rev"
 porchctl rpkg approve -n default "$pkg_rev"
