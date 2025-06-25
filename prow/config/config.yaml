@@ -1976,8 +1976,8 @@ periodics:
           command: *command_sh_c
           args:
             - |
-              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -auto-approve
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.latest-ubuntu-packer-image -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.latest-ubuntu-packer-image -var="e2e_type=free5gc" -auto-approve
           volumeMounts:
             - *satoken_mount
             - *sshkey_mount
@@ -2024,8 +2024,8 @@ periodics:
           command: *command_sh_c
           args:
             - |
-              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -var="e2e_type=oai" -auto-approve
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.latest-ubuntu-packer-image -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.latest-ubuntu-packer-image -var="e2e_type=oai" -auto-approve
           volumeMounts:
             - *satoken_mount
             - *sshkey_mount
@@ -2072,8 +2072,8 @@ periodics:
           command: *command_sh_c
           args:
             - |
-              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -var="e2e_type=flux" -auto-approve
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.latest-ubuntu-packer-image -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.latest-ubuntu-packer-image -var="e2e_type=flux" -auto-approve
           volumeMounts:
             - *satoken_mount
             - *sshkey_mount
@@ -2097,8 +2097,8 @@ periodics:
           command: *command_sh_c
           args:
             - |
-              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -var="fail_fast=true" -var="mgmt_cluster_type=kubeadm" -auto-approve
+              set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.latest-ubuntu-packer-image -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.latest-ubuntu-packer-image -var="fail_fast=true" -var="mgmt_cluster_type=kubeadm" -auto-approve
           volumeMounts:
             - *satoken_mount
             - *sshkey_mount
@@ -2145,8 +2145,8 @@ periodics:
           command: *command_sh_c
           args:
             - |
-              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -var="e2e_type=ocloud" -auto-approve
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.latest-ubuntu-packer-image -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.latest-ubuntu-packer-image -var="e2e_type=ocloud" -auto-approve
           volumeMounts:
             - *satoken_mount
             - *sshkey_mount
