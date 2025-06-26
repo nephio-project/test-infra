@@ -90,3 +90,7 @@
       ansible.builtin.copy:
         remote_src: true
         src: /tmp/kubeconfig
+        dest: "{{ ansible_user_dir }}/.kube/config"
+        owner: "{{ ansible_user_uid }}"
+        group: "{{ ansible_user_gid }}"
+        mode: '0644'
