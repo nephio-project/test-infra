@@ -36,6 +36,51 @@
     - role: andrewrothstein.docker_engine
       become: true
   tasks:
+    - name: Ensure disk /dev/sdb is present
+      ansible.builtin.command: ls /dev/sdb
+      register: sdb_check
+      failed_when: sdb_check.rc != 0
+      changed_when: false
+
+    - name: Format /dev/sdb if not already formatted
+      ansible.builtin.command: lsblk -f /dev/sdb | grep -q ext4
+      register: disk_format_check
+      failed_when: false
+      changed_when: false
+
+    - name: Create ext4 filesystem on /dev/sdb
+      ansible.builtin.filesystem:
+        fstype: ext4
+        dev: /dev/sdb
+      when: disk_format_check.rc != 0
+
+    - name: Create mount point
+      ansible.builtin.file:
+        path: /mnt/data
+        state: directory
+        mode: '0755'
+
+    - name: Mount /dev/sdb to /mnt/data
+      ansible.posix.mount:
+        path: /mnt/data
+        src: /dev/sdb
+        fstype: ext4
+        state: mounted
+
+    - name: Persist mount in fstab
+      ansible.builtin.mount:
+        path: /mnt/data
+        src: /dev/sdb
+        fstype: ext4
+        opts: defaults
+        state: present
+    
+    - name: Display disk layout
+      ansible.builtin.command: lsblk
+      register: disk_info
+    - debug:
+        var: disk_info.stdout_lines
+
     - name: Unarchive /tmp/kpt.tgz into /usr/local/bin/
       become: true
       become_user: root
