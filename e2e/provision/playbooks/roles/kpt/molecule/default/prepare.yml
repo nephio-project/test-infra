@@ -8,105 +8,84 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-- name: Boostrap servers
+- name: Bootstrap servers
   hosts: all
   become: true
+
   pre_tasks:
     - name: Wait for SSH to be available
       ansible.builtin.wait_for_connection:
         timeout: 300
+
     - name: Update Apt cache
-      ansible.builtin.raw: apt-get update --allow-releaseinfo-change
-      become: true
-      changed_when: false
+      ansible.builtin.apt:
+        update_cache: yes
       when: ansible_distribution == 'Ubuntu'
-    - name: Install pip package
-      become: true
+
+    - name: Install pip
       ansible.builtin.package:
         name: python3-pip
         state: present
       when: ansible_distribution == 'Ubuntu'
+
     - name: Install kubernetes python package
-      become: true
       ansible.builtin.pip:
         name: kubernetes==26.1.0
+
   roles:
     - andrewrothstein.kind
     - andrewrothstein.kubectl
     - role: andrewrothstein.docker_engine
       become: true
+
   tasks:
-    - name: Ensure disk /dev/sdb is present
-      ansible.builtin.command: ls /dev/sdb
-      register: sdb_check
-      failed_when: sdb_check.rc != 0
-      changed_when: false
-
-    - name: Format /dev/sdb if not already formatted
-      ansible.builtin.command: lsblk -f /dev/sdb | grep -q ext4
-      register: disk_format_check
-      failed_when: false
-      changed_when: false
-
-    - name: Create ext4 filesystem on /dev/sdb
-      ansible.builtin.filesystem:
-        fstype: ext4
-        dev: /dev/sdb
-      when: disk_format_check.rc != 0
-
-    - name: Create mount point
-      ansible.builtin.file:
-        path: /mnt/data
-        state: directory
-        mode: '0755'
-
-    - name: Mount /dev/sdb to /mnt/data
-      ansible.posix.mount:
-        path: /mnt/data
-        src: /dev/sdb
-        fstype: ext4
-        state: mounted
-
-    - name: Persist mount in fstab
-      ansible.builtin.mount:
-        path: /mnt/data
-        src: /dev/sdb
-        fstype: ext4
-        opts: defaults
+    - name: Ensure growpart and resize tools are installed
+      ansible.builtin.apt:
+        name:
+          - cloud-guest-utils
+          - gdisk
         state: present
-    
-    - name: Display disk layout
-      ansible.builtin.command: lsblk
-      register: disk_info
-    - debug:
-        var: disk_info.stdout_lines
+
+    - name: Check current partitions
+      command: lsblk
+      register: lsblk_output
+      changed_when: false
+
+    - name: Grow root partition
+      ansible.builtin.command: growpart /dev/sda 1
+      register: growpart_result
+      failed_when: growpart_result.rc not in [0, 1]
+      when: "'sda' in lsblk_output.stdout"
+
+    - name: Resize root filesystem
+      ansible.builtin.command: resize2fs /dev/sda1
+      when: growpart_result.rc == 0
 
     - name: Unarchive /tmp/kpt.tgz into /usr/local/bin/
-      become: true
       become_user: root
       ansible.builtin.unarchive:
         remote_src: true
         src: https://github.com/GoogleContainerTools/kpt/releases/download/v1.0.0-beta.49/kpt_linux_amd64-1.0.0-beta.49.tar.gz
         dest: /usr/local/bin/
         creates: /usr/local/bin/kpt
+
     - name: Get k8s clusters
-      become: true
       ansible.builtin.command: kind get clusters
       register: kind_get_cluster
-      failed_when: (kind_get_cluster.rc not in [0, 1])
+      failed_when: kind_get_cluster.rc not in [0, 1]
       changed_when: false
-    - name: Create k8s cluster
-      become: true
+
+    - name: Create k8s cluster if not present
       ansible.builtin.command: kind create cluster --image kindest/node:v1.29.2 --kubeconfig=/tmp/kubeconfig
-      when: not 'kind' in kind_get_cluster.stdout
-      changed_when: false
+      when: "'kind' not in kind_get_cluster.stdout"
+
     - name: Create .kube directory
       ansible.builtin.file:
         path: "{{ ansible_user_dir }}/.kube"
         state: directory
         mode: '0755'
-    - name: Copy root kubeconfig file
-      become: true
+
+    - name: Copy kubeconfig for non-root user
       ansible.builtin.copy:
         remote_src: true
         src: /tmp/kubeconfig

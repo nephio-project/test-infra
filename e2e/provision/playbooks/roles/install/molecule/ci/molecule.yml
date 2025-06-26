@@ -47,6 +47,13 @@ platforms:
     tags:
       items:
         - allow-ssh
+    disks:
+      - auto_delete: true
+        boot: true
+        type: PERSISTENT
+        initialize_params:
+          source_image: projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts
+          disk_size_gb: 100
 provisioner:
   name: ansible
   playbooks:
