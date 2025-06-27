@@ -30,4 +30,4 @@ collections:
   - name: community.docker
     version: 3.10.4
   - name: ansible.posix
-    version: 1.5.4
+    version: 2.0.0
