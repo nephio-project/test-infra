@@ -63,6 +63,7 @@ nephio:
       - config-management-system
       - resource-group-system
       - flux-system
+      - argocd
   kpt:
     packages:
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
@@ -90,6 +91,11 @@ nephio:
         poll: 0
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: nephio/optional/fluxcd
+        version: main
+        async: 240
+        poll: 5
+      - repo_uri: "{{ nephio_catalog_repo_uri }}"
+        pkg: nephio/optional/argo-cd-full
         version: main
         async: 240
         poll: 5
