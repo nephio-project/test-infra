@@ -8,69 +8,34 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-- name: Bootstrap servers
+- name: Boostrap servers
   hosts: all
   become: true
-
   pre_tasks:
     - name: Wait for SSH to be available
       ansible.builtin.wait_for_connection:
         timeout: 300
-
     - name: Update Apt cache
-      ansible.builtin.apt:
-        update_cache: yes
+      ansible.builtin.raw: apt-get update --allow-releaseinfo-change
+      become: true
+      changed_when: false
       when: ansible_distribution == 'Ubuntu'
-
-    - name: Install pip
+    - name: Install pip package
+      become: true
       ansible.builtin.package:
         name: python3-pip
         state: present
       when: ansible_distribution == 'Ubuntu'
-
     - name: Install kubernetes python package
+      become: true
       ansible.builtin.pip:
         name: kubernetes==26.1.0
-
   roles:
     - andrewrothstein.kind
     - andrewrothstein.kubectl
     - role: andrewrothstein.docker_engine
       become: true
-
   tasks:
-    - name: Ensure growpart and resize tools are installed
-      ansible.builtin.apt:
-        name:
-          - cloud-guest-utils
-          - gdisk
-        state: present
-
-    - name: Check current partitions
-      ansible.builtin.command: lsblk
-      register: lsblk_output
-      changed_when: false
-
-    - name: Grow root partition
-      ansible.builtin.command: growpart /dev/sda 1
-      register: growpart_result
-      failed_when: growpart_result.rc not in [0, 1]
-      when: "'sda' in lsblk_output.stdout"
-
-    - name: Resize root filesystem
-      become: true
-      ansible.builtin.command: resize2fs /dev/sda1
-      when: growpart_result.rc in [0, 1]
-
-    - name: Check disk size after resize
-      ansible.builtin.command: df -h /
-      register: disk_size
-      changed_when: false
-
-    - name: Show root disk usage
-      ansible.builtin.debug:
-        var: disk_size.stdout_lines
-
     - name: Unarchive /tmp/kpt.tgz into /usr/local/bin/
       become: true
       become_user: root

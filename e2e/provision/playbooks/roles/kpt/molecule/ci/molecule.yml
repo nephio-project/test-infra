@@ -31,7 +31,7 @@ platforms:
   - name: int-jammy-vm-$POSFIX_NAME
     zone: us-central1-c
     machine_type: e2-standard-16
-    image: projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts
+    image: ubuntu-2204-large-disk-img
     tags:
       items:
         - allow-ssh
@@ -42,7 +42,6 @@ provisioner:
     converge: ${MOLECULE_PROJECT_DIRECTORY}/molecule/default/converge.yml
   env:
     ANSIBLE_LIBRARY: ${MOLECULE_PROJECT_DIRECTORY}/../../../playbooks/library
-    ANSIBLE_ROLES_PATH: ${MOLECULE_PROJECT_DIRECTORY}/../../../playbooks/roles
   inventory:
     group_vars:
       all:
