@@ -38,7 +38,7 @@ pytest==8.3.3
 pytest-testinfra==10.1.1
 python-vagrant==1.0.0
 pyyaml==6.0.2
-referencing==0.35.1
+referencing==0.36.2
 requests==2.32.3
 resolvelib==1.0.1
 rich==13.9.1
