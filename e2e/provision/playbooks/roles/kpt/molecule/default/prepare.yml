@@ -47,7 +47,7 @@
         state: present
 
     - name: Check current partitions
-      command: lsblk
+      ansible.builtin.command: lsblk
       register: lsblk_output
       changed_when: false
 
@@ -63,12 +63,12 @@
       when: growpart_result.rc in [0, 1]
 
     - name: Check disk size after resize
-      command: df -h /
+      ansible.builtin.command: df -h /
       register: disk_size
       changed_when: false
 
     - name: Show root disk usage
-      debug:
+      ansible.builtin.debug:
         var: disk_size.stdout_lines
 
     - name: Unarchive /tmp/kpt.tgz into /usr/local/bin/
