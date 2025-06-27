@@ -58,8 +58,18 @@
       when: "'sda' in lsblk_output.stdout"
 
     - name: Resize root filesystem
+      become: true
       ansible.builtin.command: resize2fs /dev/sda1
-      when: growpart_result.rc == 0
+      when: growpart_result.rc in [0, 1]
+
+    - name: Check disk size after resize
+      command: df -h /
+      register: disk_size
+      changed_when: false
+
+    - name: Show root disk usage
+      debug:
+        var: disk_size.stdout_lines
 
     - name: Unarchive /tmp/kpt.tgz into /usr/local/bin/
       become: true
