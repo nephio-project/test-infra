@@ -69,11 +69,11 @@ markupsafe==2.1.5
     # via jinja2
 mdurl==0.1.2
     # via markdown-it-py
-molecule==24.9.0
+molecule==25.6.0
     # via
     #   -r test-requirements.in
     #   molecule-plugins
-molecule-plugins[gce,vagrant]==23.5.3
+molecule-plugins[gce,vagrant]==23.7.0
     # via -r test-requirements.in
 mypy-extensions==1.0.0
     # via black
