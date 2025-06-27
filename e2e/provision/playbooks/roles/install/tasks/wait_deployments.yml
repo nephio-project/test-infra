@@ -32,11 +32,7 @@
     wait: true
     wait_condition:
       type: Available
-      status: "True"
-  register: deployment_result
-  until: deployment_result is succeeded
-  retries: 60
-  delay: 5
+      reason: MinimumReplicasAvailable
   loop: "{{ deployment_list.resources }}"
   loop_control:
     loop_var: resource
