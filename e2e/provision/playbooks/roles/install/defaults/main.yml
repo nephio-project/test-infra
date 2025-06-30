@@ -99,6 +99,6 @@ nephio_webui:
     namespace: nephio-webui
   kpt:
     package:
-      repo_uri: "{{ nephio_catalog_repo_uri }}"
+      repo_uri: "https://github.com/efiacor/porch-pkgs-catalog.git"
       pkg: nephio/optional/webui
       version: main
