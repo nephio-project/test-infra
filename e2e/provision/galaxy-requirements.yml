@@ -1,7 +1,7 @@
 ---
 # SPDX-license-identifier: Apache-2.0
 ##############################################################################
-# Copyright (c) 2023 The Nephio Authors.
+# Copyright (c) 2023-2025 The Nephio Authors.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Apache License, Version 2.0
 # which accompanies this distribution, and is available at
@@ -10,24 +10,24 @@
 
 roles:
   - name: andrewrothstein.docker_engine
-    version: v0.3.1
+    version: v0.3.2
   - name: andrewrothstein.podman
     version: v2.1.1
   - name: andrewrothstein.kind
-    version: v1.2.12
+    version: v1.2.14
   - name: andrewrothstein.kubectl
-    version: v1.4.0
+    version: v1.4.3
   - name: andrewrothstein.kpt
     version: 0.0.4
   - name: darkwizard242.cni
-    version: 2.5.0
+    version: 2.5.3
 
 collections:
   - name: community.general
-    version: 8.6.2
+    version: 11.0.0
   - name: kubernetes.core
-    version: 2.4.0
+    version: 6.0.0
   - name: community.docker
-    version: 3.10.4
+    version: 4.6.1
   - name: ansible.posix
-    version: 1.5.4
+    version: 1.6.2
