@@ -31,7 +31,7 @@ platforms:
   - name: int-jammy-vm-$POSFIX_NAME
     zone: us-central1-c
     machine_type: e2-standard-16
-    image: projects/pure-faculty-367518/global/images/ubuntu-2204-large-disk-img
+    image: projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts
     tags:
       items:
         - allow-ssh
