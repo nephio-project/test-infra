@@ -55,11 +55,10 @@
       ansible.builtin.command: kind create cluster --image kindest/node:v1.32.0 --kubeconfig=/tmp/kubeconfig
       when: not 'kind' in kind_get_cluster.stdout
       changed_when: false
-    - name: Increase open file limit inside kind-control-plane container
-      become: true
-      shell: |
-        docker exec kind-control-plane bash -c "ulimit -n 1048576 || true"
-      ignore_errors: true
+    # - name: Increase open file limit inside kind-control-plane container
+    #   become: true
+    #   ansible.builtin.command: docker exec kind-control-plane bash -c "ulimit -n 1048576 || true"
+    #   ignore_errors: true
     - name: Create .kube directory
       ansible.builtin.file:
         path: "{{ ansible_user_dir }}/.kube"
