@@ -8,6 +8,7 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
+
 scenario:
   name: ci
   test_sequence:
@@ -53,7 +54,7 @@ provisioner:
     prepare: ${MOLECULE_PROJECT_DIRECTORY}/../kpt/molecule/default/prepare.yml
     converge: ${MOLECULE_PROJECT_DIRECTORY}/molecule/default/converge.yml
   env:
-    ANSIBLE_LIBRARY: ${MOLECULE_PROJECT_DIRECTORY}/../../../playbooks/library
+    ANSIBLE_LIBRARY: ${MOLECULE_PROJECT_DIRECTORY}/../../library
 verifier:
   name: testinfra
   directory: ${MOLECULE_PROJECT_DIRECTORY}/molecule/default/tests
