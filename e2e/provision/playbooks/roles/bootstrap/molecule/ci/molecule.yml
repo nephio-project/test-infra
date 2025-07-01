@@ -58,9 +58,6 @@ provisioner:
     converge: ${MOLECULE_PROJECT_DIRECTORY}/molecule/default/converge.yml
   env:
     ANSIBLE_LIBRARY: ${MOLECULE_PROJECT_DIRECTORY}/../../../playbooks/library
-  config_options:
-    defaults:
-      roles_path: "${MOLECULE_PROJECT_DIRECTORY}/../../../playbooks/roles"
   inventory:
     group_vars:
       all:
