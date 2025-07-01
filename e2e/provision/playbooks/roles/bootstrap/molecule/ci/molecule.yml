@@ -13,7 +13,6 @@ dependency:
   options:
     role-file: ../../../galaxy-requirements.yml
     requirements-file: ../../../galaxy-requirements.yml
-    roles-path: ../../../playbooks/roles
 driver:
   name: gce
   project_id: pure-faculty-367518
@@ -59,6 +58,7 @@ provisioner:
     converge: ${MOLECULE_PROJECT_DIRECTORY}/molecule/default/converge.yml
   env:
     ANSIBLE_LIBRARY: ${MOLECULE_PROJECT_DIRECTORY}/../../../playbooks/library
+    ANSIBLE_ROLES_PATH: ${MOLECULE_PROJECT_DIRECTORY}/../../../playbooks/roles
   inventory:
     group_vars:
       all:
