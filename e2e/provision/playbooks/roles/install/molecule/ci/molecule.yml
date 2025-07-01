@@ -26,6 +26,7 @@ dependency:
   options:
     role-file: ../../../galaxy-requirements.yml
     requirements-file: ../../../galaxy-requirements.yml
+    roles-path: ../../../playbooks/roles
 driver:
   name: gce
   project_id: pure-faculty-367518
