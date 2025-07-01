@@ -57,8 +57,7 @@ provisioner:
     prepare: ${MOLECULE_PROJECT_DIRECTORY}/molecule/default/prepare.yml
     converge: ${MOLECULE_PROJECT_DIRECTORY}/molecule/default/converge.yml
   env:
-    ANSIBLE_LIBRARY: ${MOLECULE_PROJECT_DIRECTORY}/../../../playbooks/library
-    ANSIBLE_ROLES_PATH: ${MOLECULE_PROJECT_DIRECTORY}/../../../playbooks/roles
+    ANSIBLE_LIBRARY: ${MOLECULE_PROJECT_DIRECTORY}/../../library
   inventory:
     group_vars:
       all:
