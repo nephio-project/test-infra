@@ -2220,6 +2220,30 @@ periodics:
         - *satoken_volume
         - *sshkey_volume
 
+  - name: e2e-daily-ubuntu-jammy-argo
+    annotations:
+    labels:
+    cron: *cron_daily
+    skip_report: false
+    decorate: true
+    cluster: default
+    extra_refs: *nephio_test_infra_ref
+    spec:
+      containers:
+        - image: "nephio/e2e:latest"
+          command: *command_sh_c
+          args:
+            - |
+              set -eE; cd "$GOPATH/src/nephio_repo/test-infra/e2e/terraform"; trap 'terraform destroy -target module.latest-ubuntu-packer-image -auto-approve' EXIT;
+              terraform init && timeout 120m terraform apply -target module.latest-ubuntu-packer-image -var="e2e_type=argo" -auto-approve
+          volumeMounts:
+            - *satoken_mount
+            - *sshkey_mount
+          resources: *default_resources
+      volumes:
+        - *satoken_volume
+        - *sshkey_volume
+
   # Weekly jobs
   - name: e2e-weekly-ubuntu-jammy-kubeadm
     annotations:
