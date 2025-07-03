@@ -417,7 +417,7 @@ presubmits:
                 path: id_rsa
               - key: id_rsa.pub
                 path: id_rsa.pub
-  - name: e2e-argo-ubuntu-jammy
+  - name: e2e-argocd-ubuntu-jammy
     annotations:
     labels:
     run_if_changed: '^(e2e/tests/argocd/|e2e/lib/|e2e/e2e.sh|e2e/defaults.env)'
@@ -433,7 +433,7 @@ presubmits:
             - "-c"
             - |
               set -eE; cd "$(git rev-parse --show-toplevel)/e2e/terraform"; trap 'terraform destroy -target module.gcp-ubuntu-jammy -auto-approve' EXIT;
-              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -var="e2e_type=argo" -var="fail_fast=true" -auto-approve
+              terraform init && timeout 120m terraform apply -target module.gcp-ubuntu-jammy -var="e2e_type=argocd" -var="fail_fast=true" -auto-approve
           volumeMounts:
             - name: satoken
               mountPath: "/etc/satoken"
