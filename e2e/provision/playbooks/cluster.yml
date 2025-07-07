@@ -138,7 +138,7 @@
       become_user: root
       ansible.builtin.unarchive:
         remote_src: true
-        src: https://github.com/nephio-project/porch/releases/download/v1.4.0/porchctl_1.4.0_linux_amd64.tar.gz
+        src: https://github.com/nephio-project/porch/releases/download/dev/porchctl.tgz
         dest: /usr/local/bin/
         creates: /usr/local/bin/porchctl
     - name: Call porchctl version
