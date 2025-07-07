@@ -59,6 +59,7 @@ provisioner:
   env:
     ANSIBLE_LIBRARY: ${MOLECULE_PROJECT_DIRECTORY}/../../../playbooks/library
   inventory:
+    sources: ../../../inventory.ini
     group_vars:
       all:
         host_reqs:

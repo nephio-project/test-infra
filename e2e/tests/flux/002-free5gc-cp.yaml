@@ -15,7 +15,7 @@ spec:
   upstream:
     repo: catalog-workloads-free5gc
     package: free5gc-cp
-    workspaceName: main
+    workspaceName: ${BRANCH}
   downstream:
     repo: regional
     package: free5gc-cp

@@ -138,7 +138,7 @@
       become_user: root
       ansible.builtin.unarchive:
         remote_src: true
-        src: https://github.com/nephio-project/porch/releases/download/dev/porchctl.tgz
+        src: https://github.com/nephio-project/porch/releases/download/v1.4.0/porchctl_1.4.0_linux_amd64.tar.gz
         dest: /usr/local/bin/
         creates: /usr/local/bin/porchctl
     - name: Call porchctl version
@@ -170,7 +170,7 @@
         repo_uri: "{{ nephio_catalog_repo_uri }}"
         local_dest_directory: "{{ item.dest }}"
         pkg: "{{ item.pkg }}"
-        version: main
+        version: "{{ nephio_catalog_version }}"
         for_deployment: true
         context: "{{ k8s.context }}"
         kpt_async: 900

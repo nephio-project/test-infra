@@ -66,12 +66,12 @@ for nf in du cuup; do
     k8s_wait_ready "packagevariant" "oai-$nf"
 done
 
-porch_wait_published_packagerev "oai-ran-cuup" "edge" "packagevariant-1"
+porch_wait_published_packagerev "oai-ran-cuup" "edge" "$REVISION"
 kpt_wait_pkg "edge" "oai-ran-cuup" "nephio" "1800"
 k8s_wait_exists "nfdeployment" "cuup-edge" "$_edge_kubeconfig" "oai-ran-cuup"
 k8s_wait_ready_replicas "deployment" "oai-gnb-cu-up" "$_edge_kubeconfig" "oai-ran-cuup"
 
-porch_wait_published_packagerev "oai-ran-du" "edge" "packagevariant-1"
+porch_wait_published_packagerev "oai-ran-du" "edge" "$REVISION"
 kpt_wait_pkg "edge" "oai-ran-du" "nephio" "1800"
 k8s_wait_exists "nfdeployment" "du-edge" "$_edge_kubeconfig" "oai-ran-du"
 k8s_wait_ready_replicas "deployment" "oai-gnb-du" "$_edge_kubeconfig" "oai-ran-du"
