@@ -42,9 +42,9 @@ provisioner:
   env:
     ANSIBLE_LIBRARY: ${MOLECULE_PROJECT_DIRECTORY}/../../../playbooks/library
   inventory:
-    sources: ../../../inventory.ini
     group_vars:
       all:
+        nephio_catalog_version: main
         host_min_vcpu: 2
         host_min_cpu_ram: 1
 verifier:
