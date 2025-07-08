@@ -16,7 +16,7 @@ spec:
   upstream:
     repo: catalog-workloads-oai-ran
     package: pkg-example-du-bp
-    workspaceName: main
+    workspaceName: ${BRANCH}
   downstream:
     repo: edge
     package: oai-ran-du
@@ -33,7 +33,7 @@ spec:
   upstream:
     repo: catalog-workloads-oai-ran
     package: pkg-example-cuup-bp
-    workspaceName: main
+    workspaceName: ${BRANCH}
   downstream:
     repo: edge
     package: oai-ran-cuup

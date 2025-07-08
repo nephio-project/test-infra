@@ -152,7 +152,7 @@ resource "google_compute_instance" "e2e_instances" {
     inline = [
       "cd /home/${var.ansible_user}/test-infra/e2e/",
       "chmod +x e2e.sh",
-      "sudo -E FAIL_FAST=${var.nephio_e2e_fail_fast} MGMT_CLUSTER_TYPE=${var.nephio_mgmt_cluster_type} E2ETYPE=${var.nephio_e2e_type} NEPHIO_REPO_DIR=/home/${var.ansible_user}/test-infra NEPHIO_DEBUG=true NEPHIO_RUN_E2E=true NEPHIO_USER=${var.ansible_user} ./e2e.sh"
+      "sudo -E FAIL_FAST=${var.nephio_e2e_fail_fast} MGMT_CLUSTER_TYPE=${var.nephio_mgmt_cluster_type} E2ETYPE=${var.nephio_e2e_type} NEPHIO_REPO_DIR=/home/${var.ansible_user}/test-infra DEBUG=true NEPHIO_RUN_E2E=true NEPHIO_USER=${var.ansible_user} ./e2e.sh"
     ]
   }
 }

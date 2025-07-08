@@ -30,7 +30,6 @@ kind:
   enabled: true
 
 nephio_catalog_repo_uri: https://github.com/nephio-project/catalog.git
-nephio_catalog_revision: main
 
 gitea:
   enabled: true
@@ -46,7 +45,7 @@ gitea:
     packages:
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: distros/sandbox/gitea
-        version: "{{ nephio_catalog_revision }}"
+        version: "{{ nephio_catalog_version }}"
         async: 780
         poll: 0
 
@@ -59,7 +58,7 @@ resource_backend:
     packages:
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: nephio/optional/resource-backend
-        version: "{{ nephio_catalog_revision }}"
+        version: "{{ nephio_catalog_version }}"
         async: 780
         poll: 0
 
@@ -72,7 +71,7 @@ cert_manager:
     packages:
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: distros/sandbox/cert-manager
-        version: "{{ nephio_catalog_revision }}"
+        version: "{{ nephio_catalog_version }}"
         async: 660
         poll: 0
 
@@ -88,17 +87,17 @@ cluster_api:
     packages:
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: infra/capi/cluster-capi
-        version: "{{ nephio_catalog_revision }}"
+        version: "{{ nephio_catalog_version }}"
         async: 900
         poll: 5
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: infra/capi/cluster-capi-infrastructure-docker
-        version: "{{ nephio_catalog_revision }}"
+        version: "{{ nephio_catalog_version }}"
         async: 780
         poll: 5
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: infra/capi/cluster-capi-kind-docker-templates
-        version: "{{ nephio_catalog_revision }}"
+        version: "{{ nephio_catalog_version }}"
         async: 1500
         poll: 0
 
@@ -111,7 +110,7 @@ cluster_api_nonkind_k8s:
     packages:
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: infra/capi/cluster-capi-infrastructure-metal3
-        version: "{{ nephio_catalog_revision }}"
+        version: "{{ nephio_catalog_version }}"
         async: 1500
         poll: 0
 
@@ -124,11 +123,11 @@ metallb:
     packages:
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: distros/sandbox/metallb
-        version: "{{ nephio_catalog_revision }}"
+        version: "{{ nephio_catalog_version }}"
         async: 1020
         poll: 5
       - repo_uri: "{{ nephio_catalog_repo_uri }}"
         pkg: distros/sandbox/metallb-sandbox-config
-        version: "{{ nephio_catalog_revision }}"
+        version: "{{ nephio_catalog_version }}"
         async: 660
         poll: 0

@@ -52,6 +52,10 @@ provisioner:
   playbooks:
     prepare: ${MOLECULE_PROJECT_DIRECTORY}/../kpt/molecule/default/prepare.yml
     converge: ${MOLECULE_PROJECT_DIRECTORY}/molecule/default/converge.yml
+  inventory:
+    group_vars:
+      all:
+        nephio_catalog_version: main
   env:
     ANSIBLE_LIBRARY: ${MOLECULE_PROJECT_DIRECTORY}/../../../playbooks/library
 verifier:

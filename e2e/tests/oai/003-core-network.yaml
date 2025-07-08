@@ -16,7 +16,7 @@ spec:
   upstream:
     repo: oai-core-packages
     package: oai-nrf
-    workspaceName: main
+    workspaceName: ${BRANCH}
   downstream:
     repo: core
     package: oai-nrf
@@ -33,7 +33,7 @@ spec:
   upstream:
     repo: oai-core-packages
     package: oai-udm
-    workspaceName: main
+    workspaceName: ${BRANCH}
   downstream:
     repo: core
     package: oai-udm
@@ -50,7 +50,7 @@ spec:
   upstream:
     repo: oai-core-packages
     package: oai-ausf
-    workspaceName: main
+    workspaceName: ${BRANCH}
   downstream:
     repo: core
     package: oai-ausf
@@ -67,7 +67,7 @@ spec:
   upstream:
     repo: oai-core-packages
     package: oai-udr
-    workspaceName: main
+    workspaceName: ${BRANCH}
   downstream:
     repo: core
     package: oai-udr
@@ -84,7 +84,7 @@ spec:
   upstream:
     repo: oai-core-packages
     package: oai-amf
-    workspaceName: main
+    workspaceName: ${BRANCH}
   downstream:
     repo: core
     package: oai-amf
@@ -101,7 +101,7 @@ spec:
   upstream:
     repo: oai-core-packages
     package: oai-smf
-    workspaceName: main
+    workspaceName: ${BRANCH}
   downstream:
     repo: core
     package: oai-smf
@@ -118,7 +118,7 @@ spec:
   upstream:
     repo: oai-core-packages
     package: oai-upf-edge
-    workspaceName: main
+    workspaceName: ${BRANCH}
   downstream:
     repo: edge
     package: oai-upf

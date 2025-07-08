@@ -2,3 +2,4 @@
 .vagrant/
 *.bak
 *.pyc
+.vscode/*
