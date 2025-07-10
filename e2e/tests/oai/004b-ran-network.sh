@@ -39,19 +39,19 @@ function _wait_for_ran {
     timeout=600
 
     temp_file=$(mktemp)
-    kubectl logs -l app.kubernetes.io/name=oai-gnb-cu-cp --tail -1 -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" >temp_file
+    kubectl logs -l app.kubernetes.io/name=oai-cu-cp --tail -1 -n oai-ran-cucp -c cucp --kubeconfig "$kubeconfig" >temp_file
     while
         grep "$wait_msg" temp_file
         status=$?
         [[ $status != 0 ]]
     do
         if [[ $timeout -lt 0 ]]; then
-            kubectl logs -l app.kubernetes.io/name=oai-gnb-cu-cp -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" --tail 50
+            kubectl logs -l app.kubernetes.io/name=oai-cu-cp -n oai-ran-cucp -c cucp --kubeconfig "$kubeconfig" --tail 50
             error "Timed out waiting for $link_name link to be established"
         fi
         timeout=$((timeout - 5))
         sleep 5
-        kubectl logs -l app.kubernetes.io/name=oai-gnb-cu-cp --tail -1 -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" >temp_file
+        kubectl logs -l app.kubernetes.io/name=oai-cu-cp --tail -1 -n oai-ran-cucp -c cucp --kubeconfig "$kubeconfig" >temp_file
     done
     debug "timeout: $timeout"
     rm "${temp_file}"
@@ -69,12 +69,12 @@ done
 porch_wait_published_packagerev "oai-ran-cuup" "edge" "$REVISION"
 kpt_wait_pkg "edge" "oai-ran-cuup" "nephio" "1800"
 k8s_wait_exists "nfdeployment" "cuup-edge" "$_edge_kubeconfig" "oai-ran-cuup"
-k8s_wait_ready_replicas "deployment" "oai-gnb-cu-up" "$_edge_kubeconfig" "oai-ran-cuup"
+k8s_wait_ready_replicas "deployment" "oai-cu-up" "$_edge_kubeconfig" "oai-ran-cuup"
 
 porch_wait_published_packagerev "oai-ran-du" "edge" "$REVISION"
 kpt_wait_pkg "edge" "oai-ran-du" "nephio" "1800"
 k8s_wait_exists "nfdeployment" "du-edge" "$_edge_kubeconfig" "oai-ran-du"
-k8s_wait_ready_replicas "deployment" "oai-gnb-du" "$_edge_kubeconfig" "oai-ran-du"
+k8s_wait_ready_replicas "deployment" "oai-du" "$_edge_kubeconfig" "oai-ran-du"
 
 # Check if the E1Setup Request Response is okay between CU-CP and CU-UP
 _wait_for_ran "$_regional_kubeconfig" "Accepting new CU-UP ID" "E1"
