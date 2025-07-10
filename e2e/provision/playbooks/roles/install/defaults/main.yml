@@ -42,7 +42,7 @@ nephio_stock_repos:
   - name: oai-core-packages
     repo: https://github.com/OPENAIRINTERFACE/oai-packages.git
     directory: /
-    branch: main
+    branch: "{{ nephio_catalog_version }}"
   - name: catalog-workloads-oai-ran
     repo: "{{ nephio_catalog_repo_uri }}"
     directory: /workloads/oai

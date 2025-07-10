@@ -39,19 +39,19 @@ function _wait_for_ran {
     timeout=600
 
     temp_file=$(mktemp)
-    kubectl logs -l app.kubernetes.io/name=oai-gnb-cu-cp --tail -1 -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" >temp_file
+    kubectl logs -l app.kubernetes.io/name=oai-cu-cp --tail -1 -n oai-ran-cucp -c cucp --kubeconfig "$kubeconfig" >temp_file
     while
         grep "$wait_msg" temp_file
         status=$?
         [[ $status != 0 ]]
     do
         if [[ $timeout -lt 0 ]]; then
-            kubectl logs -l app.kubernetes.io/name=oai-gnb-cu-cp -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" --tail 50
+            kubectl logs -l app.kubernetes.io/name=oai-cu-cp -n oai-ran-cucp -c cucp --kubeconfig "$kubeconfig" --tail 50
             error "Timed out waiting for $link_name link to be established"
         fi
         timeout=$((timeout - 5))
         sleep 5
-        kubectl logs -l app.kubernetes.io/name=oai-gnb-cu-cp --tail -1 -n oai-ran-cucp -c gnbcucp --kubeconfig "$kubeconfig" >temp_file
+        kubectl logs -l app.kubernetes.io/name=oai-cu-cp --tail -1 -n oai-ran-cucp -c cucp --kubeconfig "$kubeconfig" >temp_file
     done
     debug "timeout: $timeout"
     rm "${temp_file}"
@@ -66,7 +66,7 @@ k8s_wait_ready "packagevariant" "oai-cucp"
 porch_wait_published_packagerev "oai-ran-cucp" "regional" "$REVISION"
 kpt_wait_pkg "regional" "oai-ran-cucp" "nephio" "1800"
 k8s_wait_exists "nfdeployment" "cucp-regional" "$_regional_kubeconfig" "oai-ran-cucp"
-k8s_wait_ready_replicas "deployment" "oai-gnb-cu-cp" "$_regional_kubeconfig" "oai-ran-cucp"
+k8s_wait_ready_replicas "deployment" "oai-cu-cp" "$_regional_kubeconfig" "oai-ran-cucp"
 
 # Check if the NGAPSetup Request Response is okay between AMF and CU-CP
 _wait_for_ran "$_regional_kubeconfig" "Received NGAP_REGISTER_GNB_CNF: associated AMF" "N2"
