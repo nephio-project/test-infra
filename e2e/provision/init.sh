@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-license-identifier: Apache-2.0
 ##############################################################################
-# Copyright (c) 2023 The Nephio Authors.
+# Copyright (c) 2023-2025 The Nephio Authors.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Apache License, Version 2.0
 # which accompanies this distribution, and is available at
@@ -73,7 +73,7 @@ BRANCH=${NEPHIO_BRANCH:-$(get_metadata nephio-test-infra-branch "main")}
 NEPHIO_USER=${NEPHIO_USER:-$(get_metadata nephio-user "${USER:-ubuntu}")}
 NEPHIO_CATALOG_REPO_URI=${NEPHIO_CATALOG_REPO_URI:-$(get_metadata nephio-catalog-repo-uri "https://github.com/nephio-project/catalog.git")}
 K8S_CONTEXT=${K8S_CONTEXT:-"kind-kind"}
-K8S_VERSION=${K8S_VERSION:-"v1.31.0"}
+K8S_VERSION=${K8S_VERSION:-"v1.32.0"}
 HOME=${NEPHIO_HOME:-/home/$NEPHIO_USER}
 REPO_DIR=${NEPHIO_REPO_DIR:-$HOME/test-infra}
 DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME:-""}

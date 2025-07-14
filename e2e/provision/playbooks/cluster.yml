@@ -1,7 +1,7 @@
 ---
 # SPDX-license-identifier: Apache-2.0
 ##############################################################################
-# Copyright (c) 2023 The Nephio Authors.
+# Copyright (c) 2023-2025 The Nephio Authors.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Apache License, Version 2.0
 # which accompanies this distribution, and is available at
@@ -40,7 +40,7 @@
     - name: Install kubernetes python package
       become: true
       ansible.builtin.pip:
-        name: kubernetes==26.1.0
+        name: kubernetes==33.1.0
       tags:
         - nonkind_k8s
     - name: Install Docker Engine
@@ -98,13 +98,13 @@
       tags:
         - always
       vars:
-        kpt_ver: '1.0.0-beta.49'
+        kpt_ver: '1.0.0-beta.57'
         kpt_checksums:
-          '1.0.0-beta.49':
-            linux_amd64: sha256:8de2996018992ea946c9002aa43c85250a78d9fa3eb1c8da24c7878d7d24b9b7
-            linux_arm64: sha256:18dfb4540eeed32d2bdded612b3aa678cee6fdcdb14813e184c1a54b4ca35b56
-            darwin_amd64: sha256:558c1b082a8f1221b88cf6728178076190adda58db84e129ffb40f1e2a462759
-            darwin_arm64: sha256:bbaa7c6b4c7af0f9cdda694476a9b3b8d9fdd8fba3c0c0ec49f4f26687a2527a
+          '1.0.0-beta.57':
+            linux_amd64: sha256:23fe84d3584573144c8c8feb7bd4bca813797001d97548e0f3009e409c0179d5
+            linux_arm64: sha256:3ea0ea9785895092c62fb42886a45bfa602fcfe4e5984f31952b690f231a5bcf
+            darwin_amd64: sha256:003bd8afb5927c2c0368d85be0e6e85398f1eb3f7ef9f23270f67eb079aff7b8
+            darwin_arm64: sha256:b9b6ab6b224358f09abe727165bef91341b23622b94d33fbde0dde1e57f91abd
     - name: Download CNI plugins
       ansible.builtin.include_role:
         name: darkwizard242.cni

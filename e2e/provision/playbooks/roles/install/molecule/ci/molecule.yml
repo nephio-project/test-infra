@@ -8,6 +8,7 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
+
 scenario:
   name: ci
   test_sequence:
@@ -57,7 +58,7 @@ provisioner:
       all:
         nephio_catalog_version: main
   env:
-    ANSIBLE_LIBRARY: ${MOLECULE_PROJECT_DIRECTORY}/../../../playbooks/library
+    ANSIBLE_LIBRARY: ${MOLECULE_PROJECT_DIRECTORY}/../../library
 verifier:
   name: testinfra
   directory: ${MOLECULE_PROJECT_DIRECTORY}/molecule/default/tests
