@@ -15,16 +15,16 @@ source "${E2EDIR:-$HOME/test-infra/e2e}/lib/_utils.sh"
 function porch_wait_published_packagerev {
     local pkg_name="$1"
     local repository="$2"
-    local workspacename="${3:-main}"
+    local revision="${3:-1}"
     local timeout=${4:-900}
     lapse=$timeout
     in_propose=0
 
-    info "looking for package published revision on $pkg_name"
+    info "looking for published package revision $pkg_name on $repository"
     local found=""
     while [[ $lapse -gt 0 ]]; do
         for pkg_rev in $(kubectl get packagerevisions -o jsonpath="{range .items[?(@.spec.packageName==\"$pkg_name\")]}{.metadata.name}{\"\\n\"}{end}"); do
-            if [ "$(kubectl get packagerevision "$pkg_rev" -o jsonpath='{.spec.repository}/{.spec.workspaceName}')" == "$repository/$workspacename" ]; then
+            if [ "$(kubectl get packagerevision "$pkg_rev" -o jsonpath='{.spec.repository}/{.spec.revision}')" == "$repository/$revision" ]; then
                 found=$pkg_rev
                 break
             fi

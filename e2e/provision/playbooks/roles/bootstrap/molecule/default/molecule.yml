@@ -44,6 +44,7 @@ provisioner:
   inventory:
     group_vars:
       all:
+        nephio_catalog_version: main
         host_min_vcpu: 2
         host_min_cpu_ram: 1
 verifier:

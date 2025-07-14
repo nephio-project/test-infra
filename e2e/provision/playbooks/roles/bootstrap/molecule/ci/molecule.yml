@@ -61,6 +61,7 @@ provisioner:
   inventory:
     group_vars:
       all:
+        nephio_catalog_version: main
         host_reqs:
           sandbox:
             vcpu: 2

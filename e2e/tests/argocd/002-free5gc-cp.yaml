@@ -1,7 +1,6 @@
----
 # SPDX-license-identifier: Apache-2.0
 ##############################################################################
-# Copyright (c) 2024 The Nephio Authors.
+# Copyright (c) 2025 The Nephio Authors.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Apache License, Version 2.0
 # which accompanies this distribution, and is available at
@@ -11,16 +10,14 @@
 apiVersion: config.porch.kpt.dev/v1alpha1
 kind: PackageVariant
 metadata:
-  name: oai-cucp
+  name: free5gc-control-plane
 spec:
   upstream:
-    repo: catalog-workloads-oai-ran
-    package: pkg-example-cucp-bp
+    repo: catalog-workloads-free5gc
+    package: free5gc-cp
     workspaceName: ${BRANCH}
   downstream:
     repo: regional
-    package: oai-ran-cucp
+    package: free5gc-cp
   annotations:
-    approval.nephio.org/policy: always
-  injectors:
-  - name: regional
+    approval.nephio.org/policy: initial

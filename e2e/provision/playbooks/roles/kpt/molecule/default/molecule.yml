@@ -31,6 +31,7 @@ provisioner:
   inventory:
     group_vars:
       all:
+        nephio_catalog_version: main
         local_dest_directory: /tmp/kpt-molecule-test/nginx
         pkg: package-examples/nginx
         repo_uri: https://github.com/GoogleContainerTools/kpt

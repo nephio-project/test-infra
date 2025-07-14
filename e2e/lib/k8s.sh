@@ -20,7 +20,7 @@ function k8s_apply {
     [ -f $kubeconfig ] || error "Kubeconfig file doesn't exist"
     [ -f $file ] || error "Resources file doesn't exist"
 
-    kubectl --kubeconfig $kubeconfig apply -f $file
+    envsubst < $file | kubectl --kubeconfig $kubeconfig apply -f -
 }
 
 # k8s_wait_exists() - Waits for the creation of a given kubernetes resource

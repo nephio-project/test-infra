@@ -16,7 +16,7 @@ spec:
   upstream:
     repo: oai-core-packages
     package: database
-    workspaceName: main
+    workspaceName: ${BRANCH}
   targets:
   - objectSelector:
       apiVersion: infra.nephio.org/v1alpha1

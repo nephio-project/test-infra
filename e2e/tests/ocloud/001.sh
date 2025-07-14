@@ -66,7 +66,7 @@ kind create cluster -n focom-cluster --kubeconfig $focom_kubecofig
 
 # Get the focom operator pkg
 tmp_pkg_path="/tmp/focom"
-kpt pkg get --for-deployment https://github.com/nephio-project/catalog.git/nephio/optional/focom-operator@origin/main $tmp_pkg_path
+kpt pkg get --for-deployment https://github.com/nephio-project/catalog.git/nephio/optional/focom-operator@$BRANCH $tmp_pkg_path
 # Apply it to the SMO cluster
 kubectl --kubeconfig $focom_kubecofig apply -f $tmp_pkg_path
 

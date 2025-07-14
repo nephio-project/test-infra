@@ -2,4 +2,4 @@
 .vagrant/
 *.bak
 *.pyc
-.vscode/settings.json
+.vscode/*
