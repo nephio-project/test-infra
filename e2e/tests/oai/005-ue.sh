@@ -45,7 +45,7 @@ function _wait_for_ue {
         [ $status != 0 ]
     do
         if [[ $timeout -lt 0 ]]; then
-            kubectl logs -l app.kubernetes.io/name=oai-nr-ue -n oai-ue -c nr-ue --kubeconfig "$kubeconfig" --tail 50
+            kubectl logs -l app.kubernetes.io/name=oai-nr-ue -n oai-ue -c nr-ue --kubeconfig "$kubeconfig" --tail -1
             error "Timed out waiting for $msg"
         fi
         timeout=$((timeout - 5))
@@ -57,7 +57,7 @@ function _wait_for_ue {
 }
 
 function _wait_for_ue_registration {
-    _wait_for_ue "$1" "REGISTRATION ACCEPT" "UE Registration"
+    _wait_for_ue "$1" "RegistrationComplete" "UE Registration"
 }
 
 function _wait_for_ue_pdu_session {
