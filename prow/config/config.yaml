@@ -2036,7 +2036,7 @@ defaults:
       memory: 2Gi
 
   cron_daily: &cron_daily "0 3 * * *"
-  cron_weekly: &cron_weekly "0 3 * * 0"
+  cron_weekly: &cron_weekly "0 2 * * 0"
 
   nephio_test_infra_ref: &nephio_test_infra_ref
     - org: nephio-project
