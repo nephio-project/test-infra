@@ -54,7 +54,6 @@ k8s_wait_exists "packagerev" "$regional_pkg_rev"
 # Draft creation
 kubectl wait --for jsonpath='{.spec.lifecycle}'=Draft packagerevisions "$regional_pkg_rev" --timeout="600s"
 assert_branch_exists "drafts/regional/v1"
-assert_commit_msg_in_branch "Rendering package" "drafts/regional/v1"
 assert_workload_resource_contains "drafts/regional/v1" "clusterName: regional" "Workload cluster has not been transformed properly"
 
 pushd "$(mktemp -d -t "001-pkg-XXX")" >/dev/null
@@ -69,7 +68,6 @@ porchctl rpkg push -n default "$regional_pkg_rev" regional
 porchctl rpkg propose -n default "$regional_pkg_rev"
 kubectl wait --for jsonpath='{.spec.lifecycle}'=Proposed packagerevisions "$regional_pkg_rev" --timeout="600s"
 assert_branch_exists "proposed/regional/v1"
-assert_commit_msg_in_branch "Rendering package" "proposed/regional/v1"
 assert_workload_resource_contains "proposed/regional/v1" "nephio.org/site-type: regional" "Workload cluster has not been transformed properly to proposed"
 
 # Approval

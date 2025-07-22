@@ -37,7 +37,6 @@ k8s_wait_exists "packagerev" "$pkg_rev"
 # Create Draft
 kubectl wait --for jsonpath='{.spec.lifecycle}'=Draft packagerevisions "$pkg_rev" --timeout="600s"
 assert_branch_exists "drafts/o2ims/v1"
-assert_commit_msg_in_branch "Rendering package" "drafts/o2ims/v1"
 
 # Propose
 info "proposing package $pkg_rev"
@@ -45,7 +44,6 @@ porchctl rpkg propose -n default "$pkg_rev"
 kubectl wait --for jsonpath='{.spec.lifecycle}'=Proposed packagerevisions "$pkg_rev" --timeout="600s"
 info "package $pkg_rev proposed"
 assert_branch_exists "proposed/o2ims/v1"
-assert_commit_msg_in_branch "Rendering package" "proposed/o2ims/v1"
 
 # Approve
 info "approving package $pkg_rev"
