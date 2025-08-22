@@ -98,6 +98,24 @@ source "googlecompute" "nephio-packer" {
 build {
   sources = ["source.googlecompute.nephio-packer"]
 
+  # ------------------------
+  # Fix apt / command-not-found issue
+  # ------------------------
+  provisioner "shell" {
+    inline = [
+      "echo '=============================================='",
+      "echo 'Fixing apt command-not-found issue...'",
+      "echo '=============================================='",
+      "sudo rm -rf /var/lib/apt/lists/*",
+      "sudo apt-get clean",
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get update || true",
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends apt-utils || true"
+    ]
+  }
+
+  # ------------------------
+  # File provisioners
+  # ------------------------
   provisioner "file" {
     source      = "../../../../test-infra"
     destination = "/home/${var.ssh_username}/test-infra"
@@ -116,6 +134,9 @@ build {
   EOF
   }
 
+  # ------------------------
+  # Shell provisioners for installation
+  # ------------------------
   provisioner "shell" {
     inline = [
       "echo '=============================================='",
