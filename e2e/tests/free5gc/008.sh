@@ -74,7 +74,25 @@ diff -r /tmp/$ws $ws || echo
 porch_wait_packagerev_ready "$upf_pkg_rev"
 
 info "Pushing $upf_pkg_rev update"
-porchctl rpkg push -n default "$upf_pkg_rev" $ws
+max_retries=5
+delay=10
+
+for i in $(seq 1 $max_retries); do
+  if porchctl rpkg push -n default "$upf_pkg_rev" "$ws"; then
+    echo "porchctl rpkg push succeeded on attempt $i"
+    break
+  else
+    echo "porchctl rpkg push failed on attempt $i"
+    if [[ $i -lt $max_retries ]]; then
+      echo "Retrying in $delay seconds..."
+      sleep $delay
+      delay=$((delay * 2)) # exponential backoff
+    else
+      echo "porchctl rpkg push failed after $max_retries attempts"
+      exit 1
+    fi
+  fi
+done
 
 info "Proposing $upf_pkg_rev update"
 porchctl rpkg propose -n default "$upf_pkg_rev"
