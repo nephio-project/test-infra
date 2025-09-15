@@ -34,6 +34,7 @@ kubeconfig="$HOME/.kube/config"
 # Set the new value for maxUplinkThroughput as a parameter
 new_capacity_value=${1:-20G}
 
+
 #Get the cluster kubeconfig
 info "Getting kubeconfig for edge01"
 cluster_kubeconfig=$(k8s_get_capi_kubeconfig "edge01")
