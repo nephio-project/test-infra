@@ -40,7 +40,6 @@ function _curl_workload_cluster_content {
 }
 
 # Assertions
-
 function assert_workload_resource_contains {
     assert_contains "$(_curl_workload_cluster_content "$1")" "$2" "$3"
 }
