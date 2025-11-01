@@ -47,7 +47,7 @@ None
       become_user: root
       ansible.builtin.unarchive:
         remote_src: true
-        src: https://github.com/GoogleContainerTools/kpt/releases/download/v1.0.0-beta.49/kpt_linux_amd64-1.0.0-beta.49.tar.gz
+        src: https://github.com/kptdev/kpt/releases/download/v1.0.0-beta.59/kpt_linux_amd64-1.0.0-beta.59.tar.gz
         dest: /usr/local/bin/
         creates: /usr/local/bin/kpt
     - name: Install Docker Engine

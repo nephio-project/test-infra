@@ -29,7 +29,7 @@ None
       become_user: root
       ansible.builtin.unarchive:
         remote_src: true
-        src: https://github.com/GoogleContainerTools/kpt/releases/download/v1.0.0-beta.49/kpt_linux_amd64-1.0.0-beta.49.tar.gz
+        src: https://github.com/kptdev/kpt/releases/download/v1.0.0-beta.59/kpt_linux_amd64-1.0.0-beta.59.tar.gz
         dest: /usr/local/bin/
         creates: /usr/local/bin/kpt
     - name: Install Docker Engine
@@ -41,7 +41,7 @@ None
       vars:
         local_dest_directory: /tmp/kpt-molecule-test/nginx
         pkg: package-examples/nginx
-        repo_uri: https://github.com/GoogleContainerTools/kpt
+        repo_uri: https://github.com/kptdev/kpt
         version: v0.9
         context: kind-kind
         kpt_async: 600
