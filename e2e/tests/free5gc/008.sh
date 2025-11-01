@@ -67,8 +67,8 @@ rm -rf /tmp/$ws
 cp -r $ws /tmp
 
 info "Updating the capacity"
-kpt fn eval --image gcr.io/kpt-fn/search-replace:v0.2.0 "$ws" -- by-path='spec.maxUplinkThroughput' by-file-path='**/capacity.yaml' put-value="$new_capacity_value"
-kpt fn eval --image gcr.io/kpt-fn/search-replace:v0.2.0 "$ws" -- by-path='spec.maxDownlinkThroughput' by-file-path='**/capacity.yaml' put-value="$new_capacity_value"
+kpt fn eval --image ghcr.io/kptdev/krm-functions-catalog/search-replace:v0.2 "$ws" -- by-path='spec.maxUplinkThroughput' by-file-path='**/capacity.yaml' put-value="$new_capacity_value"
+kpt fn eval --image ghcr.io/kptdev/krm-functions-catalog/search-replace:v0.2 "$ws" -- by-path='spec.maxDownlinkThroughput' by-file-path='**/capacity.yaml' put-value="$new_capacity_value"
 
 diff -r /tmp/$ws $ws || echo
 

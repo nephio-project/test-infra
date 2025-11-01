@@ -24,7 +24,7 @@ spec:
     approval.nephio.org/policy: initial
   pipeline:
     mutators:
-    - image: gcr.io/kpt-fn/set-labels:v0.2.0
+    - image: ghcr.io/kptdev/krm-functions-catalog/set-labels:v0.2
       configMap:
         nephio.org/site-type: core
         nephio.org/region: us-west1
@@ -48,7 +48,7 @@ spec:
         approval.nephio.org/policy: initial
       pipeline:
         mutators:
-        - image: gcr.io/kpt-fn/set-labels:v0.2.0
+        - image: ghcr.io/kptdev/krm-functions-catalog/set-labels:v0.2
           configMap:
             nephio.org/site-type: regional
             nephio.org/region: us-west1
@@ -72,7 +72,7 @@ spec:
         approval.nephio.org/policy: initial
       pipeline:
         mutators:
-        - image: gcr.io/kpt-fn/set-labels:v0.2.0
+        - image: ghcr.io/kptdev/krm-functions-catalog/set-labels:v0.2
           configMap:
             nephio.org/site-type: edge
             nephio.org/region: us-west1
