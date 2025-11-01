@@ -48,8 +48,8 @@ provisioner:
         nephio_catalog_version: main
         local_dest_directory: /tmp/kpt-molecule-test/nginx
         pkg: package-examples/nginx
-        repo_uri: https://github.com/GoogleContainerTools/kpt
-        version: v1.0.0-beta.57
+        repo_uri: https://github.com/kptdev/kpt
+        version: v1.0.0-beta.59
         context: kind-kind
         kpt_async: 600
         kpt_poll: 5
