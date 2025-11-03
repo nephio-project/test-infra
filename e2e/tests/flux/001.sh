@@ -57,7 +57,7 @@ assert_workload_resource_contains "drafts/regional/v1" "clusterName: regional" "
 pushd "$(mktemp -d -t "001-pkg-XXX")" >/dev/null
 trap popd EXIT
 porchctl rpkg pull -n default "$regional_pkg_rev" regional
-kpt fn eval --image "gcr.io/kpt-fn/set-labels:v0.2.0" regional -- "nephio.org/site-type=regional" "nephio.org/region=us-west1"
+kpt fn eval --image "ghcr.io/kptdev/krm-functions-catalog/set-labels:v0.2" regional -- "nephio.org/site-type=regional" "nephio.org/region=us-west1"
 assert_contains "$(cat regional/workload-cluster.yaml)" "nephio.org/region: us-west1" "Workload cluster doesn't have region label"
 
 porchctl rpkg push -n default "$regional_pkg_rev" regional

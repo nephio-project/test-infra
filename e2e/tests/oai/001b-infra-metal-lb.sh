@@ -46,8 +46,8 @@ function _define_ip_address_pool {
     pkg_rev=$(porchctl rpkg clone -n default "https://github.com/nephio-project/catalog.git/distros/sandbox/metallb-sandbox-config@$BRANCH" --repository mgmt-staging "$cluster-metallb-sandbox-config" | cut -f 1 -d ' ')
     k8s_wait_exists "packagerev" "$pkg_rev"
     porchctl rpkg pull -n default "$pkg_rev" "$cluster-metallb-sandbox-config"
-    kpt fn eval --image "gcr.io/kpt-fn/search-replace:v0.2" "$cluster-metallb-sandbox-config" -- 'by-path=spec.addresses[0]' "put-value=$cidr"
-    kpt fn eval --image "gcr.io/kpt-fn/set-annotations:v0.1.4" "$cluster-metallb-sandbox-config" -- "nephio.org/cluster-name=$cluster"
+    kpt fn eval --image "ghcr.io/kptdev/krm-functions-catalog/search-replace:v0.2" "$cluster-metallb-sandbox-config" -- 'by-path=spec.addresses[0]' "put-value=$cidr"
+    kpt fn eval --image "ghcr.io/kptdev/krm-functions-catalog/set-annotations:v0.1" "$cluster-metallb-sandbox-config" -- "nephio.org/cluster-name=$cluster"
 
     # Push changes
     porchctl rpkg push -n default "$pkg_rev" "$cluster-metallb-sandbox-config"
