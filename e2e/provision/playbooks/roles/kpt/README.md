@@ -4,7 +4,7 @@ This role gets, renders, initialializes and applies a given kpt package.
 
 ## Requirements
 
-* [Docker Container Engine](https://docs.docker.com/engine/install/). Recommended Ansible role: `andrewrothstein.docker_engine`
+* [Docker Container Engine](https://docs.docker.com/engine/install/). Recommended Ansible role: `geerlingguy.docker`
 * [kpt CLI](https://kpt.dev/installation/kpt-cli). Recommended Ansible role: `andrewrothstein.kpt`
 
 ## Role Variables
@@ -35,7 +35,7 @@ None
     - name: Install Docker Engine
       become: true
       ansible.builtin.include_role:
-        name: andrewrothstein.docker_engine
+        name: geerlingguy.docker
   roles:
     - role: kpt
       vars:

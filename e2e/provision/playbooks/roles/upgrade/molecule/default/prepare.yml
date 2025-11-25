@@ -32,7 +32,7 @@
   roles:
     - andrewrothstein.kind
     - andrewrothstein.kubectl
-    - role: andrewrothstein.docker_engine
+    - role: geerlingguy.docker
       become: true
   tasks:
     - name: Unarchive /tmp/kpt.tgz into /usr/local/bin/

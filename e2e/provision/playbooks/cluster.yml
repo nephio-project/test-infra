@@ -65,7 +65,7 @@
 
         - name: Install docker binaries
           ansible.builtin.include_role:
-            name: andrewrothstein.docker_engine
+            name: geerlingguy.docker
         - name: Grant Docker permissions to user
           ansible.builtin.user:
             name: "{{ ansible_user_id }}"

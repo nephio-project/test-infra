@@ -4,7 +4,7 @@ This role installs Nephio services on a target cluster.
 
 ## Requirements
 
-* [Docker Container Engine](https://docs.docker.com/engine/install/). Recommended Ansible role: `andrewrothstein.docker_engine`
+* [Docker Container Engine](https://docs.docker.com/engine/install/). Recommended Ansible role: `geerlingguy.docker`
 * [KinD CLI](https://kind.sigs.k8s.io/docs/user/quick-start/#installation). Recommended Ansible role: `andrewrothstein.kind`
 * [kpt CLI](https://kpt.dev/installation/kpt-cli). Recommended Ansible role: `andrewrothstein.kpt`
 
@@ -57,7 +57,7 @@ None
     - name: Install Docker Engine
       become: true
       ansible.builtin.include_role:
-        name: andrewrothstein.docker_engine
+        name: geerlingguy.docker
     - name: Install KinD command-line
       ansible.builtin.include_role:
         name: andrewrothstein.kind

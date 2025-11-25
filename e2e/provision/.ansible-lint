@@ -20,7 +20,7 @@ mock_modules:
 mock_roles:
   - andrewrothstein.kubectl
   - andrewrothstein.kind
-  - andrewrothstein.docker_engine
+  - geerlingguy.docker
   - andrewrothstein.podman
   - andrewrothstein.kpt
   - darkwizard242.cni
