@@ -66,6 +66,8 @@
         - name: Install docker binaries
           ansible.builtin.include_role:
             name: geerlingguy.docker
+        - name: Upgrade Docker to latest version
+          ansible.builtin.include_tasks: roles/bootstrap/tasks/upgrade-docker.yml
         - name: Grant Docker permissions to user
           ansible.builtin.user:
             name: "{{ ansible_user_id }}"
