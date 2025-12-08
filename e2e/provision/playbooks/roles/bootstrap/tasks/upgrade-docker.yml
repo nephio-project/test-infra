@@ -8,22 +8,22 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-- name: Upgrade Docker to latest version
+- name: Upgrade Docker to version supporting API 1.44+
   become: true
   ansible.builtin.package:
     name:
-      - docker-ce
-      - docker-ce-cli
+      - docker-ce=5:27.4.1-1~ubuntu.24.04~noble
+      - docker-ce-cli=5:27.4.1-1~ubuntu.24.04~noble
       - containerd.io
-    state: latest
+    state: present
   when: ansible_os_family == 'Debian'
 
-- name: Upgrade Docker to latest version (RedHat)
+- name: Upgrade Docker to version supporting API 1.44+ (RedHat)
   become: true
   ansible.builtin.dnf:
     name:
-      - docker-ce
-      - docker-ce-cli
+      - docker-ce-27.4.1
+      - docker-ce-cli-27.4.1
       - containerd.io
-    state: latest
+    state: present
   when: ansible_os_family == 'RedHat'
