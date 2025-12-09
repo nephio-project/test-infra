@@ -20,6 +20,14 @@ set -o nounset
 # shellcheck source=e2e/defaults.env
 source "$E2EDIR/defaults.env"
 
+focom_kubecofig="/tmp/focom-kubeconfig"
+
+function cleanup {
+    get_pod_logs "o2ims-operator" "o2ims" || true
+    get_pod_logs "focom-operator-controller-manager" "focom-operator-system" "$focom_kubecofig" || true
+}
+trap cleanup EXIT
+
 # shellcheck source=e2e/lib/k8s.sh
 source "${LIBDIR}/k8s.sh"
 
@@ -28,6 +36,9 @@ source "${LIBDIR}/capi.sh"
 
 # shellcheck source=e2e/lib/_assertions.sh
 source "${LIBDIR}/_assertions.sh"
+
+# shellcheck source=e2e/lib/_utils.sh
+source "${LIBDIR}/_utils.sh"
 
 
 # Clone the o2ims pkg
@@ -59,7 +70,6 @@ k8s_wait_exists "deployment" "o2ims-operator" "" "o2ims"
 kubectl rollout status deployment/o2ims-operator --namespace="o2ims" --timeout="600s"
 
 # Create the simulated SMO cluster
-focom_kubecofig="/tmp/focom-kubeconfig"
 kind create cluster -n focom-cluster --kubeconfig $focom_kubecofig
 
 # Get the focom operator pkg

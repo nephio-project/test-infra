@@ -36,3 +36,20 @@ function error {
 function _print_msg {
     echo "$(date +%H:%M:%S) - $1: $2"
 }
+
+# get_pod_logs() - Collect logs from pods of a deployment
+# Usage: get_pod_logs <deployment> <namespace> [kubeconfig]
+function get_pod_logs {
+    local deployment=$1
+    local namespace=$2
+    local kubeconfig=${3:-}
+    local kubectl_cmd="kubectl"
+    [[ -z "$kubeconfig" ]] || kubectl_cmd="kubectl --kubeconfig $kubeconfig"
+    
+    info "Collecting logs from deployment $deployment in $namespace namespace"
+    local selector=$($kubectl_cmd get deployment "$deployment" -n "$namespace" -o jsonpath='{.spec.selector.matchLabels}' | jq -r 'to_entries|map("\(.key)=\(.value)")|join(",")')
+    for pod in $($kubectl_cmd get pods -n "$namespace" -l "$selector" -o jsonpath='{.items[*].metadata.name}'); do
+        info "Logs from pod: $pod"
+        $kubectl_cmd logs -n "$namespace" "$pod" --all-containers=true --tail=100 || warn "Failed to get logs from $pod"
+    done
+}
