@@ -17,6 +17,6 @@ spec:
       downstream:
         package: free5gc-upf
       annotations:
-        approval.nephio.org/policy: initial
+        approval.nephio.org/policy: always
       injectors:
       - nameExpr: target.name

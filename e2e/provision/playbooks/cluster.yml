@@ -13,7 +13,7 @@
   vars:
     container_engine: docker
     clab:
-      version: 0.42.0
+      version: 0.54.1
       download_url: "https://github.com/srl-labs/containerlab/releases/download"
     proxy_env:
       http_proxy: "{{ lookup('ansible.builtin.env', 'http_proxy') }}"
