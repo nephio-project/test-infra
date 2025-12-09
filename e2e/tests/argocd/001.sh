@@ -12,6 +12,7 @@
 ## TEST-NAME: Deploy a ArgoCD specific workload cluster
 ##
 
+
 set -o pipefail
 set -o errexit
 set -o nounset

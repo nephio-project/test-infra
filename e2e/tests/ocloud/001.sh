@@ -12,6 +12,7 @@
 ## TEST-NAME: Deploy edge cluster via Focom and O2IMS Operators
 ##
 
+
 set -o pipefail
 set -o errexit
 set -o nounset
