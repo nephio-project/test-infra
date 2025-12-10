@@ -12,7 +12,6 @@
 ## TEST-NAME: Deploy a flux specific workload cluster
 ##
 
-
 set -o pipefail
 set -o errexit
 set -o nounset
