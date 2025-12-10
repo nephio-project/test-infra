@@ -71,8 +71,18 @@ tide:
     - do-not-merge/hold
     - do-not-merge/work-in-progress
     - do-not-merge/invalid-owners-file
-    orgs:
-    - nephio-project
+    repos:
+    - nephio-project/nephio-test-prow-project
+    - nephio-project/test-infra
+    - nephio-project/nephio
+    - nephio-project/api
+    - nephio-project/nephio-example-packages
+    - nephio-project/nephio-packages
+    - nephio-project/docs
+    - nephio-project/free5gc-packages
+    - nephio-project/free5gc
+    - nephio-project/kpt-backstage-plugins
+    - nephio-project/oai
   merge_method:
     nephio-project/nephio-test-prow-project: squash
     nephio-project/test-infra: squash
@@ -83,7 +93,6 @@ tide:
     nephio-project/docs: squash
     nephio-project/free5gc-packages: squash
     nephio-project/free5gc: squash
-    nephio-project/edge-status-aggregator: squash
     nephio-experimental: squash
 
 decorate_all_jobs: true
