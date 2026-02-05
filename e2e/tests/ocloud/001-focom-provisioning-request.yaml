@@ -48,5 +48,5 @@ spec:
     clusterName: edge
     labels:
       nephio.org/site-type: edge
-      nephio.org/region: europe-paris-west
+      nephio.org/region: europe-germany-west
       nephio.org/owner: nephio-o2ims
