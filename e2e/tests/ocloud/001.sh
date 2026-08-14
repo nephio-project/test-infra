@@ -29,6 +29,10 @@ source "${LIBDIR}/capi.sh"
 # shellcheck source=e2e/lib/_assertions.sh
 source "${LIBDIR}/_assertions.sh"
 
+RESDIR="$(mktemp -d -t ocloud-e2e-resources)"
+kpt pkg get --for-deployment \
+  "https://github.com/nephio-project/catalog.git/test-infra-resources/ocloud@${BRANCH}" \
+  "${RESDIR}"
 
 # Clone the o2ims pkg
 pkg_rev=$(porchctl rpkg clone -n default "https://github.com/nephio-project/catalog.git/nephio/optional/o2ims@$BRANCH" --repository mgmt o2ims | cut -f 1 -d ' ')

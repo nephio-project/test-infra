@@ -36,6 +36,12 @@ source "${LIBDIR}/porch.sh"
 # shellcheck source=e2e/lib/_assertions.sh
 source "${LIBDIR}/_assertions.sh"
 
+
+RESDIR="$(mktemp -d -t oai-e2e-resources)"
+kpt pkg get --for-deployment \
+  "https://github.com/nephio-project/catalog.git/test-infra-resources/oai@${BRANCH}" \
+  "${RESDIR}"
+
 declare -A clusters
 clusters=(
     ["core"]="172.18.16.0/20"
@@ -43,7 +49,7 @@ clusters=(
     ["edge"]="172.18.48.0/20"
 )
 
-k8s_apply "$TESTDIR/001-infra.yaml"
+k8s_apply "$RESDIR/001-infra.yaml"
 
 # Wait for cluster resources creation
 for cluster in "${!clusters[@]}"; do
@@ -70,10 +76,10 @@ done
 "$E2EDIR/provision/hacks/vlan-interfaces.sh"
 
 # Create network package variant
-k8s_apply "$TESTDIR/001-network.yaml"
+k8s_apply "$RESDIR/001-network.yaml"
 
 # Provide a secret for external backend connection
-k8s_apply "$TESTDIR/001-secret.yaml"
+k8s_apply "$RESDIR/001-secret.yaml"
 
 k8s_wait_ready "packagevariant" "network"
 kpt_wait_pkg "mgmt" "network"

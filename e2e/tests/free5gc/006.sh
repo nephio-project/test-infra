@@ -30,9 +30,14 @@ source "${LIBDIR}/kpt.sh"
 # shellcheck source=e2e/lib/porch.sh
 source "${LIBDIR}/porch.sh"
 
+RESDIR="$(mktemp -d -t free5gc-e2e-resources)"
+kpt pkg get --for-deployment \
+  "https://github.com/nephio-project/catalog.git/test-infra-resources/free5gc@${BRANCH}" \
+  "${RESDIR}"
+
 # apply both AMF and SMF so they both start processing
-k8s_apply "$TESTDIR/006-regional-free5gc-amf.yaml"
-k8s_apply "$TESTDIR/006-regional-free5gc-smf.yaml"
+k8s_apply "$RESDIR/006-regional-free5gc-amf.yaml"
+k8s_apply "$RESDIR/006-regional-free5gc-smf.yaml"
 
 cluster_kubeconfig=$(k8s_get_capi_kubeconfig "regional")
 

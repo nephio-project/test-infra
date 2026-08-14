@@ -30,8 +30,13 @@ source "${LIBDIR}/kpt.sh"
 # shellcheck source=e2e/lib/porch.sh
 source "${LIBDIR}/porch.sh"
 
-k8s_apply "$TESTDIR/002-database.yaml"
-k8s_apply "$TESTDIR/002-operators.yaml"
+RESDIR="$(mktemp -d -t oai-e2e-resources)"
+kpt pkg get --for-deployment \ 
+  "https://github.com/nephio-project/catalog.git/test-infra-resources/oai@${BRANCH}" \
+  "${RESDIR}"
+
+k8s_apply "$RESDIR/002-database.yaml"
+k8s_apply "$RESDIR/002-operators.yaml"
 
 for pkgvar in common-core-database cp-operators up-operators ran-operator-edge ran-operator-regional; do
     k8s_wait_ready "packagevariant" "oai-$pkgvar"

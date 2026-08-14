@@ -33,6 +33,11 @@ source "${LIBDIR}/porch.sh"
 # shellcheck source=e2e/lib/_assertions.sh
 source "${LIBDIR}/_assertions.sh"
 
+RESDIR="$(mktemp -d -t oai-e2e-resources)"
+kpt pkg get --for-deployment \
+  "https://github.com/nephio-project/catalog.git/test-infra-resources/oai@${BRANCH}" \
+  "${RESDIR}"
+
 function _wait_for_pfcp_session {
     local kubeconfig=$1
 
@@ -52,7 +57,7 @@ function _wait_for_pfcp_session {
 _core_kubeconfig="$(k8s_get_capi_kubeconfig "core")"
 _edge_kubeconfig="$(k8s_get_capi_kubeconfig "edge")"
 
-k8s_apply "$TESTDIR/003-core-network.yaml"
+k8s_apply "$RESDIR/003-core-network.yaml"
 
 for nf in nrf udm udr ausf amf smf; do
     k8s_wait_ready "packagevariant" "oai-$nf"

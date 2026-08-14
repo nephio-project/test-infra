@@ -30,7 +30,12 @@ source "${LIBDIR}/kpt.sh"
 # shellcheck source=e2e/lib/porch.sh
 source "${LIBDIR}/porch.sh"
 
-k8s_apply "$TESTDIR/005-edge-free5gc-upf.yaml"
+RESDIR="$(mktemp -d -t free5gc-e2e-resources)"
+kpt pkg get --for-deployment \
+  "https://github.com/nephio-project/catalog.git/test-infra-resources/free5gc@${BRANCH}" \
+  "${RESDIR}"
+
+k8s_apply "$RESDIR/005-edge-free5gc-upf.yaml"
 
 for cluster in "edge01" "edge02"; do
     k8s_wait_exists "packagevariant" "edge-free5gc-upf-${cluster}-free5gc-upf"
