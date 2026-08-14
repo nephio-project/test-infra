@@ -30,6 +30,11 @@ source "${LIBDIR}/kpt.sh"
 # shellcheck source=e2e/lib/porch.sh
 source "${LIBDIR}/porch.sh"
 
+RESDIR="$(mktemp -d -t oai-e2e-resources)"
+kpt pkg get --for-deployment \
+  "https://github.com/nephio-project/catalog.git/test-infra-resources/oai@${BRANCH}" \
+  "${RESDIR}"
+
 function _wait_for_ran {
     kubeconfig=$1
     wait_msg=$2
@@ -59,7 +64,7 @@ function _wait_for_ran {
 
 _regional_kubeconfig="$(k8s_get_capi_kubeconfig "regional")"
 
-k8s_apply "$TESTDIR/004a-ran-network.yaml"
+k8s_apply "$RESDIR/004a-ran-network.yaml"
 
 k8s_wait_ready "packagevariant" "oai-cucp"
 

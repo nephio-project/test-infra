@@ -30,7 +30,12 @@ source "${LIBDIR}/kpt.sh"
 # shellcheck source=e2e/lib/porch.sh
 source "${LIBDIR}/porch.sh"
 
-k8s_apply "$TESTDIR/004-free5gc-operator.yaml"
+RESDIR="$(mktemp -d -t free5gc-e2e-resources)"
+kpt pkg get --for-deployment \
+  "https://github.com/nephio-project/catalog.git/test-infra-resources/free5gc@${BRANCH}" \
+  "${RESDIR}"
+
+k8s_apply "$RESDIR/004-free5gc-operator.yaml"
 
 kubeconfig="$HOME/.kube/config"
 for cluster in $(kubectl get cl -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' --kubeconfig "$kubeconfig"); do

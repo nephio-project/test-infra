@@ -30,6 +30,11 @@ source "${LIBDIR}/kpt.sh"
 # shellcheck source=e2e/lib/porch.sh
 source "${LIBDIR}/porch.sh"
 
+RESDIR="$(mktemp -d -t oai-e2e-resources)"
+kpt pkg get --for-deployment \
+  "https://github.com/nephio-project/catalog.git/test-infra-resources/oai@${BRANCH}" \
+  "${RESDIR}"
+
 function _wait_for_ue {
     local kubeconfig=$1
     local log_msg=$2
@@ -64,7 +69,7 @@ function _wait_for_ue_pdu_session {
     _wait_for_ue "$1" "Interface oaitun_ue1 successfully configured" "PDU session"
 }
 
-k8s_apply "$TESTDIR/005-ue.yaml"
+k8s_apply "$RESDIR/005-ue.yaml"
 
 k8s_wait_ready "packagevariant" "oai-ue"
 porch_wait_published_packagerev "oai-ran-ue" "edge" "$REVISION"

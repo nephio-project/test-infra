@@ -30,7 +30,12 @@ source "${LIBDIR}/kpt.sh"
 # shellcheck source=e2e/lib/porch.sh
 source "${LIBDIR}/porch.sh"
 
-k8s_apply "$TESTDIR/002-free5gc-cp.yaml"
+RESDIR="$(mktemp -d -t argocd-e2e-resources)"
+kpt pkg get --for-deployment \
+  "https://github.com/nephio-project/catalog.git/test-infra-resources/argocd@${BRANCH}" \
+  "${RESDIR}"
+
+k8s_apply "$RESDIR/002-free5gc-cp.yaml"
 
 kubeconfig="$HOME/.kube/config"
 k8s_wait_exists "packagevariant" "free5gc-control-plane"

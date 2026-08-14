@@ -30,6 +30,11 @@ source "${LIBDIR}/k8s.sh"
 # shellcheck source=e2e/lib/porch.sh
 source "${LIBDIR}/porch.sh"
 
+RESDIR="$(mktemp -d -t free5gc-e2e-resources)"
+kpt pkg get --for-deployment \
+  "https://github.com/nephio-project/catalog.git/test-infra-resources/free5gc@${BRANCH}" \
+  "${RESDIR}"
+
 function _wait_for_uesimtun0 {
     kubeconfig="$1"
     pod_name="$2"
@@ -72,7 +77,7 @@ curl -v -d "@${TESTDIR}/007-subscriber.json" -H 'Token: admin' -H 'Content-Type:
 curl -s -X GET -H 'Token: admin' "http://${ip}:${port}/api/subscriber"
 
 # Deploy UERANSIM to edge01
-k8s_apply "$TESTDIR/007-edge01-ueransim.yaml"
+k8s_apply "$RESDIR/007-edge01-ueransim.yaml"
 k8s_wait_ready "packagevariant" "edge01-ueransim"
 porch_wait_published_packagerev "ueransim" "edge01" "$REVISION"
 edge01_kubeconfig=$(k8s_get_capi_kubeconfig "edge01")

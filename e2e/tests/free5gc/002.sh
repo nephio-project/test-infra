@@ -30,7 +30,12 @@ source "${LIBDIR}/kpt.sh"
 # shellcheck source=e2e/lib/capi.sh
 source "${LIBDIR}/capi.sh"
 
-k8s_apply "$TESTDIR/002-edge-clusters.yaml"
+RESDIR="$(mktemp -d -t free5gc-e2e-resources)"
+kpt pkg get --for-deployment \
+  "https://github.com/nephio-project/catalog.git/test-infra-resources/free5gc@${BRANCH}" \
+  "${RESDIR}"
+
+k8s_apply "$RESDIR/002-edge-clusters.yaml"
 
 # Wait for cluster resources creation
 for cluster in edge01 edge02; do
@@ -50,12 +55,11 @@ done
 
 # Configure VLAN interfaces
 "$E2EDIR/provision/hacks/vlan-interfaces.sh"
-
 # Create network package variant
-k8s_apply "$TESTDIR/002-network.yaml"
+k8s_apply "$RESDIR/002-network.yaml"
 
 # Provide a secret for external backend connection
-k8s_apply "$TESTDIR/002-secret.yaml"
+k8s_apply "$RESDIR/002-secret.yaml"
 
 k8s_wait_ready "packagevariant" "network"
 kpt_wait_pkg "mgmt" "network"
